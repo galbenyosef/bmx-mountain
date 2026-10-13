@@ -1,0 +1,45 @@
+{
+  "start": "https://wavedash.com/games/bmx-mountain",
+  "origin": "https://wavedash.com",
+  "gated": false,
+  "sessionRenewal": "per-page-load playKey (server-rendered on the game page) -> /embed shell on the per-build CDN host -> ~1 h gameplay JWT (Authorization: Bearer + X-Wd-Sw: jwt) for every build-host request; minted fresh by tools/update.mjs / tools/capture.mjs",
+  "gameHost": "https://mx73991psazdpp9w16acd1e6xd8fhq77-<fnv32(userId)>-<fnv32(gameBuildId)>.builds.wavedashcdn.com (per-user, per-build host; the capture was taken on a Node/anonymous host, files verified byte-identical via the logged-in browser host abc3e19d-884b3fbd and re-probed 2026-10-13: 79/79 identical)",
+  "requests": 80,
+  "fetched": 79,
+  "bytes": 18043450,
+  "paths": [
+    "index.html",
+    "embed",
+    "embed.js",
+    "embed.css",
+    "sw-embed.js",
+    "assets/index-gCVK5XnX.js",
+    "assets/horizon.worker-C1soCJoO.js",
+    "assets/cover.worker-DrUDywG9.js",
+    "assets/deerSkin.worker-DhQg8wxY.js",
+    "assets/natural.worker-i0ZaMPjG.js",
+    "tex/ (24 webp: 8 ground sets colour+normal, bark_pine/bark_birch colour+normal 1k, leaf_pine/leaf_aspen, wood_rough colour+normal)",
+    "sfx/ (45 wav: ride loops, ambience, impacts, water, human, UI clicks)"
+  ],
+  "unresolved": [],
+  "unreachable": [
+    { "status": 404, "path": "favicon.ico", "probes": 1, "note": "declared by browsers only; the build ships `<link rel=\"icon\" href=\"data:,\">` in index.html and no icon file" }
+  ],
+  "external": [
+    { "host": "convex-api.wavedash.com", "kind": "backend", "note": "Convex realtime backend for platform SDK state (presence/lobbies/cloud saves) — dynamic endpoints, never captured" },
+    { "host": "uploads.wavedash.com / ugc.wavedashcdn.com", "kind": "platform storage", "note": "UGC/cloud-save hosts referenced by the SDK (embed.js) — runtime-only endpoints" },
+    { "host": "o4510067032457216.ingest.us.sentry.io", "kind": "telemetry", "note": "SDK error reporting — runtime-only endpoint" },
+    { "host": "accounts.google.com", "kind": "auth", "note": "Google sign-in iframe on the platform page — platform chrome, outside the game closure" },
+    { "host": "build host /auth/token + /auth/refresh", "kind": "auth", "note": "dynamic JWT mint/refresh endpoints on the CDN host (POST/route shapes) — credentials, never captured" }
+  ],
+  "notes": [
+    "platform page (wavedash.com/games/bmx-mountain) = SvelteKit shell + GamePlayer; the game itself runs on the per-build builds.wavedashcdn.com host inside an iframe whose src carries the playKey + sdkconfig",
+    "the build host requires auth: without the gameplay JWT every build-file path 401s (except embed.js/embed.css/sw-embed.js, which are public)",
+    "the embed shell sets window.__WAVEDASH_GAME__ = { gcid, gbid, swPath, gameplayJwt } and embed.js document.write-boots index.html into #app; sw-embed.js authorizes every subsequent fetch",
+    "build metadata at capture (2026-10-13): gameBuild mn79ffen43qqtarbeqsw0mkvdh8g34bf, buildNumber 86, engine CUSTOM, entrypoint index.html, buildSizeBytes 17271305; captured closure 18043450 bytes = game payload + the public platform embed files (embed.js + embed.css + sw-embed.js ≈ 772 KB); a ~614 B remainder of the upload-side build record is not reachable by any runtime request",
+    "closure was network-log-led (browser session recorded while loading and playing: 80 unique CDN paths) and closed to fixpoint by tools/scan.mjs + the bundle's own tables (i$ terrain-texture set, Iz sfx table, worker URLs, bark/leaf/wood texture call sites); zero referenced-but-missing files",
+    "the entry chunk ships no dynamic import()/chunk table — the four module workers are the only split points, all captured",
+    "network logs: docs/network-log-2026-10-13.jsonl (platform page + game-tab session, merged and deduped)",
+    "platform noise: the game page occasionally answers a smaller client-rendered variant without the SSR bootstrap (observed once, 78864 B; retries return the 84.5 KB SSR payload) — the probe fails loudly and succeeds on retry"
+  ]
+}
