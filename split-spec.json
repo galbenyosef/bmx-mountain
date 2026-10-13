@@ -1,0 +1,1384 @@
+{
+  "project": "bmx-mountain",
+  "kind": "statement-aligned-slices",
+  "defaultFile": "src/assets__index-gCVK5XnX-01.js",
+  "note": "BMX MOUNTAIN (https://wavedash.com/games/bmx-mountain) is capture-class: a custom Vite production build served by the Wavedash platform from a per-build CDN host (the platform page server-renders playKey/gameCloudId/gameBuild and the game runs in an iframe whose src carries the playKey + sdkconfig; see tools/update.mjs). §0.4 fork-over-mirror was checked on 2026-10-13 — the page carries no link to a public source repo (platform SDK/library credits only; the bundle ships no LICENSE/source references of its own), so the mirror stands. Derived pipeline: capture → pinned prettier 3.9.6 (module API, default options, applied to a VERIFIED FIXED POINT — ≤4 passes, stability checked at derive time; every file stabilizes in one pass except the main game bundle, which needs two; never the CLI: it respects .gitignore and can silently echo its input) → readable/<name>.pretty.js|css per captured JS/CSS file (capture-root-relative name with nested dirs flattened with __; every pretty provably NOT byte-identical to its capture source) → statement-aligned slices src/<name>-NN.js of every APP chunk (top-level declaration boundaries only, ~250-350 line windows; oversized single declarations stay whole) with an exact 2-line provenance header. Every slice parses standalone under `node --input-type=module --check -` and round-trips byte-exact to its recorded readable line range. Vendor rule — wholeFile sections, never sliced: embed.js (Wavedash platform embed SDK), sw-embed.js (embed service worker), the Vite modulepreload polyfill and the bundled three.js r186 region inside assets/index-gCVK5XnX.js (core + node/TSL + WebGPURenderer/WebGLRenderer), content-anchored and guarded. Boundary note: the app's first slice is the tail of a minifier-merged `var` declaration whose head closes the three.js region, so it starts mid-declaration (flagged `boundary`; still byte-exact and standalone-parsing). Machinery/non-standalone parts are skipped or wholeFile sections, indexed but never sliced: the final export table of every module worker. Stylesheet rule — embed.css is wholeFile. Inline <script>/<style> scan: index.html carries one inline <style> block; `embed` (the dynamic platform shell, JWT-bearing) carries the inline window.__WAVEDASH_GAME__ boot script — twins + readable/index-inline-map.json (the `embed` bytes rotate per session: JWT/sessionToken, marked dynamic in the manifest). Binary payloads — tex/*.webp (24 textures) and sfx/*.wav (45 sounds) — are sha256-recorded notRendered: served byte-exact, never text-derived, never re-encoded. Identifiers in src/ are the bundle's own minified names — the rename campaign (PLAN §5) is recorded as an open task in README.md, not claimed here. Capture bytes are untouched by everything above; re-cut with `node tools/derive.mjs` after any capture refresh. `node tools/audit.js` is the gate.",
+  "renderOptions": {
+    "_default": "prettier 3.9.6, module API, default options, applied to a verified fixed point (≤4 passes; one pass stabilizes every file except the main game bundle, which needs two) — never the CLI: it respects .gitignore and can silently echo its input",
+    "js": "parser babel, no plugins",
+    "css": "parser css, no plugins",
+    "json": "parser json, no plugins (inline importmap blocks, if any)"
+  },
+  "source": "readable/: 8 JS pretties (5 app chunk(s) sliced, 2 vendor wholeFile) + 2 CSS pretties; src/: 75 statement-aligned slices across 5 app chunk(s); 0 skipped section(s); 7 wholeFile section(s); capture: 79 files under .upstream/manifest.json; notRendered: 69 binary payload(s) (tex/sfx); inline scan: embed, index.html (2 inline content block(s)).",
+  "inline": {
+    "scanned": [
+      "embed",
+      "index.html"
+    ],
+    "contentBlocks": 2,
+    "notRendered": 0,
+    "note": "index.html carries one inline <style> block; `embed` carries the platform's inline window.__WAVEDASH_GAME__ boot script (rotating JWT/sessionToken — the capture bytes are the snapshot, marked dynamic in the manifest). Twins + readable/index-inline-map.json record byte ranges and sha256 of both."
+  },
+  "sources": [
+    {
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js",
+      "capture": "assets/index-gCVK5XnX.js",
+      "captureKind": "file",
+      "captureSha256": "dc4eef5aa06fd5025daac1a50b9af00471cece76a8b6f9035e808babfa27f799",
+      "captureBytes": 1310254,
+      "prettyLines": 69249,
+      "prettyBytes": 2048444,
+      "prettyRecipe": "prettier 3.9.6 → fixed point (≤4 passes; stability verified at derive time)",
+      "tag": "assets__index-gCVK5XnX",
+      "slices": 71,
+      "derived": "readable + 71 statement-aligned slice(s) + 2 wholeFile region(s)"
+    },
+    {
+      "sourceFile": "readable/assets__cover.worker-DrUDywG9.pretty.js",
+      "capture": "assets/cover.worker-DrUDywG9.js",
+      "captureKind": "file",
+      "captureSha256": "4ef55e47ae281a2e979e91eb8c6e3fe31766942d6152a9c440914d0d66ff2a13",
+      "captureBytes": 20094,
+      "prettyLines": 1291,
+      "prettyBytes": 35517,
+      "prettyRecipe": "prettier 3.9.6 → fixed point (≤4 passes; stability verified at derive time)",
+      "tag": "assets__cover.worker-DrUDywG9",
+      "slices": 1,
+      "derived": "readable + 1 statement-aligned slice(s)"
+    },
+    {
+      "sourceFile": "readable/assets__deerSkin.worker-DhQg8wxY.pretty.js",
+      "capture": "assets/deerSkin.worker-DhQg8wxY.js",
+      "captureKind": "file",
+      "captureSha256": "428e24be784900fc340f28060e6ce0f3deb7d2846b0cb83ab384dde3208175ec",
+      "captureBytes": 11086,
+      "prettyLines": 823,
+      "prettyBytes": 22318,
+      "prettyRecipe": "prettier 3.9.6 → fixed point (≤4 passes; stability verified at derive time)",
+      "tag": "assets__deerSkin.worker-DhQg8wxY",
+      "slices": 1,
+      "derived": "readable + 1 statement-aligned slice(s)"
+    },
+    {
+      "sourceFile": "readable/assets__horizon.worker-C1soCJoO.pretty.js",
+      "capture": "assets/horizon.worker-C1soCJoO.js",
+      "captureKind": "file",
+      "captureSha256": "8eccfab3a8b2ca807c670736189e47a4377a9e3df19e951fe487bea14757af72",
+      "captureBytes": 3746,
+      "prettyLines": 226,
+      "prettyBytes": 6651,
+      "prettyRecipe": "prettier 3.9.6 → fixed point (≤4 passes; stability verified at derive time)",
+      "tag": "assets__horizon.worker-C1soCJoO",
+      "slices": 1,
+      "derived": "readable + 1 statement-aligned slice(s)"
+    },
+    {
+      "sourceFile": "readable/assets__natural.worker-i0ZaMPjG.pretty.js",
+      "capture": "assets/natural.worker-i0ZaMPjG.js",
+      "captureKind": "file",
+      "captureSha256": "b9fa17dd840f7651a0089e853cad176a40076ccecd8893559c4a21d318736ff1",
+      "captureBytes": 2682,
+      "prettyLines": 170,
+      "prettyBytes": 4823,
+      "prettyRecipe": "prettier 3.9.6 → fixed point (≤4 passes; stability verified at derive time)",
+      "tag": "assets__natural.worker-i0ZaMPjG",
+      "slices": 1,
+      "derived": "readable + 1 statement-aligned slice(s)"
+    },
+    {
+      "sourceFile": "readable/embed.pretty.js",
+      "capture": "embed.js",
+      "captureKind": "file",
+      "captureSha256": "0c3bd2aadac43a34b93f7b6b7ada0229f5a14b4dc2b4b3b5d3a49c3801dcee83",
+      "captureBytes": 732728,
+      "prettyLines": 23054,
+      "prettyBytes": 751778,
+      "tag": "embed",
+      "slices": 0,
+      "derived": "readable only (vendor bundle, wholeFile)",
+      "what": "Wavedash platform embed SDK"
+    },
+    {
+      "sourceFile": "readable/sw-embed.pretty.js",
+      "capture": "sw-embed.js",
+      "captureKind": "file",
+      "captureSha256": "c1eccb55a9af77957b44cbf49b0f68bff6fcacdb2de617ec9a85b33237121698",
+      "captureBytes": 30200,
+      "prettyLines": 1828,
+      "prettyBytes": 56753,
+      "tag": "sw-embed",
+      "slices": 0,
+      "derived": "readable only (vendor bundle, wholeFile)",
+      "what": "Wavedash embed service worker"
+    },
+    {
+      "sourceFile": "readable/embed.pretty.css",
+      "capture": "embed.css",
+      "captureKind": "file",
+      "captureSha256": "ab8c6ec5254b739d6b9270dbc3a79aacbcf56a5f353c2885ce5e870daf35d915",
+      "captureBytes": 9831,
+      "prettyLines": 636,
+      "prettyBytes": 10091,
+      "prettyRecipe": "prettier 3.9.6 → fixed point (≤4 passes; stability verified at derive time)",
+      "tag": "embed",
+      "slices": 0,
+      "derived": "readable only (stylesheet, wholeFile)"
+    },
+    {
+      "sourceFile": "readable/embed-inline-1.pretty.js",
+      "capture": "embed",
+      "captureKind": "inline-script",
+      "captureByteStart": 201,
+      "captureByteEnd": 1363,
+      "captureSha256": "d5a105c974a0f11e3e45800abf3165553b8fe7cc6652ddc233f64b877d3fd751",
+      "captureBytes": 1162,
+      "prettyLines": 7,
+      "prettyBytes": 1180,
+      "prettySha256": "51ae694c29020cbfdf2fdeebdfd553155c344451bfb018356ab4445fa1d3dd81",
+      "tag": "embed-inline-1",
+      "slices": 0,
+      "derived": "readable only (inline block, wholeFile)"
+    },
+    {
+      "sourceFile": "readable/index-inline-1.pretty.css",
+      "capture": "index.html",
+      "captureKind": "inline-style",
+      "captureByteStart": 282,
+      "captureByteEnd": 565,
+      "captureSha256": "32bf7e853b42d7a15718dbde7882923d91081929eb0b46223b71d4b14da546fb",
+      "captureBytes": 283,
+      "prettyLines": 22,
+      "prettyBytes": 356,
+      "prettySha256": "80b59cb20f210617d6428742baea83e062397a3f4b69743fbddf58021e6f68b3",
+      "tag": "index-inline-1",
+      "slices": 0,
+      "derived": "readable only (inline block, wholeFile)"
+    }
+  ],
+  "sections": [
+    {
+      "file": "assets__index-gCVK5XnX-polyfill-machinery.js",
+      "wholeFile": true,
+      "title": "assets__index-gCVK5XnX — Vite modulepreload polyfill (build machinery, whole-file, never sliced)",
+      "desc": "Lines 1-31 of readable/assets__index-gCVK5XnX.pretty.js: the Vite-generated modulepreload polyfill IIFE (`link[rel=modulepreload]` relList.supports check + MutationObserver fetch warm-up) — build machinery, not app code; indexed whole-file in readable/, never sliced.",
+      "note": "whole-file region (build machinery/vendor rule): indexed in readable/, never sliced",
+      "startLine": 1,
+      "endLine": 31,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-three-vendor.js",
+      "wholeFile": true,
+      "title": "assets__index-gCVK5XnX — bundled three.js r186 (core + node/TSL system + WebGPURenderer/WebGLRenderer) (vendor region, whole-file, never sliced)",
+      "desc": "Lines 32-47336 of readable/assets__index-gCVK5XnX.pretty.js: the bundled three.js r186 engine (math, color management, textures, geometries, materials, objects, nodes/TSL, WebGPURenderer, WebGLRenderer, RenderPipeline, `window.__THREE__` r186 registration) — vendor, not app code. The region ends where the last three-only declaration closes; the following app constants share a minifier-merged `var` declaration whose head closes that three.js code (recorded as the first app slice's `boundary` note). Vendor rule — indexed whole-file in readable/, never sliced or rewritten.",
+      "note": "whole-file region (build machinery/vendor rule): indexed in readable/, never sliced",
+      "startLine": 32,
+      "endLine": 47336,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-01.js",
+      "title": "assets__index-gCVK5XnX 01 — math",
+      "desc": "Boundary fragment: the tail of the minifier-merged `var` declaration whose head closes the three.js vendor region; starts mid-declaration by construction (parses standalone, round-trips byte-exact). Lines 47337-47502. Markers: math(10), max(2).",
+      "startLine": 47337,
+      "endLine": 47502,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-02.js",
+      "title": "assets__index-gCVK5XnX 02 — math",
+      "desc": "Lines 47503-47816. Markers: math(36), fbm(8).",
+      "startLine": 47503,
+      "endLine": 47816,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-03.js",
+      "title": "assets__index-gCVK5XnX 03 — math",
+      "desc": "Lines 47817-47906. Markers: math(23), floor(8).",
+      "startLine": 47817,
+      "endLine": 47906,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-04.js",
+      "title": "assets__index-gCVK5XnX 04 — math",
+      "desc": "Oversized single declaration (kept whole). Lines 47907-48286. Markers: math(46), kind(19).",
+      "startLine": 47907,
+      "endLine": 48286,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-05.js",
+      "title": "assets__index-gCVK5XnX 05 — math",
+      "desc": "Lines 48287-48614. Markers: math(23), path(14).",
+      "startLine": 48287,
+      "endLine": 48614,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-06.js",
+      "title": "assets__index-gCVK5XnX 06 — math",
+      "desc": "Lines 48615-48745. Markers: math(6), gap(3).",
+      "startLine": 48615,
+      "endLine": 48745,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-07.js",
+      "title": "assets__index-gCVK5XnX 07 — math",
+      "desc": "Oversized single declaration (kept whole). Lines 48746-49109. Markers: math(41), top(11).",
+      "startLine": 48746,
+      "endLine": 49109,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-08.js",
+      "title": "assets__index-gCVK5XnX 08 — math",
+      "desc": "Lines 49110-49392. Markers: math(16), index(9).",
+      "startLine": 49110,
+      "endLine": 49392,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-09.js",
+      "title": "assets__index-gCVK5XnX 09 — math",
+      "desc": "Oversized single declaration (kept whole). Lines 49393-49778. Markers: math(32), kind(23).",
+      "startLine": 49393,
+      "endLine": 49778,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-10.js",
+      "title": "assets__index-gCVK5XnX 10 — url",
+      "desc": "Lines 49779-49816. Markers: url(4), len(3).",
+      "startLine": 49779,
+      "endLine": 49816,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-11.js",
+      "title": "assets__index-gCVK5XnX 11 — math",
+      "desc": "Oversized single declaration (kept whole). Lines 49817-50182. Markers: math(31), trail(20).",
+      "startLine": 49817,
+      "endLine": 50182,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-12.js",
+      "title": "assets__index-gCVK5XnX 12 — math",
+      "desc": "Lines 50183-50288. Markers: math(6), settargetattime(3).",
+      "startLine": 50183,
+      "endLine": 50288,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-13.js",
+      "title": "assets__index-gCVK5XnX 13 — gain",
+      "desc": "Oversized single declaration (kept whole). Lines 50289-50953. Markers: gain(60), ctx(35).",
+      "startLine": 50289,
+      "endLine": 50953,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-14.js",
+      "title": "assets__index-gCVK5XnX 14 — faceforward",
+      "desc": "Lines 50954-51279. Markers: faceforward(2), inversesqrt(2).",
+      "startLine": 50954,
+      "endLine": 51279,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-15.js",
+      "title": "assets__index-gCVK5XnX 15 — mul",
+      "desc": "Lines 51280-51576. Markers: mul(1), mx_aastep(1).",
+      "startLine": 51280,
+      "endLine": 51576,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-16.js",
+      "title": "assets__index-gCVK5XnX 16 — console",
+      "desc": "Lines 51577-51910. Markers: console(12), count(12).",
+      "startLine": 51577,
+      "endLine": 51910,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-17.js",
+      "title": "assets__index-gCVK5XnX 17 — math",
+      "desc": "Lines 51911-52216. Markers: math(26), push(10).",
+      "startLine": 51911,
+      "endLine": 52216,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-18.js",
+      "title": "assets__index-gCVK5XnX 18 — math",
+      "desc": "Oversized single declaration (kept whole). Lines 52217-53522. Markers: math(163), vel(54).",
+      "startLine": 52217,
+      "endLine": 53522,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-19.js",
+      "title": "assets__index-gCVK5XnX 19 — add",
+      "desc": "Lines 53523-53849. Markers: add(40), clone(19).",
+      "startLine": 53523,
+      "endLine": 53849,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-20.js",
+      "title": "assets__index-gCVK5XnX 20 — mul",
+      "desc": "Lines 53850-54197. Markers: mul(53), math(47).",
+      "startLine": 53850,
+      "endLine": 54197,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-21.js",
+      "title": "assets__index-gCVK5XnX 21 — math",
+      "desc": "Lines 54198-54530. Markers: math(18), fillstyle(12).",
+      "startLine": 54198,
+      "endLine": 54530,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-22.js",
+      "title": "assets__index-gCVK5XnX 22 — math",
+      "desc": "Lines 54531-54869. Markers: math(34), helmet(17).",
+      "startLine": 54531,
+      "endLine": 54869,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-23.js",
+      "title": "assets__index-gCVK5XnX 23 — mul",
+      "desc": "Lines 54870-54937. Markers: mul(8), accent(7).",
+      "startLine": 54870,
+      "endLine": 54937,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-24.js",
+      "title": "assets__index-gCVK5XnX 24 — math",
+      "desc": "Oversized single declaration (kept whole). Lines 54938-55366. Markers: math(16), max(7).",
+      "startLine": 54938,
+      "endLine": 55366,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-25.js",
+      "title": "assets__index-gCVK5XnX 25 — clone",
+      "desc": "Lines 55367-55694. Markers: clone(27), addscaledvector(18).",
+      "startLine": 55367,
+      "endLine": 55694,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-26.js",
+      "title": "assets__index-gCVK5XnX 26 — mul",
+      "desc": "Lines 55695-56042. Markers: mul(20), head(12).",
+      "startLine": 55695,
+      "endLine": 56042,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-27.js",
+      "title": "assets__index-gCVK5XnX 27 — math",
+      "desc": "Lines 56043-56368. Markers: math(36), push(13).",
+      "startLine": 56043,
+      "endLine": 56368,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-28.js",
+      "title": "assets__index-gCVK5XnX 28 — copy",
+      "desc": "Lines 56369-56697. Markers: copy(40), math(36).",
+      "startLine": 56369,
+      "endLine": 56697,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-29.js",
+      "title": "assets__index-gCVK5XnX 29 — copy",
+      "desc": "Lines 56698-56906. Markers: copy(26), math(19).",
+      "startLine": 56698,
+      "endLine": 56906,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-30.js",
+      "title": "assets__index-gCVK5XnX 30 — math",
+      "desc": "Oversized single declaration (kept whole). Lines 56907-57388. Markers: math(39), crouch(17).",
+      "startLine": 56907,
+      "endLine": 57388,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-31.js",
+      "title": "assets__index-gCVK5XnX 31 — math",
+      "desc": "Lines 57389-57738. Markers: math(43), mode(18).",
+      "startLine": 57389,
+      "endLine": 57738,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-32.js",
+      "title": "assets__index-gCVK5XnX 32 — time",
+      "desc": "Lines 57739-57931. Markers: time(5), math(4).",
+      "startLine": 57739,
+      "endLine": 57931,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-33.js",
+      "title": "assets__index-gCVK5XnX 33 — math",
+      "desc": "Oversized single declaration (kept whole). Lines 57932-58382. Markers: math(28), chair(24).",
+      "startLine": 57932,
+      "endLine": 58382,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-34.js",
+      "title": "assets__index-gCVK5XnX 34 — mul",
+      "desc": "Lines 58383-58706. Markers: mul(42), add(21).",
+      "startLine": 58383,
+      "endLine": 58706,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-35.js",
+      "title": "assets__index-gCVK5XnX 35 — math",
+      "desc": "Lines 58707-59033. Markers: math(25), mul(25).",
+      "startLine": 58707,
+      "endLine": 59033,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-36.js",
+      "title": "assets__index-gCVK5XnX 36 — math",
+      "desc": "Lines 59034-59188. Markers: math(18), height(9).",
+      "startLine": 59034,
+      "endLine": 59188,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-37.js",
+      "title": "assets__index-gCVK5XnX 37 — bone",
+      "desc": "Lines 59189-59504. Markers: bone(28), part(28).",
+      "startLine": 59189,
+      "endLine": 59504,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-38.js",
+      "title": "assets__index-gCVK5XnX 38 — math",
+      "desc": "Lines 59505-59851. Markers: math(29), push(13).",
+      "startLine": 59505,
+      "endLine": 59851,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-39.js",
+      "title": "assets__index-gCVK5XnX 39 — math",
+      "desc": "Lines 59852-60196. Markers: math(34), add(11).",
+      "startLine": 59852,
+      "endLine": 60196,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-40.js",
+      "title": "assets__index-gCVK5XnX 40 — mul",
+      "desc": "Lines 60197-60264. Markers: mul(17), add(10).",
+      "startLine": 60197,
+      "endLine": 60264,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-41.js",
+      "title": "assets__index-gCVK5XnX 41 — options",
+      "desc": "Oversized single declaration (kept whole). Lines 60265-60767. Markers: options(39), branch(25).",
+      "startLine": 60265,
+      "endLine": 60767,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-42.js",
+      "title": "assets__index-gCVK5XnX 42 — mul",
+      "desc": "Lines 60768-61109. Markers: mul(44), toconst(33).",
+      "startLine": 60768,
+      "endLine": 61109,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-43.js",
+      "title": "assets__index-gCVK5XnX 43 — mul",
+      "desc": "Oversized single declaration (kept whole). Lines 61110-61769. Markers: mul(26), perm(21).",
+      "startLine": 61110,
+      "endLine": 61769,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-44.js",
+      "title": "assets__index-gCVK5XnX 44 — mul",
+      "desc": "Lines 61770-62080. Markers: mul(35), add(31).",
+      "startLine": 61770,
+      "endLine": 62080,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-45.js",
+      "title": "assets__index-gCVK5XnX 45 — math",
+      "desc": "Oversized single declaration (kept whole). Lines 62081-62619. Markers: math(19), camera(16).",
+      "startLine": 62081,
+      "endLine": 62619,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-46.js",
+      "title": "assets__index-gCVK5XnX 46 — mul",
+      "desc": "Lines 62620-62805. Markers: mul(65), add(37).",
+      "startLine": 62620,
+      "endLine": 62805,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-47.js",
+      "title": "assets__index-gCVK5XnX 47 — mul",
+      "desc": "Lines 62806-63147. Markers: mul(31), sun(15).",
+      "startLine": 62806,
+      "endLine": 63147,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-48.js",
+      "title": "assets__index-gCVK5XnX 48 — mul",
+      "desc": "Lines 63148-63303. Markers: mul(40), add(17).",
+      "startLine": 63148,
+      "endLine": 63303,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-49.js",
+      "title": "assets__index-gCVK5XnX 49 — math",
+      "desc": "Lines 63304-63629. Markers: math(16), push(11).",
+      "startLine": 63304,
+      "endLine": 63629,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-50.js",
+      "title": "assets__index-gCVK5XnX 50 — mul",
+      "desc": "Lines 63630-63945. Markers: mul(61), math(35).",
+      "startLine": 63630,
+      "endLine": 63945,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-51.js",
+      "title": "assets__index-gCVK5XnX 51 — push",
+      "desc": "Lines 63946-64286. Markers: push(32), math(13).",
+      "startLine": 63946,
+      "endLine": 64286,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-52.js",
+      "title": "assets__index-gCVK5XnX 52 — mul",
+      "desc": "Lines 64287-64328. Markers: mul(9), roughness(4).",
+      "startLine": 64287,
+      "endLine": 64328,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-53.js",
+      "title": "assets__index-gCVK5XnX 53 — board",
+      "desc": "Oversized single declaration (kept whole). Lines 64329-64783. Markers: board(24), stained(16).",
+      "startLine": 64329,
+      "endLine": 64783,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-54.js",
+      "title": "assets__index-gCVK5XnX 54 — float32array",
+      "desc": "Lines 64784-65006. Markers: float32array(7), push(7).",
+      "startLine": 64784,
+      "endLine": 65006,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-55.js",
+      "title": "assets__index-gCVK5XnX 55 — math",
+      "desc": "Lines 65007-65354. Markers: math(25), min(18).",
+      "startLine": 65007,
+      "endLine": 65354,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-56.js",
+      "title": "assets__index-gCVK5XnX 56 — mul",
+      "desc": "Lines 65355-65504. Markers: mul(57), add(21).",
+      "startLine": 65355,
+      "endLine": 65504,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-57.js",
+      "title": "assets__index-gCVK5XnX 57 — board",
+      "desc": "Oversized single declaration (kept whole). Lines 65505-65891. Markers: board(16), shade(14).",
+      "startLine": 65505,
+      "endLine": 65891,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-58.js",
+      "title": "assets__index-gCVK5XnX 58 — group",
+      "desc": "Lines 65892-66233. Markers: group(14), math(12).",
+      "startLine": 65892,
+      "endLine": 66233,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-59.js",
+      "title": "assets__index-gCVK5XnX 59 — buffer",
+      "desc": "Lines 66234-66314. Markers: buffer(7), bytelength(7).",
+      "startLine": 66234,
+      "endLine": 66314,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-60.js",
+      "title": "assets__index-gCVK5XnX 60 — arrived",
+      "desc": "Oversized single declaration (kept whole). Lines 66315-66773. Markers: arrived(28), peers(27).",
+      "startLine": 66315,
+      "endLine": 66773,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-61.js",
+      "title": "assets__index-gCVK5XnX 61 — sdk",
+      "desc": "Lines 66774-67116. Markers: sdk(20), lobby(17).",
+      "startLine": 66774,
+      "endLine": 67116,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-62.js",
+      "title": "assets__index-gCVK5XnX 62 — metadata",
+      "desc": "Lines 67117-67126. Markers: metadata(3), abs(1).",
+      "startLine": 67117,
+      "endLine": 67126,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-63.js",
+      "title": "assets__index-gCVK5XnX 63 — math",
+      "desc": "Oversized single declaration (kept whole). Lines 67127-67506. Markers: math(41), pos(14).",
+      "startLine": 67127,
+      "endLine": 67506,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-64.js",
+      "title": "assets__index-gCVK5XnX 64 — mul",
+      "desc": "Lines 67507-67840. Markers: mul(46), math(32).",
+      "startLine": 67507,
+      "endLine": 67840,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-65.js",
+      "title": "assets__index-gCVK5XnX 65 — mul",
+      "desc": "Lines 67841-67880. Markers: mul(7), setattribute(7).",
+      "startLine": 67841,
+      "endLine": 67880,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-66.js",
+      "title": "assets__index-gCVK5XnX 66 — action",
+      "desc": "Oversized single declaration (kept whole). Lines 67881-68446. Markers: action(28), keys(28).",
+      "startLine": 67881,
+      "endLine": 68446,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-67.js",
+      "title": "assets__index-gCVK5XnX 67 — block",
+      "desc": "Lines 68447-68503. Markers: block(2), columns(2).",
+      "startLine": 68447,
+      "endLine": 68503,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-68.js",
+      "title": "assets__index-gCVK5XnX 68 — shown",
+      "desc": "Oversized single declaration (kept whole). Lines 68504-68894. Markers: shown(16), root(10).",
+      "startLine": 68504,
+      "endLine": 68894,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-69.js",
+      "title": "assets__index-gCVK5XnX 69 — sdk",
+      "desc": "Lines 68895-68898. Markers: sdk(1), vte(1).",
+      "startLine": 68895,
+      "endLine": 68898,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-70.js",
+      "title": "assets__index-gCVK5XnX 70 — update",
+      "desc": "Lines 68899-69248. Markers: update(27), camera(10).",
+      "startLine": 68899,
+      "endLine": 69248,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__index-gCVK5XnX-71.js",
+      "title": "assets__index-gCVK5XnX 71 — hte",
+      "desc": "Lines 69249-69249. Markers: hte(1), wte(1).",
+      "startLine": 69249,
+      "endLine": 69249,
+      "sourceFile": "readable/assets__index-gCVK5XnX.pretty.js"
+    },
+    {
+      "file": "assets__cover.worker-DrUDywG9-01.js",
+      "title": "assets__cover.worker-DrUDywG9 01 — math",
+      "desc": "Oversized single declaration (kept whole). Lines 1-1291. Markers: math(149), max(31).",
+      "startLine": 1,
+      "endLine": 1291,
+      "sourceFile": "readable/assets__cover.worker-DrUDywG9.pretty.js"
+    },
+    {
+      "file": "assets__deerSkin.worker-DhQg8wxY-01.js",
+      "title": "assets__deerSkin.worker-DhQg8wxY 01 — math",
+      "desc": "Oversized single declaration (kept whole). Lines 1-823. Markers: math(62), bone(29).",
+      "startLine": 1,
+      "endLine": 823,
+      "sourceFile": "readable/assets__deerSkin.worker-DhQg8wxY.pretty.js"
+    },
+    {
+      "file": "assets__horizon.worker-C1soCJoO-01.js",
+      "title": "assets__horizon.worker-C1soCJoO 01 — math",
+      "desc": "Lines 1-226. Markers: math(30), fbm(11).",
+      "startLine": 1,
+      "endLine": 226,
+      "sourceFile": "readable/assets__horizon.worker-C1soCJoO.pretty.js"
+    },
+    {
+      "file": "assets__natural.worker-i0ZaMPjG-01.js",
+      "title": "assets__natural.worker-i0ZaMPjG 01 — math",
+      "desc": "Lines 1-170. Markers: math(18), fbm(8).",
+      "startLine": 1,
+      "endLine": 170,
+      "sourceFile": "readable/assets__natural.worker-i0ZaMPjG.pretty.js"
+    },
+    {
+      "file": "embed-vendor.js",
+      "wholeFile": true,
+      "title": "embed — Wavedash platform embed SDK (vendor runtime, whole-file, never sliced)",
+      "desc": "Lines 1-23054 of readable/embed.pretty.js: The Wavedash platform embed loader (embed.js) served at the build-host root next to /embed: it reads window.__WAVEDASH_GAME__ (gcid/gbid/swPath/gameplayJwt), mints the session token at /auth/token, installs /sw-embed.js, then document.write-boots the game's index.html into the #app element. Platform glue — vendor rule: indexed whole-file in readable/, never sliced or rewritten.",
+      "note": "whole-file (vendor rule): indexed in readable/, never sliced",
+      "startLine": 1,
+      "endLine": 23054,
+      "sourceFile": "readable/embed.pretty.js"
+    },
+    {
+      "file": "sw-embed-vendor.js",
+      "wholeFile": true,
+      "title": "sw-embed — Wavedash embed service worker (vendor, whole-file, never sliced)",
+      "desc": "Lines 1-1828 of readable/sw-embed.pretty.js: The platform's embed service worker: it authorizes every build-host fetch with `Authorization: Bearer <jwt>` + `X-Wd-Sw: jwt`, caches embed.js/embed.css and refreshes the gameplay JWT at /auth/refresh. Platform machinery — vendor rule: indexed whole-file in readable/, never sliced or rewritten.",
+      "note": "whole-file (vendor rule): indexed in readable/, never sliced",
+      "startLine": 1,
+      "endLine": 1828,
+      "sourceFile": "readable/sw-embed.pretty.js"
+    },
+    {
+      "file": "embed.css",
+      "wholeFile": true,
+      "title": "embed — stylesheet (whole-file, never sliced)",
+      "desc": "Lines 1-636 of readable/embed.pretty.css. Whole-file (stylesheet rule): the capture stylesheet is indexed whole in readable/, never sliced.",
+      "note": "whole-file (stylesheet, not sliced): CSS is indexed whole in readable/",
+      "startLine": 1,
+      "endLine": 636,
+      "sourceFile": "readable/embed.pretty.css"
+    },
+    {
+      "file": "embed-inline-1.js",
+      "wholeFile": true,
+      "title": "embed-inline-1 — inline script block (whole-file, never sliced)",
+      "desc": "Lines 1-7 of readable/embed-inline-1.pretty.js. Whole-file: the entry document's inline script block (1162 B at bytes 201-1363 of embed) is indexed whole and never sliced.",
+      "note": "whole-file (entry inline script block, not sliced)",
+      "startLine": 1,
+      "endLine": 7,
+      "sourceFile": "readable/embed-inline-1.pretty.js"
+    },
+    {
+      "file": "index-inline-1.css",
+      "wholeFile": true,
+      "title": "index-inline-1 — inline style block (whole-file, never sliced)",
+      "desc": "Lines 1-22 of readable/index-inline-1.pretty.css. Whole-file: the entry document's inline style block (283 B at bytes 282-565 of index.html) is indexed whole and never sliced.",
+      "note": "whole-file (entry inline style block, not sliced)",
+      "startLine": 1,
+      "endLine": 22,
+      "sourceFile": "readable/index-inline-1.pretty.css"
+    }
+  ],
+  "notRendered": [
+    {
+      "capture": "sfx/amb_birds.wav",
+      "kind": "audio",
+      "bytes": 1543544,
+      "sha256": "f477ff2a313285c7601ace22268faf9e1da500f070a80f5960af529a293d6784",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/amb_breeze.wav",
+      "kind": "audio",
+      "bytes": 960044,
+      "sha256": "0957723e150341d5f6aa680e50be96e1d36af2afbfc96ec4d4a2107bbaea8e60",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/amb_creek.wav",
+      "kind": "audio",
+      "bytes": 1102544,
+      "sha256": "49eac53cd6b6587a13525aa9e711281ec0399f39a209abd7b2ae66453c83e04c",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/bikefall0.wav",
+      "kind": "audio",
+      "bytes": 89126,
+      "sha256": "e678b06b5b96a1c27785a41e3e295dc166f18ba418d4242256039689051ac059",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/bikefall1.wav",
+      "kind": "audio",
+      "bytes": 89126,
+      "sha256": "4ac0dd1daebb397f2d3489c5e52d93a893ea5e0aa42b5be95c5b33fa31f8f74a",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/bikefall2.wav",
+      "kind": "audio",
+      "bytes": 89126,
+      "sha256": "3656466d704fc6218fb196a4c303388d27841183fd0b16b04325296e428ea8d9",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/bodyfall.wav",
+      "kind": "audio",
+      "bytes": 125288,
+      "sha256": "b247002337079fd2f73b3227f8192f944978f0e9ff574e39145fd6633c3aa1c3",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/breath.wav",
+      "kind": "audio",
+      "bytes": 268844,
+      "sha256": "9554eab185933927906d74740d4a5870f821553d5b96d9a838f5e203f999875c",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/chain_rattle.wav",
+      "kind": "audio",
+      "bytes": 256044,
+      "sha256": "d73c603d93ea1f1814e778fdbd3350b54ff1285218eb00886ea354460262e685",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/click0.wav",
+      "kind": "audio",
+      "bytes": 1102,
+      "sha256": "b4a019884cb5c5e5373a3472edc068170a18912937790cb302abe5f09a7d9560",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/click1.wav",
+      "kind": "audio",
+      "bytes": 1102,
+      "sha256": "6b6b5533e167bb00a73dc5b78f0fb8d53ef05e6e0c12e5e68bfb8af8ff26c471",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/click10.wav",
+      "kind": "audio",
+      "bytes": 1104,
+      "sha256": "dda8106a0608cf868a523bce0e431320c348263c23789b0103c20cea5d53224e",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/click11.wav",
+      "kind": "audio",
+      "bytes": 1104,
+      "sha256": "4ab1a982111003778e55272cea7d645e27e4bea811de5a32c06e89f6cf45e79a",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/click2.wav",
+      "kind": "audio",
+      "bytes": 1102,
+      "sha256": "39141499394ca079ddeae515ebb9b1a9bc94f1f17ad6c35ea796a91fbebcfbeb",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/click3.wav",
+      "kind": "audio",
+      "bytes": 1102,
+      "sha256": "326ea8b88ef35748d950bcef930cd62bdbb0a92915fe60f0af5c6c5fe0b9c11d",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/click4.wav",
+      "kind": "audio",
+      "bytes": 1102,
+      "sha256": "b5795c6688a6d422dca8379ebffd0ac90162528a6b4c4c20a19979ab7f4b9a37",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/click5.wav",
+      "kind": "audio",
+      "bytes": 1102,
+      "sha256": "661906b406eb0f23687b35aeb78b5c607e67db24b605897cefd576ed751e6de1",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/click6.wav",
+      "kind": "audio",
+      "bytes": 1102,
+      "sha256": "405cbfd41b356a66983e8d7f07c52bfbc429f11eaf21a0ea52b8b7b3b22ab1ca",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/click7.wav",
+      "kind": "audio",
+      "bytes": 1102,
+      "sha256": "70fa272646aeccf2da1ecebdbd58e5a1f107933f71fda080b4334d72d761b594",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/click8.wav",
+      "kind": "audio",
+      "bytes": 1102,
+      "sha256": "8ae9c3ea1c01a8f88ae5f5c0246d51d03fe08841f19470d7fa5a857fb6177324",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/click9.wav",
+      "kind": "audio",
+      "bytes": 1102,
+      "sha256": "8e25c5c95eb68205c2a373a9bc82d9a688bd0f91f3e2a1cd992723596c6c5a04",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/grunt0.wav",
+      "kind": "audio",
+      "bytes": 26504,
+      "sha256": "78763c3447ee1ae2cd56632bcf3bafc17d5b606f98ccee136344c73b419d7a52",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/grunt1.wav",
+      "kind": "audio",
+      "bytes": 26504,
+      "sha256": "53c85d8da4c3509094b2e886cfba91a7013a1039b39cb5a6d0e870e317ca440e",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/grunt2.wav",
+      "kind": "audio",
+      "bytes": 26504,
+      "sha256": "fb3497da26bbd7469f0d922d57f0b352635c7850090a4c27619a440be6a13332",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/hub_buzz.wav",
+      "kind": "audio",
+      "bytes": 486784,
+      "sha256": "580fb7d6de94d5f90e6612d50b02b984fbee41be28db462f1fe64bb25a509613",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/hurt0.wav",
+      "kind": "audio",
+      "bytes": 30912,
+      "sha256": "3b5f867409e78fbc497b76d5beba76b60e4c977d3dd2b12e086dd96cc71daba5",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/hurt1.wav",
+      "kind": "audio",
+      "bytes": 30912,
+      "sha256": "500a209c6d7e2e556290cb0c7ab98a4380ed44445d0efc5618bda4d947b4b89b",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/hurt2.wav",
+      "kind": "audio",
+      "bytes": 30912,
+      "sha256": "460cae90f4cc2dd53f5d627128476b36504ee2fbffcf3cb1d2b605b2dcd2d963",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/land0.wav",
+      "kind": "audio",
+      "bytes": 58434,
+      "sha256": "fc9b266430a8d4a2a79c32e16311f68035eea39bbf1d62468e4c5b634f3f00f4",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/land1.wav",
+      "kind": "audio",
+      "bytes": 58434,
+      "sha256": "de0f56a2b906855686a41a89a11a3316399b42b00cbafd492e8e18e5a6ad4d03",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/land2.wav",
+      "kind": "audio",
+      "bytes": 58434,
+      "sha256": "3c3ac2c734e5d4341b90a9be343308934b73e40f339930b4a846bac5403dec62",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/land3.wav",
+      "kind": "audio",
+      "bytes": 58432,
+      "sha256": "6f2dfc782ff5524888d855867c94a82d94acf132ec8c5121d61304eedf2f7fb6",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/land4.wav",
+      "kind": "audio",
+      "bytes": 58432,
+      "sha256": "932699b3ab7f74430ae727f6af93d6e55e75550cf706814d5f61868f40522019",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/pedal_chain.wav",
+      "kind": "audio",
+      "bytes": 495746,
+      "sha256": "a650a246d9b3f21ed227691777f6abb44ad56d08cfb789226890a0cb5412faea",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/roll_dirt.wav",
+      "kind": "audio",
+      "bytes": 960044,
+      "sha256": "b53d1e5781613b48aa0f2bbfbeb25f2f743b6ae71379106de0c49c90db28ca32",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/roll_gravel.wav",
+      "kind": "audio",
+      "bytes": 640044,
+      "sha256": "e6fa4ebf72db13dc08522b487994fed227336d1a2c33d85b42cec9e8c67739dc",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/skid_gravel.wav",
+      "kind": "audio",
+      "bytes": 140842,
+      "sha256": "3980f0280c17d5b78f478721067dee43e4ad80e3050f3ab2fd06752da4282b0f",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/slosh0.wav",
+      "kind": "audio",
+      "bytes": 29150,
+      "sha256": "5e3b77368bae17aa11a940acc8eda6ad624daaf7a963eb94cb81e9c2a4d4e5d2",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/slosh1.wav",
+      "kind": "audio",
+      "bytes": 29150,
+      "sha256": "a8a11b82bd9b166a421547995771cf411a3f700cd8ad277d97cd960851466611",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/slosh2.wav",
+      "kind": "audio",
+      "bytes": 29148,
+      "sha256": "b1b44eec6a61acd38a41ece6dd56a9f17b1765ee4551ae7ab2b5ae9ad183d9c8",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/splash0.wav",
+      "kind": "audio",
+      "bytes": 195848,
+      "sha256": "7344c38e141aeec307d6cae8c60d51634b3bb7d9774c9d572e5c8a00af819c30",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/splash1.wav",
+      "kind": "audio",
+      "bytes": 116468,
+      "sha256": "3dbf40a52a49cbd8b23fb08c8fc77a1a5764b5a9df8dc846fe2f76b65c9ce5fc",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/wood0.wav",
+      "kind": "audio",
+      "bytes": 62842,
+      "sha256": "5d8fec04a930d46e7ac55a192a63a53d28e5b81947a3b98f9cc6c668b0e12919",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/wood1.wav",
+      "kind": "audio",
+      "bytes": 62844,
+      "sha256": "0dee66da82f45b11d26fa518f55fd1de2858c39a8bcec09e2519d18f4081779a",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "sfx/wood2.wav",
+      "kind": "audio",
+      "bytes": 62844,
+      "sha256": "0e3a0d359bc14f88eec3a880b10466c6cd265c26c0e2d75b7fb3c5e9c50b63fd",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "tex/aerial_grass_rock_c.webp",
+      "kind": "texture",
+      "bytes": 221230,
+      "sha256": "d08b0fc72726f778bb2cfb79d7ee950c5d7beaa1e7a991633a4492cdafc228d5",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "tex/aerial_grass_rock_n.webp",
+      "kind": "texture",
+      "bytes": 300970,
+      "sha256": "41da089fe85f8f09c466cce87788474f36a09ebcd4dcbe773e302bb189f53e4e",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "tex/aerial_rocks_02_c.webp",
+      "kind": "texture",
+      "bytes": 304372,
+      "sha256": "7a5d5eefd4b7cb2d792c96046ada7d75220d851cf6192f1dfc384877a0e62c3d",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "tex/aerial_rocks_02_n.webp",
+      "kind": "texture",
+      "bytes": 401756,
+      "sha256": "4adf1c2f9906443a78d822dda6c7579f7f799e39ae17b3a9eaf93f2f7ee84c77",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "tex/bark_birch_color_1k.webp",
+      "kind": "texture",
+      "bytes": 232286,
+      "sha256": "8acc36909d17d706e0da810b5604ea0935cccf706b2904ebc06c7abd7b5441bd",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "tex/bark_birch_normal_1k.webp",
+      "kind": "texture",
+      "bytes": 390100,
+      "sha256": "8e0cb5d8092cfa47d9a50c8a6922653d59430a8ae384642b167bd2adbc8a4211",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "tex/bark_pine_color_1k.webp",
+      "kind": "texture",
+      "bytes": 227960,
+      "sha256": "2f03486f359b5fdfef6149fb419d8746299983947f16da9393ba3c9055301285",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "tex/bark_pine_normal_1k.webp",
+      "kind": "texture",
+      "bytes": 163394,
+      "sha256": "6a1e4199913043f53dc28fc5c938d8cc3f3a4e9f31d6e4da5617ac94f3880e80",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "tex/dirt_floor_c.webp",
+      "kind": "texture",
+      "bytes": 249794,
+      "sha256": "043cd2d291eb18fa97e32777aaf621b573440c51984bfe9101b452a39e288623",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "tex/dirt_floor_n.webp",
+      "kind": "texture",
+      "bytes": 374088,
+      "sha256": "9443a2aaf07f871cda274f2fa3ee9a739749cfefdbdd12c0f9d72248cee38bb4",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "tex/forest_floor_c.webp",
+      "kind": "texture",
+      "bytes": 443528,
+      "sha256": "ed676281d86ba2b6b92184571e6143d434630729391b97cb998dab5e6a6658da",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "tex/forest_floor_n.webp",
+      "kind": "texture",
+      "bytes": 481768,
+      "sha256": "289deb2ed30f82e36ee88123f956f1309b0a728fb12aad501e30d5a4eaa184bc",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "tex/forrest_ground_01_c.webp",
+      "kind": "texture",
+      "bytes": 321312,
+      "sha256": "1d0ea25ad3ad60b253ba958bf533699b47043a1cb0f12e7cd9197078d1229aa8",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "tex/forrest_ground_01_n.webp",
+      "kind": "texture",
+      "bytes": 506734,
+      "sha256": "6e1b15a67d4761b7a21332d65e8b0df3802a1989d26f9657fa462845af73c477",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "tex/leaf_aspen.webp",
+      "kind": "texture",
+      "bytes": 157318,
+      "sha256": "dc0fd4b7d74b3183a60058e97c50e01f4774d25da4e41a9a2838085a569ab557",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "tex/leaf_pine.webp",
+      "kind": "texture",
+      "bytes": 314948,
+      "sha256": "ca3399f85f19f3d3e459825a1ad249a0af8dd867d3dccb0cee85276c6adfe928",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "tex/mossy_rock_c.webp",
+      "kind": "texture",
+      "bytes": 332988,
+      "sha256": "d651c75ae487a13981e0206dfa89162398610583b5351379a2277c06b24c90c2",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "tex/mossy_rock_n.webp",
+      "kind": "texture",
+      "bytes": 277724,
+      "sha256": "50a0fe2812b90490b302af81f9bd0f0d004e21b71384d8a79b3010a9042af42c",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "tex/rocky_trail_c.webp",
+      "kind": "texture",
+      "bytes": 315276,
+      "sha256": "bc3222e2e809a6a4e48dbd1158ad682fec932cd37f056c323bf8522cb186ebed",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "tex/rocky_trail_n.webp",
+      "kind": "texture",
+      "bytes": 487008,
+      "sha256": "f2ffa2d59d98784dbd869a14d5f0105af36379544fc59260c9bf3bec6275a64f",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "tex/snow_02_c.webp",
+      "kind": "texture",
+      "bytes": 83732,
+      "sha256": "13a2edcff0e7302f68b72716e1aeb22458aa553229553d17a2c59886b24c11fa",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "tex/snow_02_n.webp",
+      "kind": "texture",
+      "bytes": 360560,
+      "sha256": "30c43ff4f99dc4fd39a7e0542cf88cb772508c4b913ce1fba5ea690296585a10",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "tex/wood_rough_color_1k.webp",
+      "kind": "texture",
+      "bytes": 294112,
+      "sha256": "8fb7375a53487923036eaeafaf22b65b2dd613eba652f98427c76af4a515c255",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    },
+    {
+      "capture": "tex/wood_rough_normal_1k.webp",
+      "kind": "texture",
+      "bytes": 364276,
+      "sha256": "7b8263d2343fc140772cc8677aa088d8f2afc96daa3778ec066f2804d6858387",
+      "rendered": false,
+      "reason": "binary payload — served byte-exact from the capture, sha256-recorded, never text-derived"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "note": "inline <script>/<style> byte ranges + sha256 inside the captured documents",
+  "blocks": [
+    {
+      "file": "readable/embed-inline-1.pretty.js",
+      "source": "embed",
+      "kind": "script",
+      "block": 1,
+      "byteStart": 201,
+      "byteEnd": 1363,
+      "captureBytes": 1162,
+      "captureSha256": "d5a105c974a0f11e3e45800abf3165553b8fe7cc6652ddc233f64b877d3fd751",
+      "prettyBytes": 1180,
+      "prettySha256": "51ae694c29020cbfdf2fdeebdfd553155c344451bfb018356ab4445fa1d3dd81"
+    },
+    {
+      "file": "readable/index-inline-1.pretty.css",
+      "source": "index.html",
+      "kind": "style",
+      "block": 1,
+      "byteStart": 282,
+      "byteEnd": 565,
+      "captureBytes": 283,
+      "captureSha256": "32bf7e853b42d7a15718dbde7882923d91081929eb0b46223b71d4b14da546fb",
+      "prettyBytes": 356,
+      "prettySha256": "80b59cb20f210617d6428742baea83e062397a3f4b69743fbddf58021e6f68b3"
+    }
+  ]
+}
