@@ -1,0 +1,323 @@
+{
+  "generated": "2026-10-13",
+  "origin": "https://wavedash.com/games/bmx-mountain",
+  "files": {
+    "assets/cover.worker-DrUDywG9.js": {
+      "bytes": 20094,
+      "sha256": "4ef55e47ae281a2e979e91eb8c6e3fe31766942d6152a9c440914d0d66ff2a13"
+    },
+    "assets/deerSkin.worker-DhQg8wxY.js": {
+      "bytes": 11086,
+      "sha256": "428e24be784900fc340f28060e6ce0f3deb7d2846b0cb83ab384dde3208175ec"
+    },
+    "assets/horizon.worker-C1soCJoO.js": {
+      "bytes": 3746,
+      "sha256": "8eccfab3a8b2ca807c670736189e47a4377a9e3df19e951fe487bea14757af72"
+    },
+    "assets/index-gCVK5XnX.js": {
+      "bytes": 1310254,
+      "sha256": "dc4eef5aa06fd5025daac1a50b9af00471cece76a8b6f9035e808babfa27f799"
+    },
+    "assets/natural.worker-i0ZaMPjG.js": {
+      "bytes": 2682,
+      "sha256": "b9fa17dd840f7651a0089e853cad176a40076ccecd8893559c4a21d318736ff1"
+    },
+    "embed": {
+      "bytes": 1776,
+      "sha256": "460c9a1c55244229e547e9e7836296936731d76d41a989e5ebd11616b38751ad",
+      "dynamic": true
+    },
+    "embed.css": {
+      "bytes": 9831,
+      "sha256": "ab8c6ec5254b739d6b9270dbc3a79aacbcf56a5f353c2885ce5e870daf35d915"
+    },
+    "embed.js": {
+      "bytes": 732728,
+      "sha256": "0c3bd2aadac43a34b93f7b6b7ada0229f5a14b4dc2b4b3b5d3a49c3801dcee83"
+    },
+    "index.html": {
+      "bytes": 737,
+      "sha256": "abc8cb4b2d7ee2e980683361a7ed47869bb2fc761a30ade09d46f49a80b49082"
+    },
+    "sfx/amb_birds.wav": {
+      "bytes": 1543544,
+      "sha256": "f477ff2a313285c7601ace22268faf9e1da500f070a80f5960af529a293d6784"
+    },
+    "sfx/amb_breeze.wav": {
+      "bytes": 960044,
+      "sha256": "0957723e150341d5f6aa680e50be96e1d36af2afbfc96ec4d4a2107bbaea8e60"
+    },
+    "sfx/amb_creek.wav": {
+      "bytes": 1102544,
+      "sha256": "49eac53cd6b6587a13525aa9e711281ec0399f39a209abd7b2ae66453c83e04c"
+    },
+    "sfx/bikefall0.wav": {
+      "bytes": 89126,
+      "sha256": "e678b06b5b96a1c27785a41e3e295dc166f18ba418d4242256039689051ac059"
+    },
+    "sfx/bikefall1.wav": {
+      "bytes": 89126,
+      "sha256": "4ac0dd1daebb397f2d3489c5e52d93a893ea5e0aa42b5be95c5b33fa31f8f74a"
+    },
+    "sfx/bikefall2.wav": {
+      "bytes": 89126,
+      "sha256": "3656466d704fc6218fb196a4c303388d27841183fd0b16b04325296e428ea8d9"
+    },
+    "sfx/bodyfall.wav": {
+      "bytes": 125288,
+      "sha256": "b247002337079fd2f73b3227f8192f944978f0e9ff574e39145fd6633c3aa1c3"
+    },
+    "sfx/breath.wav": {
+      "bytes": 268844,
+      "sha256": "9554eab185933927906d74740d4a5870f821553d5b96d9a838f5e203f999875c"
+    },
+    "sfx/chain_rattle.wav": {
+      "bytes": 256044,
+      "sha256": "d73c603d93ea1f1814e778fdbd3350b54ff1285218eb00886ea354460262e685"
+    },
+    "sfx/click0.wav": {
+      "bytes": 1102,
+      "sha256": "b4a019884cb5c5e5373a3472edc068170a18912937790cb302abe5f09a7d9560"
+    },
+    "sfx/click1.wav": {
+      "bytes": 1102,
+      "sha256": "6b6b5533e167bb00a73dc5b78f0fb8d53ef05e6e0c12e5e68bfb8af8ff26c471"
+    },
+    "sfx/click10.wav": {
+      "bytes": 1104,
+      "sha256": "dda8106a0608cf868a523bce0e431320c348263c23789b0103c20cea5d53224e"
+    },
+    "sfx/click11.wav": {
+      "bytes": 1104,
+      "sha256": "4ab1a982111003778e55272cea7d645e27e4bea811de5a32c06e89f6cf45e79a"
+    },
+    "sfx/click2.wav": {
+      "bytes": 1102,
+      "sha256": "39141499394ca079ddeae515ebb9b1a9bc94f1f17ad6c35ea796a91fbebcfbeb"
+    },
+    "sfx/click3.wav": {
+      "bytes": 1102,
+      "sha256": "326ea8b88ef35748d950bcef930cd62bdbb0a92915fe60f0af5c6c5fe0b9c11d"
+    },
+    "sfx/click4.wav": {
+      "bytes": 1102,
+      "sha256": "b5795c6688a6d422dca8379ebffd0ac90162528a6b4c4c20a19979ab7f4b9a37"
+    },
+    "sfx/click5.wav": {
+      "bytes": 1102,
+      "sha256": "661906b406eb0f23687b35aeb78b5c607e67db24b605897cefd576ed751e6de1"
+    },
+    "sfx/click6.wav": {
+      "bytes": 1102,
+      "sha256": "405cbfd41b356a66983e8d7f07c52bfbc429f11eaf21a0ea52b8b7b3b22ab1ca"
+    },
+    "sfx/click7.wav": {
+      "bytes": 1102,
+      "sha256": "70fa272646aeccf2da1ecebdbd58e5a1f107933f71fda080b4334d72d761b594"
+    },
+    "sfx/click8.wav": {
+      "bytes": 1102,
+      "sha256": "8ae9c3ea1c01a8f88ae5f5c0246d51d03fe08841f19470d7fa5a857fb6177324"
+    },
+    "sfx/click9.wav": {
+      "bytes": 1102,
+      "sha256": "8e25c5c95eb68205c2a373a9bc82d9a688bd0f91f3e2a1cd992723596c6c5a04"
+    },
+    "sfx/grunt0.wav": {
+      "bytes": 26504,
+      "sha256": "78763c3447ee1ae2cd56632bcf3bafc17d5b606f98ccee136344c73b419d7a52"
+    },
+    "sfx/grunt1.wav": {
+      "bytes": 26504,
+      "sha256": "53c85d8da4c3509094b2e886cfba91a7013a1039b39cb5a6d0e870e317ca440e"
+    },
+    "sfx/grunt2.wav": {
+      "bytes": 26504,
+      "sha256": "fb3497da26bbd7469f0d922d57f0b352635c7850090a4c27619a440be6a13332"
+    },
+    "sfx/hub_buzz.wav": {
+      "bytes": 486784,
+      "sha256": "580fb7d6de94d5f90e6612d50b02b984fbee41be28db462f1fe64bb25a509613"
+    },
+    "sfx/hurt0.wav": {
+      "bytes": 30912,
+      "sha256": "3b5f867409e78fbc497b76d5beba76b60e4c977d3dd2b12e086dd96cc71daba5"
+    },
+    "sfx/hurt1.wav": {
+      "bytes": 30912,
+      "sha256": "500a209c6d7e2e556290cb0c7ab98a4380ed44445d0efc5618bda4d947b4b89b"
+    },
+    "sfx/hurt2.wav": {
+      "bytes": 30912,
+      "sha256": "460cae90f4cc2dd53f5d627128476b36504ee2fbffcf3cb1d2b605b2dcd2d963"
+    },
+    "sfx/land0.wav": {
+      "bytes": 58434,
+      "sha256": "fc9b266430a8d4a2a79c32e16311f68035eea39bbf1d62468e4c5b634f3f00f4"
+    },
+    "sfx/land1.wav": {
+      "bytes": 58434,
+      "sha256": "de0f56a2b906855686a41a89a11a3316399b42b00cbafd492e8e18e5a6ad4d03"
+    },
+    "sfx/land2.wav": {
+      "bytes": 58434,
+      "sha256": "3c3ac2c734e5d4341b90a9be343308934b73e40f339930b4a846bac5403dec62"
+    },
+    "sfx/land3.wav": {
+      "bytes": 58432,
+      "sha256": "6f2dfc782ff5524888d855867c94a82d94acf132ec8c5121d61304eedf2f7fb6"
+    },
+    "sfx/land4.wav": {
+      "bytes": 58432,
+      "sha256": "932699b3ab7f74430ae727f6af93d6e55e75550cf706814d5f61868f40522019"
+    },
+    "sfx/pedal_chain.wav": {
+      "bytes": 495746,
+      "sha256": "a650a246d9b3f21ed227691777f6abb44ad56d08cfb789226890a0cb5412faea"
+    },
+    "sfx/roll_dirt.wav": {
+      "bytes": 960044,
+      "sha256": "b53d1e5781613b48aa0f2bbfbeb25f2f743b6ae71379106de0c49c90db28ca32"
+    },
+    "sfx/roll_gravel.wav": {
+      "bytes": 640044,
+      "sha256": "e6fa4ebf72db13dc08522b487994fed227336d1a2c33d85b42cec9e8c67739dc"
+    },
+    "sfx/skid_gravel.wav": {
+      "bytes": 140842,
+      "sha256": "3980f0280c17d5b78f478721067dee43e4ad80e3050f3ab2fd06752da4282b0f"
+    },
+    "sfx/slosh0.wav": {
+      "bytes": 29150,
+      "sha256": "5e3b77368bae17aa11a940acc8eda6ad624daaf7a963eb94cb81e9c2a4d4e5d2"
+    },
+    "sfx/slosh1.wav": {
+      "bytes": 29150,
+      "sha256": "a8a11b82bd9b166a421547995771cf411a3f700cd8ad277d97cd960851466611"
+    },
+    "sfx/slosh2.wav": {
+      "bytes": 29148,
+      "sha256": "b1b44eec6a61acd38a41ece6dd56a9f17b1765ee4551ae7ab2b5ae9ad183d9c8"
+    },
+    "sfx/splash0.wav": {
+      "bytes": 195848,
+      "sha256": "7344c38e141aeec307d6cae8c60d51634b3bb7d9774c9d572e5c8a00af819c30"
+    },
+    "sfx/splash1.wav": {
+      "bytes": 116468,
+      "sha256": "3dbf40a52a49cbd8b23fb08c8fc77a1a5764b5a9df8dc846fe2f76b65c9ce5fc"
+    },
+    "sfx/wood0.wav": {
+      "bytes": 62842,
+      "sha256": "5d8fec04a930d46e7ac55a192a63a53d28e5b81947a3b98f9cc6c668b0e12919"
+    },
+    "sfx/wood1.wav": {
+      "bytes": 62844,
+      "sha256": "0dee66da82f45b11d26fa518f55fd1de2858c39a8bcec09e2519d18f4081779a"
+    },
+    "sfx/wood2.wav": {
+      "bytes": 62844,
+      "sha256": "0e3a0d359bc14f88eec3a880b10466c6cd265c26c0e2d75b7fb3c5e9c50b63fd"
+    },
+    "sw-embed.js": {
+      "bytes": 30200,
+      "sha256": "c1eccb55a9af77957b44cbf49b0f68bff6fcacdb2de617ec9a85b33237121698"
+    },
+    "tex/aerial_grass_rock_c.webp": {
+      "bytes": 221230,
+      "sha256": "d08b0fc72726f778bb2cfb79d7ee950c5d7beaa1e7a991633a4492cdafc228d5"
+    },
+    "tex/aerial_grass_rock_n.webp": {
+      "bytes": 300970,
+      "sha256": "41da089fe85f8f09c466cce87788474f36a09ebcd4dcbe773e302bb189f53e4e"
+    },
+    "tex/aerial_rocks_02_c.webp": {
+      "bytes": 304372,
+      "sha256": "7a5d5eefd4b7cb2d792c96046ada7d75220d851cf6192f1dfc384877a0e62c3d"
+    },
+    "tex/aerial_rocks_02_n.webp": {
+      "bytes": 401756,
+      "sha256": "4adf1c2f9906443a78d822dda6c7579f7f799e39ae17b3a9eaf93f2f7ee84c77"
+    },
+    "tex/bark_birch_color_1k.webp": {
+      "bytes": 232286,
+      "sha256": "8acc36909d17d706e0da810b5604ea0935cccf706b2904ebc06c7abd7b5441bd"
+    },
+    "tex/bark_birch_normal_1k.webp": {
+      "bytes": 390100,
+      "sha256": "8e0cb5d8092cfa47d9a50c8a6922653d59430a8ae384642b167bd2adbc8a4211"
+    },
+    "tex/bark_pine_color_1k.webp": {
+      "bytes": 227960,
+      "sha256": "2f03486f359b5fdfef6149fb419d8746299983947f16da9393ba3c9055301285"
+    },
+    "tex/bark_pine_normal_1k.webp": {
+      "bytes": 163394,
+      "sha256": "6a1e4199913043f53dc28fc5c938d8cc3f3a4e9f31d6e4da5617ac94f3880e80"
+    },
+    "tex/dirt_floor_c.webp": {
+      "bytes": 249794,
+      "sha256": "043cd2d291eb18fa97e32777aaf621b573440c51984bfe9101b452a39e288623"
+    },
+    "tex/dirt_floor_n.webp": {
+      "bytes": 374088,
+      "sha256": "9443a2aaf07f871cda274f2fa3ee9a739749cfefdbdd12c0f9d72248cee38bb4"
+    },
+    "tex/forest_floor_c.webp": {
+      "bytes": 443528,
+      "sha256": "ed676281d86ba2b6b92184571e6143d434630729391b97cb998dab5e6a6658da"
+    },
+    "tex/forest_floor_n.webp": {
+      "bytes": 481768,
+      "sha256": "289deb2ed30f82e36ee88123f956f1309b0a728fb12aad501e30d5a4eaa184bc"
+    },
+    "tex/forrest_ground_01_c.webp": {
+      "bytes": 321312,
+      "sha256": "1d0ea25ad3ad60b253ba958bf533699b47043a1cb0f12e7cd9197078d1229aa8"
+    },
+    "tex/forrest_ground_01_n.webp": {
+      "bytes": 506734,
+      "sha256": "6e1b15a67d4761b7a21332d65e8b0df3802a1989d26f9657fa462845af73c477"
+    },
+    "tex/leaf_aspen.webp": {
+      "bytes": 157318,
+      "sha256": "dc0fd4b7d74b3183a60058e97c50e01f4774d25da4e41a9a2838085a569ab557"
+    },
+    "tex/leaf_pine.webp": {
+      "bytes": 314948,
+      "sha256": "ca3399f85f19f3d3e459825a1ad249a0af8dd867d3dccb0cee85276c6adfe928"
+    },
+    "tex/mossy_rock_c.webp": {
+      "bytes": 332988,
+      "sha256": "d651c75ae487a13981e0206dfa89162398610583b5351379a2277c06b24c90c2"
+    },
+    "tex/mossy_rock_n.webp": {
+      "bytes": 277724,
+      "sha256": "50a0fe2812b90490b302af81f9bd0f0d004e21b71384d8a79b3010a9042af42c"
+    },
+    "tex/rocky_trail_c.webp": {
+      "bytes": 315276,
+      "sha256": "bc3222e2e809a6a4e48dbd1158ad682fec932cd37f056c323bf8522cb186ebed"
+    },
+    "tex/rocky_trail_n.webp": {
+      "bytes": 487008,
+      "sha256": "f2ffa2d59d98784dbd869a14d5f0105af36379544fc59260c9bf3bec6275a64f"
+    },
+    "tex/snow_02_c.webp": {
+      "bytes": 83732,
+      "sha256": "13a2edcff0e7302f68b72716e1aeb22458aa553229553d17a2c59886b24c11fa"
+    },
+    "tex/snow_02_n.webp": {
+      "bytes": 360560,
+      "sha256": "30c43ff4f99dc4fd39a7e0542cf88cb772508c4b913ce1fba5ea690296585a10"
+    },
+    "tex/wood_rough_color_1k.webp": {
+      "bytes": 294112,
+      "sha256": "8fb7375a53487923036eaeafaf22b65b2dd613eba652f98427c76af4a515c255"
+    },
+    "tex/wood_rough_normal_1k.webp": {
+      "bytes": 364276,
+      "sha256": "7b8263d2343fc140772cc8677aa088d8f2afc96daa3778ec066f2804d6858387"
+    }
+  }
+}
