@@ -81,17 +81,35 @@ upstream repo to fork — the mirror stands.
 - `.upstream/manifest.json` — sha256 for every captured file (79; `embed`
   marked `dynamic`)
 - `readable/` — prettified derived layer (pinned prettier 3.9.6, fixed point)
-  for the five game JS chunks, `embed.js`, `sw-embed.js`, the stylesheet, and
-  the inline-block twins from `index.html` + `embed`
-- `src/` + `split-spec.json` — statement-aligned slices of the app chunks with
-  the recorded derivation spec
-- `docs/` — cover, boot evidence, network log
+  that **mirrors the served paths**: 8 JS pretties under `readable/assets/…`
+  plus `readable/embed.pretty.js` / `readable/sw-embed.pretty.js`, the
+  stylesheet `readable/embed.pretty.css`, the two inline-block twins from
+  `index.html` + `embed`, and `readable/index-inline-map.json`
+- `src/` + `split-spec.json` — 75 statement-aligned slices in the same
+  served-path structure (`src/assets/<chunk>-NN.js`), re-cut through the
+  recorded rename map, with the derivation spec
+- `rename-map.json` + `tools/names.json` — the identifier rename campaign: the
+  recovered per-slice map (619 word-boundary records) and the reviewed worklist
+  with per-name evidence
+- `legacy/2026-10-15/` — the superseded flat derived layers (both `readable/`
+  and `src/` with `__`-flattened names), archived before the served-path re-cut
+- `docs/` — cover, boot evidence (`boot-2026-10-13.png`, `boot-2026-10-15.png`),
+  network log
 - `tools/derive.mjs` — rebuild `readable/` + `src/` + `split-spec.json`
+- `tools/apply-names.mjs`, `tools/recover-scoped-map.mjs` — write / record the
+  rename batches (PLAN §5)
+- `tools/verify-rename.mjs`, `tools/check-chunk.mjs`, `tools/refcheck.mjs`,
+  `tools/engine/rename-layer.mjs`, `tools/lib-acorn.mjs` (+ gitignored
+  `tools/.deps`, acorn 8.14.1, authoring-time only) — the rename gates and the
+  shared tokenizer layer
+- `tools/probe-structure.mjs` — from-bytes structure / bundler-signature probe
+- `tools/record-manifest.mjs` — re-cut `.upstream/manifest.json` (`--check`
+  reproduces the committed record)
 - `tools/scan.mjs` — closure scanner (referenced-but-missing files)
 - `tools/capture.mjs` — reproducible bootstrap + re-fetch path (PLAN §3)
 - `tools/update.mjs` — read-only drift probe against the live platform
 - `tools/verify.mjs` — re-hash the capture against the manifest
-- `tools/audit.js` — integrity gate for the derived layers (`AUDIT PASS`)
+- `tools/audit.js` — integrity gate for the derived layers + rename map (`AUDIT PASS`)
 - `tools/serve.mjs` — minimal static server for boot tests
 
 ## Assets
@@ -128,9 +146,16 @@ riders stay external).
 ## Verify
 
 ```
-node tools/verify.mjs     # re-hash the capture against the manifest
-node tools/audit.js       # derived-layer integrity gate
+node tools/verify.mjs               # re-hash the capture against the manifest
+node tools/audit.js                 # derived-layer + rename-map integrity gate
+node tools/verify-rename.mjs --all  # per-slice rename reproduction + references/bindings
+node tools/check-chunk.mjs --all    # cross-slice calls resolve after renames
+node tools/record-manifest.mjs --check  # the committed manifest reproduces exactly
 ```
+
+The rename gates need acorn (authoring-time only): it installs into the
+gitignored `tools/.deps` on first use and is never shipped or required at
+runtime.
 
 ## Updating from upstream
 
@@ -142,66 +167,133 @@ The probe never rewrites the capture — a mirror is a point-in-time snapshot.
 It re-derives the platform host, mints a fresh gameplay JWT via `/embed` and
 re-hashes every captured file against the live build (build-id changes show up
 as a `<build>` row). Refreshing means re-running `tools/capture.mjs` into a
-clean tree and re-cutting the derived layers on top of the new build
-(`node tools/derive.mjs && node tools/audit.js`).
+clean tree, re-cutting `.upstream/manifest.json` (`node tools/record-manifest.mjs`),
+and re-cutting the derived layers on top of the new build
+(`node tools/derive.mjs && node tools/audit.js`). A refresh renames the chunk
+hashes in the filenames, so the rename map must be re-recorded: the campaign
+engine keeps the reviewed rules (`tools/names.json`) while
+`node tools/recover-scoped-map.mjs` re-derives `rename-map.json` against the new
+slices, and the gates (`verify-rename` / `check-chunk` / `audit`) re-prove it.
 
 Known platform noise: the game page occasionally answers a smaller
 client-rendered variant (no `playKey`/`gameBuild` in the HTML) — the probe
 fails loudly in that case and succeeds on retry.
 
-### 2026-10-13 readable/src derivation
+### 2026-10-15 structure + rename campaign (reversal pass)
 
-Both queued derived layers are in place, cut from the recorded capture
-(capture bytes untouched — `node tools/verify.mjs` re-hashes all 79 files):
+Mission: converge the derived layers on the real project shape and close the
+PLAN §5 identifier rename campaign. The capture was **not** touched —
+`node tools/verify.mjs` still re-hashes all 79 files (0 problems) — so this
+section is entirely about `readable/`, `src/`, `split-spec.json`,
+`rename-map.json` and `tools/`.
 
-- `readable/` — pinned prettier 3.9.6 (module API, default options, applied to
-  a verified fixed point — ≤4 passes; one pass stabilizes every file except
-  the main game bundle, which needs two; never the CLI, it respects
-  `.gitignore` and can silently echo its input) rendered the five game chunks
-  to `*.pretty.js` (69,249 + 1,291 + 823 + 226 + 170 lines), `embed.js` +
-  `sw-embed.js` (23,054 + 1,828 lines), the stylesheet to `embed.pretty.css`
-  (636 lines) and the two inline blocks (`embed-inline-1.pretty.js`,
-  `index-inline-1.pretty.css`) — 10 files total. Every pretty is provably not
-  a byte copy of its capture source and re-renders byte-exact under the pinned
-  version (fixed-point recipe).
-- `src/` — 75 statement-aligned slices (`src/<tag>-NN.js`, exact 2-line
-  provenance header) recorded in `split-spec.json` (82 sections): 75/75 parse
-  standalone (`node --input-type=module --check -`) and round-trip byte-exact
-  to their readable line ranges. Cuts land on top-level declaration boundaries
-  (~250-350 line windows); oversized single declarations stay whole. The main
-  entry chunk's 69,249 readable lines yield 71 slices — the first is a
-  recorded `boundary` fragment: the minifier merged the app's opening constants
-  into the same `var` declaration that closes the three.js region, so that
-  slice starts mid-declaration (still byte-exact and standalone-parsing).
-  Identification is the bundle's own minified names — the rename campaign
-  (PLAN §5) remains an open task.
-- Vendor rule — wholeFile sections, never sliced: the bundled three.js r186
-  region inside `assets/index-gCVK5XnX.js` (core + node/TSL +
-  WebGPURenderer/WebGLRenderer, content-anchored and guarded), the Vite
-  modulepreload polyfill opening that chunk, `embed.js` (Wavedash platform
-  embed SDK), `sw-embed.js` (embed service worker) and `embed.css`
-  (stylesheet). The `embed` shell's inline `window.__WAVEDASH_GAME__` boot
-  script is a wholeFile twin backed by `readable/index-inline-map.json` (its
-  bytes rotate per session — JWT/sessionToken).
-- Binary payloads are sha256-recorded `notRendered` (69 files: `tex/*.webp`,
-  `sfx/*.wav`) — served byte-exact, never text-derived, never re-encoded.
-- Gates: `node tools/verify.mjs` → `79 files checked, 0 problems`;
-  `node tools/audit.js` → `AUDIT PASS` (75/75 round-trips, 10/10 pretties
-  re-render byte-exact, 82 sections, 4/4 worker imports resolve, 69/69
-  notRendered payloads byte-exact); `node tools/update.mjs` → `up to date:
-  79 captured files identical upstream (build 884b3fbd)`; serve probe — the
-  mirror root served on loopback (`http://127.0.0.1:8747/`), the game booted
-  from local files and was played (cover shot mid-trail on the descent), the
-  listener PID killed and the port proven closed (`netstat`).
-- §0.4 fork-over-mirror checked 2026-10-13 — no public source repo exists for
-  BMX Mountain (see "What this is"), so the mirror stands.
+- **Inventory (source maps + module boundaries) — both negative, recorded**:
+  - *Source maps*: zero `sourceMappingURL` in the capture's own JS (only the
+    platform `embed.js` carries one, and it is a vendor whole-file); no `.map`
+    file in the closure, so no original tree can be reconstructed — the
+    derivation stays a prettier/slice pass.
+  - *Module boundaries*: the entry chunk `assets/index-gCVK5XnX.js` is a
+    **flat ESM module** — 1,016 top-level statements (324 `var`, 541
+    `function`, 144 expression statements), **0** `__defs[` / `__webpack_require__`
+    / `turbopack_` / `__vite__mapDeps` / `.push([` module-factory signatures, no
+    dynamic `import()`, no export table. There is no factory family to split
+    on, so the statement-aligned slice remains the true boundary this bundle
+    exposes (PLAN §5 structural precedence). The four module workers are each a
+    whole-program IIFE (one statement → one slice), which the campaign engine
+    re-roots at the IIFE callee (proposals (ag)/(ah)).
+- **Structure — `readable/` and `src/` now mirror the served paths** (PLAN §5
+  "the served path is the truth"): a captured file at
+  `assets/index-gCVK5XnX.js` derives to
+  `readable/assets/index-gCVK5XnX.pretty.js` and
+  `src/assets/index-gCVK5XnX-NN.js`; `__`-flattening is gone. Before/after:
+  `readable/` 10 flat pretties → 8 under `readable/assets/` + `embed` /
+  `sw-embed` / `embed.css` at the readable root + the two inline twins +
+  `readable/index-inline-map.json`; `src/` 75 flat slices → 75 under
+  `src/assets/`. Slice headers carry the served tag (e.g.
+  `// assets/index-gCVK5XnX 01 — math`); `split-spec.json`'s
+  `file` / `sourceFile` / `defaultFile` all use the new paths. The superseded
+  flat layers are archived in `legacy/2026-10-15/{readable,src}`.
+- **Rename campaign (PLAN §5) — tooling + 67 reviewed rules over the one app
+  chunk**: `tools/names.json` is the reviewed worklist (every entry carries its
+  evidence in `__evidence`: the declaration line the rule was authored from);
+  `tools/apply-names.mjs` is the scope-aware writer (renames only identifiers
+  resolving to the chunk's top-level bindings, cross-slice references included);
+  `tools/recover-scoped-map.mjs` records what actually fired into
+  `rename-map.json` by mechanical token alignment (both sides must agree in
+  every non-identifier position); `tools/derive.mjs` re-applies that map on
+  every re-cut, so the layer is reproducible. The engine is the newest fleet
+  lineage (`templates/rename-campaign`, roadster-flying-car) carrying the
+  canonical guard family — marked Function/ClassDeclaration ids (p), the
+  brace-depth template scanner (r), ranged-declaration refusal + per-source line
+  cache (s), the index-only binding map (t1), `of`/`in` keyword safety (x),
+  token-wise import specifiers (ab), per-chunk target uniqueness (ad), flat
+  occurrence counting (af), fixed-point pretties (t3), the labeled-loop body
+  walk (aj — the voxelrush live fix) and whole-program-IIFE re-rooting (ag)/(ah).
+  Renames applied: **67 (of 67 rules) over the entry chunk, 2,673 identifier
+  occurrences**; the recovered map holds **619 word-boundary records, 0 indexed
+  records**, all index-validated by the audit. Highlights: `PHYSICS` (the
+  physics config object), the math/utility helpers read out of the
+  minifier-merged `var` (`TAU`, `clamp`, `smoothstep`, `lerp`, `wrap`,
+  `wrapAngle`, `lerpAngle`, `headingFromXZ`, `approach`, `approachExp`,
+  `FIXED_DT`, `makeRng`, `hash01`, `hashString`, `randSpread`, `SAMPLE_STEP`,
+  `GRID_N`, `WORLD_HALF`, `LODGE_HALF`, `TRAIL_FADE`, `TRAIL_HALF_WIDTH`,
+  `FIXED_STEP`, `DEER_CHANCE`), the TSL node aliases (`tslVec3` / `tslVec2` /
+  `tslVec4` / `tslFloat` / `tslInt` / `tslSmoothstep` / `tslMix` / `tslUniform` /
+  `tslMax` / `tslTexture` / `tslAttribute` / `tslFn` / `tslUv` / `tslIf` /
+  `tslDot` / `tslLength` / `tslNormalize` / `tslAbs` / `tslSin`), the game
+  tables/enums (`SURFACE`, `RIDE_MODE`, `TRICK`, `OPCODE`, `DEER_COLORS`,
+  `FOLIAGE`, `PAD`, `CSS_VARS`, `BONES`, `LIMB_LENGTHS`, `STATION`, `wavedash`)
+  and the named helpers (`makeEl`, `addMesh`, `mergeGeometry`, `makeTube`,
+  `trailToWorld`, `valueNoise`, `fbmNoise`, `cssColor`, `mixColor`,
+  `makeBuffer`, `creekProbe`, `scratchNormal`).
+- **What the campaign deliberately does not rename** (honest scope):
+  - **vendor identifiers** — the bundled three.js r186 region (the wholeFile
+    band, lines 32–47336) is never rewritten, and the TSL namespace `K` itself
+    is declared there, so it keeps its minified name; the wholeFile vendor
+    bundles `embed.js` / `sw-embed.js` likewise;
+  - **locals inside function bodies** — the campaign renames top-level bindings
+    only (1,609 program-scope names are ELIGIBLE in the entry chunk; 67 are
+    named so far, the tooling is in place for further batches);
+  - **names in shorthand positions** (`{x}`, `const {x} = …`) — the key shares
+    the token text, so a token rename cannot express it (the writer refuses
+    them at preflight);
+  - **object keys** — the physics config's own property names (`step`, `mass`,
+    `wheelRadius`, …) are property positions and are never renamed.
+- **Gates (verbatim tails)**:
+
+  ```
+  node tools/verify.mjs         → 79 files checked, 0 problems
+  node tools/audit.js           → AUDIT PASS — 82 spec sections (75/75 src↔pretty round-trips byte-exact through the recorded rename map, 67 renamed slice(s), 10/10 pretty sources tiled contiguously, 75/75 src slices + 8/8 readable/*.pretty.js parse standalone (node --input-type=module --check -), 10/10 pretties provably distinct from their capture source, 69/69 notRendered payloads byte-exact on disk, 7 index-only wholeFile/skipped sections carry no src file, 2 inline content block(s) with twins + index-inline-map.json, 4/4 imports resolve inside the capture (0 whitelisted machinery), rename map: 619 record(s) over 67 slice(s), all indices address the recorded identifiers and no foreign position, 10/10 pretties re-render byte-exact under pinned prettier 3.9.6 (fixed point), capture manifest free of derived layers)
+  node tools/verify-rename.mjs --all → 75/75 slice(s) reproduce byte-exact, 67 renamed slice(s) (0 indexed occurrence(s)), 5/5 chunk(s) references+bindings YES
+  node tools/check-chunk.mjs --all   → 5 chunk(s), 75 slice body(ies) substituted — all cross-slice calls resolve
+  node tools/record-manifest.mjs --check → record-manifest --check: 79 files match the committed record
+  ```
+
+  `tools/derive.mjs` re-run is byte-identical (`split-spec.json` and
+  `rename-map.json` stable); `tools/apply-names.mjs --all` re-run reports
+  0 changed. Serve probe (2026-10-15): the mirror root served on loopback
+  (`http://127.0.0.1:8747/`), the game booted from local files and rendered
+  (canvas 1267×716, `window.__THREE__ = "186"`, gameplay at the START gate —
+  evidence `docs/boot-2026-10-15.png`), the listener PID killed and the port
+  proven closed (`netstat` shows no LISTENING socket; `curl` → connection
+  refused).
+- **Honest gaps**: the campaign is a first batch over the entry chunk (67 of
+  1,609 eligible program-scope names); the four module workers keep the
+  bundle's own minified names (their bindings are IIFE-locals, out of scope for
+  this pass). The platform-only extras (cloud saves, other riders) still need a
+  platform session, and the ~614 B upload-side remainder stays unreachable.
 
 ## Mirror conventions
 
 - **Capture layer** — the captured files are byte-exact copies of what the
   origin served; nothing in them is edited.
 - **Readable layer** — `readable/` is derived (prettified) and never shipped to
-  a browser; it exists so the bundle can actually be read.
+  a browser; it exists so the bundle can actually be read. Both derived layers
+  mirror the served paths (`readable/assets/…`, `src/assets/…`).
+- **Rename layer** — `src/` keeps the served chunk names; the campaign renames
+  only the chunk's top-level bindings, records every rename in
+  `rename-map.json`, and `tools/derive.mjs` re-applies the recorded map on every
+  re-cut, so the layer is reproducible (never ad-hoc).
 - **Provenance** — `.upstream/manifest.json` records sha256 for each captured
   artifact, and `tools/verify.mjs` re-checks it.
 - **Drift** — `tools/update.mjs` is read-only: it reports what changed upstream

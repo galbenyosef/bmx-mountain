@@ -87,10 +87,16 @@ for (const rel of Object.keys(manifest.files).sort()) {
 }
 console.log(`\nmodule-factory signatures across the captured JS: ${factories}`);
 console.log(
+  `  note: the "moduleFactories" column above counts every \`.push([\` — in this capture those are plain` +
+    ` Array#push calls in game code (a real webpack/Turbopack table would carry __webpack_require__ / a` +
+    ` push-array runtime, which is absent: ${factories} such signatures).`,
+);
+console.log(
   `  verdict: ${factories === 0 ? "NONE — the app is a flat ESM bundle; statement-aligned slices ARE the true boundary (no factory family to extract), and the capture preserves the served paths, so the derived layers mirror them." : "PRESENT — re-examine: a factory split may be the true boundary."}`,
 );
 
 // ── 3) top-level statements of the sliced pretty + recorded boundaries ──
+const appLines = linesOf(appSource);
 const fullText = appLines.join("\n");
 let ast;
 try {
