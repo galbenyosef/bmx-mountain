@@ -1,0 +1,172 @@
+// assets/natural.worker-i0ZaMPjG 01 — math
+// Lines 1-170 of readable/assets/natural.worker-i0ZaMPjG.pretty.js (statement-aligned).
+(function () {
+  let e = (e, t = 0, n = 1) => (e < t ? t : e > n ? n : e),
+    t = (t, n, r) => {
+      let i = e((r - t) / (n - t));
+      return i * i * (3 - 2 * i);
+    };
+  function n(e) {
+    let t = e >>> 0;
+    return () => {
+      t = (t + 1831565813) >>> 0;
+      let e = t;
+      return (
+        (e = Math.imul(e ^ (e >>> 15), e | 1)),
+        (e ^= e + Math.imul(e ^ (e >>> 7), e | 61)),
+        ((e ^ (e >>> 14)) >>> 0) / 4294967296
+      );
+    };
+  }
+  let r = 0.5 * (Math.sqrt(3) - 1),
+    i = (3 - Math.sqrt(3)) / 6,
+    a = new Float32Array([
+      1, 1, -1, 1, 1, -1, -1, -1, 1, 0, -1, 0, 0, 1, 0, -1,
+    ]);
+  var o = class {
+    perm = /* @__PURE__ */ new Uint8Array(512);
+    constructor(e) {
+      let t = n(e),
+        r = /* @__PURE__ */ new Uint8Array(256);
+      for (let e = 0; e < 256; e++) r[e] = e;
+      for (let e = 255; e > 0; e--) {
+        let n = Math.floor(t() * (e + 1)),
+          i = r[e];
+        ((r[e] = r[n]), (r[n] = i));
+      }
+      for (let e = 0; e < 512; e++) this.perm[e] = r[e & 255];
+    }
+    noise(e, t) {
+      let n = this.perm,
+        o = (e + t) * r,
+        s = Math.floor(e + o),
+        c = Math.floor(t + o),
+        l = (s + c) * i,
+        u = e - (s - l),
+        d = t - (c - l),
+        f = +(u > d),
+        p = 1 - f,
+        m = u - f + i,
+        h = d - p + i,
+        g = u - 1 + 2 * i,
+        _ = d - 1 + 2 * i,
+        v = s & 255,
+        y = c & 255,
+        b = 0,
+        x = 0.5 - u * u - d * d;
+      if (x > 0) {
+        let e = (n[v + n[y]] & 7) * 2;
+        ((x *= x), (b += x * x * (a[e] * u + a[e + 1] * d)));
+      }
+      let S = 0.5 - m * m - h * h;
+      if (S > 0) {
+        let e = (n[v + f + n[y + p]] & 7) * 2;
+        ((S *= S), (b += S * S * (a[e] * m + a[e + 1] * h)));
+      }
+      let C = 0.5 - g * g - _ * _;
+      if (C > 0) {
+        let e = (n[v + 1 + n[y + 1]] & 7) * 2;
+        ((C *= C), (b += C * C * (a[e] * g + a[e + 1] * _)));
+      }
+      return 70 * b;
+    }
+    fbm(e, t, n) {
+      let r = 0,
+        i = 1,
+        a = 0;
+      for (let o = 0; o < n; o++) {
+        ((r += i * this.noise(e, t)), (a += i), (i *= 0.5));
+        let n = e * 1.6 - t * 1.2;
+        ((t = (e * 1.2 + t * 1.6) * 1.015), (e = n * 1.015));
+      }
+      return r / a;
+    }
+    ridged(e, t, n) {
+      let r = 0,
+        i = 0.5,
+        a = 1,
+        o = 0;
+      for (let s = 0; s < n; s++) {
+        let n = 1 - Math.abs(this.noise(e, t));
+        ((n *= n),
+          (n *= a),
+          (a = Math.min(1, n * 2)),
+          (r += n * i),
+          (o += i),
+          (i *= 0.5));
+        let s = e * 1.6 - t * 1.2;
+        ((t = (e * 1.2 + t * 1.6) * 1.01), (e = s * 1.01));
+      }
+      return r / o;
+    }
+  };
+  let s = { x: -40, z: -860, h: 680 },
+    c = new o(7),
+    l = new o(19),
+    u = new o(41);
+  function d(t, n, r) {
+    let i = e(0.5 + (0.5 * (n - t)) / r);
+    return n * i + t * (1 - i) + r * i * (1 - i) * 0.5;
+  }
+  function f(n, r) {
+    let i = (n - s.x) / 1.35,
+      a = r - s.z,
+      o = Math.atan2(a, i),
+      l = Math.hypot(i, a),
+      u =
+        c.fbm(Math.cos(o) * 1.7 + 11, Math.sin(o) * 1.7 - 4, 3) *
+        60 *
+        t(60, 400, l),
+      d = Math.max(0, l + u);
+    return (
+      360 * e(1 - d / 2100) ** 1.15 -
+      100 * e((d - 430) / 1070) ** 1.2 +
+      (s.h - 360) * e(1 - d / 900) ** 1.8
+    );
+  }
+  function p(e, n, r) {
+    if (r <= 0) return 0;
+    let i = 0.5 + 0.5 * t(3e3, -5e3, n),
+      a = e + u.fbm(e / 9e3 + 5, n / 9e3, 3) * 2500,
+      o = n + u.fbm(e / 9e3, n / 9e3 + 9, 3) * 2500,
+      s = 0.5 + 0.5 * u.fbm(a / 11e3, o / 11e3, 3),
+      c = l.ridged(a / 5200 + 3.1, o / 5200 - 1.7, 5) ** 1.6;
+    return r * i * (s * 1700 + c * 3e3 * (0.4 + 0.8 * s) + 200);
+  }
+  function m(e, t, n) {
+    return n <= 0 ? 0 : n * (0.5 + 0.5 * u.fbm(e / 900 + 7, t / 900, 4)) * 260;
+  }
+  function h(e, t, n, r) {
+    let i = new Float32Array((t - e) * n);
+    for (let a = e; a < t; a++)
+      for (let t = 0; t < n; t++)
+        i[(a - e) * n + t] = _(-1024 + t * r, -1024 + a * r);
+    return i;
+  }
+  function g(e) {
+    let n = 395 - e;
+    return n > 0 ? e - 0.25 * n * t(0, 40, n) : e;
+  }
+  function _(e, n) {
+    let r = f(e, n),
+      i = t(500, 1500, Math.abs(e - 80));
+    r = d(r, m(e, n, i), 1 + 120 * i);
+    let a = Math.hypot(e, n * 0.85),
+      o = t(1800, 5200, a) * (1 - t(16e3, 24e3, a));
+    r = d(r, p(e, n, o), 1 + 300 * o);
+    let s = 12 + Math.max(0, -n) * 0.02 + Math.max(0, n - 1100) * 0.01;
+    r = d(r, s, 30);
+    let u = t(0, 400, r),
+      h = 6 + 8 * u + 40 * t(300, 560, r);
+    return (
+      (r = g(r)),
+      (r += c.fbm(e / 260, n / 260, 4) * h),
+      (r += l.fbm(e / 38, n / 38, 3) * (1.2 + 1.5 * u)),
+      r
+    );
+  }
+  onmessage = (e) => {
+    let t = h(...e.data);
+    postMessage(t, { transfer: [t.buffer] });
+  };
+})();

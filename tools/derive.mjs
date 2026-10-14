@@ -9,30 +9,41 @@
 // before it is rendered, so a drifted capture fails loudly instead of being
 // silently re-derived.
 //
+// Layout: the capture preserves the served URL structure (repo root == CDN
+// host root), so both derived layers MIRROR it — no __-flattening. A captured
+// file at assets/index-gCVK5XnX.js becomes
+//   readable/assets/index-gCVK5XnX.pretty.js   (prettified twin)
+//   src/assets/index-gCVK5XnX-NN.js            (statement-aligned slice)
+// The inline twins of the entry documents live at readable/<entry>-inline-N.*.
+//
 // Pipeline:
 //   each capture *.js -> pinned prettier 3.9.6 (module API — the CLI respects
-//                        .gitignore and can silently echo its input), single
-//                        pass, verified idempotent -> readable/<name>.pretty.js
-//                        (capture-root-relative name; nested dirs flattened
-//                        with __).
+//                        .gitignore and can silently echo its input), formatted
+//                        to a VERIFIED FIXED POINT (≤4 passes; every file
+//                        stabilizes in one pass except the main game bundle,
+//                        which needs two) -> readable/<served path>.pretty.js
 //   the capture embed.css -> readable/embed.pretty.css, wholeFile section
 //                        (stylesheet rule: stylesheets are never sliced).
 //   vendor bundles     -> readable/ + wholeFile section (vendor rule): the
-//                        Wavedash platform embed SDK (embed.js), the embed
-//                        service worker (sw-embed.js) and the modulepreload
-//                        polyfill + the bundled three.js r186 region (core +
-//                        node/TSL system + WebGPURenderer/WebGLRenderer) inside
-//                        assets/index-gCVK5XnX.js are indexed whole, never
+//                        Wavedash platform embed SDK (embed.js) and the embed
+//                        service worker (sw-embed.js) are indexed whole, never
 //                        sliced.
-//   app chunks         -> statement-aligned slices src/<name>-NN.js at
+//   app chunks         -> statement-aligned slices src/<served path>-NN.js at
 //                        top-level declaration boundaries, ~250-350 line
 //                        windows (oversized single declarations stay whole),
 //                        exact 2-line provenance header; every slice is
 //                        parse-checked with `node --input-type=module --check
-//                        -` and round-trips byte-exact to its readable range.
-//                        One recorded exception: the app's first slice is the
-//                        tail of a minifier-merged `var` declaration whose head
-//                        closes the three.js vendor region, so it starts
+//                        -` and round-trips byte-exact to its readable line
+//                        range — through the recorded semantic rename map when
+//                        the chunk has one (tools/engine/rename-layer.mjs
+//                        applyRecordedMap; index-validated, no parser needed).
+//                        Two recorded wholeFile regions inside the entry chunk:
+//                        the Vite modulepreload polyfill (statement 0) and the
+//                        bundled three.js r186 region (core + node/TSL +
+//                        WebGPURenderer/WebGLRenderer), content-anchored and
+//                        guarded. One recorded exception: the app's first slice
+//                        is the tail of a minifier-merged `var` declaration
+//                        whose head closes the three.js region, so it starts
 //                        mid-declaration (still byte-exact and standalone-
 //                        parsing) — flagged `boundary` in the spec.
 //   entry documents    -> inline <script>/<style> scan (byte ranges + sha256):
@@ -42,15 +53,24 @@
 //                        map.json.
 //   binary payloads    -> tex/*.webp + sfx/*.wav are hashed notRendered
 //                        (served byte-exact; never text-derived).
+//   rename map         -> rename-map.json (recovered from the committed slices
+//                        by tools/recover-scoped-map.mjs, curated by
+//                        tools/apply-names.mjs + tools/names.json). The map is
+//                        the input to this script: re-cut slices are the
+//                        readable ranges with the recorded identifier spans
+//                        substituted, so a re-derive is reproducible and the
+//                        run fails loudly if the map addresses a token the
+//                        readable no longer has. The chunk's fired binding map
+//                        is recorded in split-spec sources[].renameBindings for
+//                        the reconstruction gates.
 //
-// Identifiers in src/ are the bundle's own minified names — the rename
-// campaign (PLAN §5) is recorded as an open task in README.md. usage:
-//   node tools/derive.mjs
+// usage: node tools/derive.mjs
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { applyRecordedMap, markerText, markerWords, sliceHeader } from "./engine/rename-layer.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const proj = path.resolve(here, "..");
@@ -69,10 +89,17 @@ const readLines = (abs) => {
 const linesOf = (text) => text.replace(/\n$/, "").split("\n");
 const lineOf = (text, offset) => text.slice(0, offset).split("\n").length;
 
-// capture-relative name -> readable twin name (dirs flattened with __)
-const tagOf = (capRel) => capRel.replace(/\.(js|css)$/i, "").split("/").join("__");
+// capture-relative name -> derived twin name (served path kept, extension swapped)
+const tagOf = (capRel) => capRel.replace(/\.(js|css)$/i, "");
 const prettyRelFor = (capRel) =>
   "readable/" + tagOf(capRel) + (/\.css$/i.test(capRel) ? ".pretty.css" : ".pretty.js");
+
+// write a derived file, creating its (served-path) directory chain
+function writeDerived(rel, text) {
+  const abs = path.join(proj, rel);
+  fs.mkdirSync(path.dirname(abs), { recursive: true });
+  fs.writeFileSync(abs, text);
+}
 
 // ── pinned prettier (module API, exactly 3.9.6) ─────────────────────────
 async function loadPrettier() {
@@ -110,10 +137,10 @@ async function formatToFixedPoint(prettier, text, parser) {
     cur = next;
     if (i === 3) throw new Error(`prettier ${parser} does not reach a fixed point in 4 passes`);
   }
-  return { out: cur, passes };
+  return { text: cur, passes };
 }
 async function formatOnce(prettier, text, parser) {
-  const { out, passes } = await formatToFixedPoint(prettier, text, parser);
+  const { text: out, passes } = await formatToFixedPoint(prettier, text, parser);
   if (passes > 1) console.log(`  prettier ${parser}: needed ${passes} passes to stabilize`);
   return out;
 }
@@ -127,28 +154,6 @@ function parses(text) {
   });
   return { ok: r.status === 0, why: (r.stderr || "").trim().split("\n").slice(-3).join(" | ") };
 }
-
-// ── markers for titles (top tokens, lowercase; fleet convention) ────────
-const STOP = new Set(
-  ("function return typeof undefined object string number boolean prototype length value default " +
-    "exports import this that with from then else case break continue delete instanceof constructor " +
-    "arguments void null true false call apply name type text target window document globalthis self " +
-    "require module async await yield static class const let var new for while switch throw try catch " +
-    "finally extends super using debugger of in do if has own hasown get set")
-    .split(" ")
-    .filter(Boolean),
-);
-function markers(text, n = 2) {
-  const code = text.replace(/`[^`]*`|"[^"\n]*"|'[^'\n]*'/g, " ");
-  const counts = new Map();
-  for (const m of code.matchAll(/[A-Za-z][A-Za-z0-9_]{2,}/g)) {
-    const w = m[0].toLowerCase();
-    if (STOP.has(w)) continue;
-    counts.set(w, (counts.get(w) || 0) + 1);
-  }
-  return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, n);
-}
-const markerText = (ms) => ms.map(([w, c]) => `${w}(${c})`).join(", ");
 
 // ── windowize: cut only at statement starts; ≤350 lines, a single ───────
 // ── oversized declaration is a window of its own ────────────────────────
@@ -224,7 +229,7 @@ function scanBlocks(buf) {
 }
 
 // ── curated content-anchored classification (guards fail loudly) ────────
-const MAIN = "assets/index-gCVK5XnX.js";
+const MAIN = "assets/index-gCVK5XnX";
 const WHOLE_FILE = {
   embed: {
     title: "embed — Wavedash platform embed SDK (vendor runtime, whole-file, never sliced)",
@@ -247,6 +252,32 @@ const WHOLE_FILE = {
   },
 };
 
+// ── recorded semantic rename map (optional input; see engine header) ────
+function loadRenameMap() {
+  const p = path.join(proj, "rename-map.json");
+  if (!fs.existsSync(p)) return { files: {}, scoped: {}, present: false };
+  const rm = JSON.parse(fs.readFileSync(p, "utf8"));
+  return { files: rm.files || {}, scoped: rm.scoped || {}, present: true };
+}
+const recordsFor = (rm, srcRel) => {
+  const files = rm.files[srcRel];
+  const scoped = rm.scoped[srcRel];
+  if (!files && !scoped) return null;
+  return { files, scoped };
+};
+// The authored binding map (tools/names.json) — keyed by the READABLE SOURCE
+// (the chunk identity, the same key tools/apply-names.mjs reads). Its `app`
+// rules are recorded into split-spec per source as `renameBindings` (only the
+// rules that actually fired) so the reconstruction gates can rename the
+// index-only export tables too — their local-side names reference the renamed
+// bindings and are not part of any src slice.
+function loadNames() {
+  const p = path.join(here, "names.json");
+  if (!fs.existsSync(p)) return {};
+  const all = JSON.parse(fs.readFileSync(p, "utf8"));
+  return all.app || {};
+}
+
 async function main() {
   const { mod: prettier, at } = await loadPrettier();
   console.log(`pinned prettier ${PINNED} (${at})`);
@@ -267,6 +298,10 @@ async function main() {
   fs.mkdirSync(readableDir, { recursive: true });
   fs.mkdirSync(srcDir, { recursive: true });
   const written = { readable: new Set(), src: new Set() };
+  const renameMap = loadRenameMap();
+  const appNames = loadNames();
+  let renamedFiles = 0;
+  let renamedNames = 0;
 
   const sources = [];
   const sections = [];
@@ -296,19 +331,20 @@ async function main() {
   // ── 1) JS: vendor -> wholeFile; app -> statement-aligned slices ─────────
   // entry chunk first (the game's entry point), then the module workers, then
   // the platform files — a reading order, not a build order
-  const rank = (rel) => (rel === MAIN ? 0 : /^assets\/.*\.worker-/.test(rel) ? 1 : 2);
+  const rank = (rel) => (rel === "assets/index-gCVK5XnX.js" ? 0 : /^assets\/.*\.worker-/.test(rel) ? 1 : 2);
   const jsSorted = jsRels.slice().sort((a, b) => rank(a) - rank(b) || a.localeCompare(b));
 
   for (const rel of jsSorted) {
     const buf = captureBytes(rel);
     const text = buf.toString("utf8");
     if (!Buffer.from(text, "utf8").equals(buf)) throw new Error(`${rel} does not round-trip through utf8`);
-    const pretty = await formatOnce(prettier, text, "babel");
+    const { text: pretty, passes: prettyPasses } = await formatToFixedPoint(prettier, text, "babel");
+    if (prettyPasses > 1) console.log(`  prettier babel: needed ${prettyPasses} passes to stabilize`);
     if (pretty === text)
       throw new Error(`${rel}: prettier output is byte-identical to the capture — nothing to derive`);
     const sourceFile = prettyRelFor(rel);
-    fs.writeFileSync(path.join(proj, sourceFile), pretty);
-    written.readable.add(path.basename(sourceFile));
+    writeDerived(sourceFile, pretty);
+    written.readable.add(sourceFile);
     const lines = linesOf(pretty);
     const tag = tagOf(rel);
     const cls = WHOLE_FILE[tag];
@@ -334,6 +370,8 @@ async function main() {
         captureBytes: buf.length,
         prettyLines: lines.length,
         prettyBytes: Buffer.byteLength(pretty, "utf8"),
+        prettyPasses,
+        idempotent: true,
         tag,
         slices: 0,
         derived: "readable only (vendor bundle, wholeFile)",
@@ -352,6 +390,7 @@ async function main() {
       endLine: lineOf(pretty, n.end),
       startOffset: n.start,
       endOffset: n.end,
+      text: pretty.slice(n.start, n.end),
     }));
 
     const specials = [];
@@ -368,7 +407,7 @@ async function main() {
     let appFromStmt = 0; // first app-owned statement (index into stmts)
     let boundaryFragment = null; // { A, B } line range of a mid-declaration head
 
-    if (rel === MAIN) {
+    if (tag === MAIN) {
       // polyfill: Vite's modulepreload polyfill IIFE opens the chunk
       if (!/modulepreload/.test(pretty.slice(stmts[0].startOffset, stmts[0].endOffset)))
         throw new Error(`${rel}: first statement is not the modulepreload polyfill — readable changed shape`);
@@ -379,11 +418,28 @@ async function main() {
         body: "the Vite-generated modulepreload polyfill IIFE (`link[rel=modulepreload]` relList.supports check + MutationObserver fetch warm-up) — build machinery, not app code; indexed whole-file in readable/, never sliced.",
       });
       // three.js r186 region: everything up to the minifier-merged declaration
-      // whose tail carries the first app constants (J = physics config).
-      const merged = stmts.find(
-        (s) => s.node.type === "VariableDeclaration" && s.startLine <= 47339 && s.endLine >= 47339,
-      );
-      if (!merged) throw new Error(`${rel}: merged boundary declaration not found — readable changed shape`);
+      // whose tail carries the first app constants (the physics config object
+      // with `wheelRadius`). Located by content, not by a hardcoded line.
+      let mergeIdx = -1;
+      for (let i = 0; i < stmts.length; i++) {
+        const n = stmts[i].node;
+        if (n.type !== "VariableDeclaration") continue;
+        if (
+          (n.declarations || []).some(
+            (d) =>
+              d.init &&
+              d.init.type === "ObjectExpression" &&
+              (d.init.properties || []).some(
+                (p) => p.key && (p.key.name === "wheelRadius" || p.key.value === "wheelRadius"),
+              ),
+          )
+        ) {
+          mergeIdx = i;
+          break;
+        }
+      }
+      if (mergeIdx < 1) throw new Error(`${rel}: merged boundary declaration not found — readable changed shape`);
+      const merged = stmts[mergeIdx];
       const decl = (merged.node.declarations || []).find(
         (d) =>
           d.init &&
@@ -392,8 +448,6 @@ async function main() {
       );
       if (!decl) throw new Error(`${rel}: app physics-config declarator (wheelRadius) not found in the merged declaration`);
       const boundaryLine = lineOf(pretty, decl.start);
-      const mergeIdx = stmts.indexOf(merged);
-      if (mergeIdx < 1) throw new Error(`${rel}: polyfill/three region boundary is not where the readable shape says`);
       // the three.js region covers whole statements 1..mergeIdx-1 and ends at
       // the last line of the last three-only declarator (the line before the
       // app's physics-config declarator inside the merged declaration)
@@ -432,14 +486,14 @@ async function main() {
       lastStmt &&
       lastStmt.node.type === "ExportNamedDeclaration" &&
       !covered[stmts.length - 1] &&
-      /^export\s*\{[\s\S]*\}\s*;?$/.test(pretty.slice(lastStmt.startOffset, lastStmt.endOffset).trim()) &&
-      !/\bfrom\b/.test(pretty.slice(lastStmt.startOffset, lastStmt.endOffset))
+      /^export\s*\{[\s\S]*\}\s*;?$/.test(lastStmt.text.trim()) &&
+      !/\bfrom\b/.test(lastStmt.text)
     ) {
       claim(stmts.length - 1, stmts.length - 1, {
         kind: "skip",
         file: `${tag}-tail-export.js`,
         title: `${tag} — final export table (not sliced)`,
-        desc: `Lines ${lastStmt.startLine}-${lastStmt.endLine}. The chunk's final export {…} table — the exported bindings live in the earlier slices; a standalone tail carries no new statements, so it is indexed only.`,
+        desc: `Lines ${lastStmt.startLine}-${lastStmt.endLine}. The chunk's final export {…} table — the exported bindings live in the earlier slices; a standalone tail carries no new statements, so it is indexed only. Public (exported) names in this table are the capture's own public API names and are never renamed by the campaign.`,
       });
     }
 
@@ -472,23 +526,35 @@ async function main() {
     let nn = 0;
     let perFileSkipped = 0;
     let perFileVendor = 0;
+    let perFileRenamed = 0;
+    const targetsByOld = new Map(); // rename map: old name -> Set(targets) seen in this chunk's slices
+    const noteTarget = (old, target) => {
+      if (!targetsByOld.has(old)) targetsByOld.set(old, new Set());
+      targetsByOld.get(old).add(target);
+    };
     for (const b of blocks) {
       if (b.kind === "slice") {
         nn++;
         const num = String(nn).padStart(2, "0");
-        const body = lines.slice(b.A - 1, b.B).join("\n") + "\n";
-        const ms = markers(body);
+        const file = `${tag}-${num}.js`;
+        const rawBody = lines.slice(b.A - 1, b.B).join("\n") + "\n";
+        const record = recordsFor(renameMap, file);
+        const body = record ? applyRecordedMap(rawBody, record) : rawBody;
+        if (record) {
+          perFileRenamed++;
+          for (const [old, target] of Object.entries(record.files || {})) noteTarget(old, target);
+          for (const [old, hits] of Object.entries(record.scoped || {}))
+            for (const [, target] of hits) noteTarget(old, target);
+        }
+        const ms = markerWords(body);
         const topWord = ms.length ? ms[0][0] : /^\s*import\b/.test(body) ? "imports" : tag.toLowerCase();
         const oversized = b.count === 1 && b.B - b.A + 1 > MAX_WINDOW;
-        const file = `${tag}-${num}.js`;
         const sliceText =
-          `// ${tag} ${num} — ${topWord}\n` +
-          `// Lines ${b.A}-${b.B} of ${sourceFile} (statement-aligned).\n` +
-          body;
+          sliceHeader({ tag, num, body, sourceFile, startLine: b.A, endLine: b.B }) + body;
         const chk = parses(sliceText);
         if (!chk.ok) throw new Error(`generated src/${file} does not parse standalone: ${chk.why}`);
-        fs.writeFileSync(path.join(srcDir, file), sliceText);
-        written.src.add(file);
+        writeDerived(path.posix.join("src", file), sliceText);
+        written.src.add(path.posix.join("src", file));
         sections.push({
           file,
           title: `${tag} ${num} — ${topWord}`,
@@ -497,7 +563,8 @@ async function main() {
               ? "Boundary fragment: the tail of the minifier-merged `var` declaration whose head closes the three.js vendor region; starts mid-declaration by construction (parses standalone, round-trips byte-exact). "
               : "") +
             (oversized ? "Oversized single declaration (kept whole). " : "") +
-            `Lines ${b.A}-${b.B}. Markers: ${markerText(ms)}.`,
+            `Lines ${b.A}-${b.B}. Markers: ${markerText(ms)}.` +
+            (record ? " Range re-cut through the recorded semantic rename map." : ""),
           startLine: b.A,
           endLine: b.B,
           sourceFile,
@@ -531,6 +598,17 @@ async function main() {
         });
       }
     }
+    if (perFileRenamed) renamedFiles++;
+    // the authored rules that actually fired (evidence: their targets appear in
+    // this chunk's recorded map) — the chunk-level binding map recorded in the spec
+    const authored = appNames[sourceFile] || {};
+    const renameBindings = {};
+    for (const [old, target] of Object.entries(authored)) {
+      if (targetsByOld.get(old)?.has(target)) {
+        renameBindings[old] = target;
+        renamedNames++;
+      }
+    }
     slicedTotal += nn;
     skippedTotal += perFileSkipped;
     sources.push({
@@ -541,16 +619,20 @@ async function main() {
       captureBytes: buf.length,
       prettyLines: lines.length,
       prettyBytes: Buffer.byteLength(pretty, "utf8"),
-      prettyRecipe: 'prettier 3.9.6 → fixed point (≤4 passes; stability verified at derive time)',
+      prettyRecipe: `prettier ${PINNED} → fixed point (≤4 passes; stability verified at derive time)`,
+      prettyPasses,
+      idempotent: true,
       tag,
       slices: nn,
+      renameBindings,
       derived:
         `readable + ${nn} statement-aligned slice(s)` +
+        (perFileRenamed ? ` (${perFileRenamed} through the recorded rename map)` : "") +
         (perFileVendor ? ` + ${perFileVendor} wholeFile region(s)` : "") +
         (perFileSkipped ? ` + ${perFileSkipped} skipped section(s)` : ""),
     });
     console.log(
-      `derive: ${rel} -> ${sourceFile} (${lines.length} lines, ${nn} slices, ${perFileVendor} wholeFile, ${perFileSkipped} skipped)`,
+      `derive: ${rel} -> ${sourceFile} (${lines.length} lines, ${nn} slices${perFileRenamed ? `, ${perFileRenamed} renamed` : ""}, ${perFileVendor} wholeFile, ${perFileSkipped} skipped)`,
     );
   }
 
@@ -558,11 +640,11 @@ async function main() {
   for (const rel of cssRels) {
     const buf = captureBytes(rel);
     const text = buf.toString("utf8");
-    const pretty = await formatOnce(prettier, text, "css");
+    const { text: pretty, passes: prettyPasses } = await formatToFixedPoint(prettier, text, "css");
     if (pretty === text) throw new Error(`${rel}: prettier output is byte-identical to the capture`);
     const sourceFile = prettyRelFor(rel);
-    fs.writeFileSync(path.join(proj, sourceFile), pretty);
-    written.readable.add(path.basename(sourceFile));
+    writeDerived(sourceFile, pretty);
+    written.readable.add(sourceFile);
     const lines = linesOf(pretty);
     const tag = tagOf(rel);
     sections.push({
@@ -583,7 +665,9 @@ async function main() {
       captureBytes: buf.length,
       prettyLines: lines.length,
       prettyBytes: Buffer.byteLength(pretty, "utf8"),
-      prettyRecipe: 'prettier 3.9.6 → fixed point (≤4 passes; stability verified at derive time)',
+      prettyRecipe: `prettier ${PINNED} → fixed point (≤4 passes; stability verified at derive time)`,
+      prettyPasses,
+      idempotent: true,
       tag,
       slices: 0,
       derived: "readable only (stylesheet, wholeFile)",
@@ -605,17 +689,17 @@ async function main() {
       console.log(`derive: ${rel}: no inline <script>/<style> content blocks — no inline twins`);
       continue;
     }
-    const entryTag = rel.replace(/\.html$/i, "").split("/").join("__");
+    const entryTag = rel.replace(/\.html$/i, "");
     for (const b of inline) {
       const isImportmap = b.kind === "importmap";
       const parser = isImportmap ? "json" : b.kind === "style" ? "css" : "babel";
       const tag = `${entryTag}-inline-${b.block}`;
       const prettyFile = `${tag}.pretty.${isImportmap ? "json" : b.kind === "style" ? "css" : "js"}`;
-      const pretty = await formatOnce(prettier, b.text, parser);
+      const { text: pretty, passes: prettyPasses } = await formatToFixedPoint(prettier, b.text, parser);
       if (pretty === b.text)
         throw new Error(`readable/${prettyFile} would be byte-identical to its capture source`);
-      fs.writeFileSync(path.join(readableDir, prettyFile), pretty);
-      written.readable.add(prettyFile);
+      writeDerived(path.posix.join("readable", prettyFile), pretty);
+      written.readable.add(path.posix.join("readable", prettyFile));
       const lines = linesOf(pretty);
       const prettyBuf = Buffer.from(pretty, "utf8");
       sections.push({
@@ -639,6 +723,7 @@ async function main() {
         prettyLines: lines.length,
         prettyBytes: prettyBuf.length,
         prettySha256: sha256(prettyBuf),
+        prettyPasses,
         tag,
         slices: 0,
         derived: "readable only (inline block, wholeFile)",
@@ -657,8 +742,8 @@ async function main() {
       });
     }
   }
-  fs.writeFileSync(
-    path.join(readableDir, "index-inline-map.json"),
+  writeDerived(
+    "readable/index-inline-map.json",
     JSON.stringify(
       {
         note: "inline <script>/<style> byte ranges + sha256 inside the captured documents",
@@ -668,59 +753,92 @@ async function main() {
       2,
     ) + "\n",
   );
+  written.readable.add("readable/index-inline-map.json");
 
   // ── 4) prune orphan derived files (capture untouched) ──────────────────
   let pruned = 0;
+  const walkFiles = (dir, base = dir, out = []) => {
+    if (!fs.existsSync(dir)) return out;
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      const p = path.join(dir, e.name);
+      if (e.isDirectory()) walkFiles(p, base, out);
+      else out.push(path.relative(base, p).split(path.sep).join("/"));
+    }
+    return out;
+  };
+  const removeEmptyDirs = (dir) => {
+    if (!fs.existsSync(dir)) return;
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (!e.isDirectory()) continue;
+      const p = path.join(dir, e.name);
+      removeEmptyDirs(p);
+      if (fs.existsSync(p) && fs.readdirSync(p).length === 0) fs.rmdirSync(p);
+    }
+  };
   for (const [dir, keep, exts] of [
     [readableDir, written.readable, /\.(pretty\.js|pretty\.css)$/],
     [srcDir, written.src, /\.js$/],
   ]) {
-    for (const f of fs.readdirSync(dir)) {
-      if (exts.test(f) && !keep.has(f)) {
+    for (const f of walkFiles(dir)) {
+      const relFull = path.posix.join(path.basename(dir), f);
+      if (exts.test(f) && !keep.has(relFull)) {
         fs.rmSync(path.join(dir, f));
         pruned++;
-        console.log(`derive: pruned orphan derived file ${path.join(path.basename(dir), f)}`);
+        console.log(`derive: pruned orphan derived file ${relFull}`);
       }
     }
+    removeEmptyDirs(dir);
   }
 
   // ── 5) split-spec.json (2-space indent + trailing newline) ─────────────
+  const indexedOccurrences = Object.values(renameMap.scoped).reduce(
+    (n, m) => n + Object.values(m).reduce((k, hits) => k + hits.length, 0),
+    0,
+  );
   const appJs = sources.filter((s) => s.derived.startsWith("readable +"));
   const vendorJsS = sources.filter((s) => /wholeFile\)$/.test(s.derived) && s.capture.endsWith(".js"));
+  const cssSources = sources.filter((s) => s.sourceFile.endsWith(".pretty.css"));
   const spec = {
     project: "bmx-mountain",
     kind: "statement-aligned-slices",
     defaultFile: `src/${sections.find((s) => !s.wholeFile && !s.skipped).file}`,
     note:
-      "BMX MOUNTAIN (https://wavedash.com/games/bmx-mountain) is capture-class: a custom Vite production " +
-      "build served by the Wavedash platform from a per-build CDN host (the platform page server-renders " +
-      "playKey/gameCloudId/gameBuild and the game runs in an iframe whose src carries the playKey + sdkconfig; " +
-      "see tools/update.mjs). §0.4 fork-over-mirror was checked on 2026-10-13 — the page carries no link to a " +
-      "public source repo (platform SDK/library credits only; the bundle ships no LICENSE/source references of " +
-      "its own), so the mirror stands. Derived pipeline: capture → pinned prettier 3.9.6 (module API, default " +
-      "options, applied to a VERIFIED FIXED POINT — ≤4 passes, stability checked at derive time; every file " +
-      "stabilizes in one pass except the main game bundle, which needs two; never the CLI: it respects " +
-      ".gitignore and can silently echo its input) → readable/<name>.pretty.js|css per captured JS/CSS file " +
-      "(capture-root-relative name with nested dirs flattened with __; every pretty provably NOT byte-identical " +
-      "to its capture source) → " +
-      "statement-aligned slices src/<name>-NN.js of every APP chunk (top-level declaration boundaries only, " +
-      "~250-350 line windows; oversized single declarations stay whole) with an exact 2-line provenance header. " +
-      "Every slice parses standalone under `node --input-type=module --check -` and round-trips byte-exact to " +
-      "its recorded readable line range. Vendor rule — wholeFile sections, never sliced: embed.js (Wavedash " +
-      "platform embed SDK), sw-embed.js (embed service worker), the Vite modulepreload polyfill and the " +
-      "bundled three.js r186 region inside assets/index-gCVK5XnX.js (core + node/TSL + WebGPURenderer/" +
-      "WebGLRenderer), content-anchored and guarded. Boundary note: the app's first slice is the tail of a " +
-      "minifier-merged `var` declaration whose head closes the three.js region, so it starts mid-declaration " +
-      "(flagged `boundary`; still byte-exact and standalone-parsing). Machinery/non-standalone parts are " +
-      "skipped or wholeFile sections, indexed but never sliced: the final export table of every module worker. " +
-      "Stylesheet rule — embed.css is wholeFile. Inline <script>/<style> scan: index.html carries one inline " +
-      "<style> block; `embed` (the dynamic platform shell, JWT-bearing) carries the inline " +
-      "window.__WAVEDASH_GAME__ boot script — twins + readable/index-inline-map.json (the `embed` bytes " +
-      "rotate per session: JWT/sessionToken, marked dynamic in the manifest). Binary payloads — tex/*.webp " +
-      "(24 textures) and sfx/*.wav (45 sounds) — are sha256-recorded notRendered: served byte-exact, never " +
-      "text-derived, never re-encoded. Identifiers in src/ are the bundle's own minified names — the rename " +
-      "campaign (PLAN §5) is recorded as an open task in README.md, not claimed here. Capture bytes are " +
-      "untouched by everything above; re-cut with `node tools/derive.mjs` after any capture refresh. " +
+      "BMX MOUNTAIN (https://wavedash.com/games/bmx-mountain) is capture-class: a custom Vite " +
+      "production build served by the Wavedash platform from a per-build CDN host (the platform page " +
+      "server-renders playKey/gameCloudId/gameBuild and the game runs in an iframe whose src carries the " +
+      "playKey + sdkconfig; see tools/update.mjs). §0.4 fork-over-mirror was checked on 2026-10-13 — the " +
+      "page carries no link to a public source repo (platform SDK/library credits only; the bundle ships no " +
+      "LICENSE/source references of its own), so the mirror stands. Derived pipeline: capture → pinned " +
+      "prettier 3.9.6 (module API, default options, applied to a VERIFIED FIXED POINT — ≤4 passes, " +
+      "stability checked at derive time; every file stabilizes in one pass except the main game bundle, " +
+      "which needs two; never the CLI: it respects .gitignore and can silently echo its input) → " +
+      "readable/<served path>.pretty.js|css per captured JS/CSS file (the capture preserves the served URL " +
+      "structure — repo root == CDN host root — so the derived layers MIRROR it: real subdirectories and " +
+      "the served filenames (hash included) are kept, no __-flattening; every pretty provably NOT " +
+      "byte-identical to its capture source) → statement-aligned slices src/<served path>-NN.js of every " +
+      "APP chunk (top-level declaration boundaries only, ~250-350 line windows; oversized single " +
+      "declarations stay whole) with an exact 2-line provenance header. The identifier rename campaign " +
+      "(PLAN §5) is applied to the app slices: the chunk's top-level bindings get semantic names " +
+      "(tools/names.json), written by tools/apply-names.mjs with a scope-aware token pass, recovered " +
+      "mechanically into rename-map.json (tools/recover-scoped-map.mjs: token alignment, non-identifier " +
+      "positions identical) and re-applied by tools/derive.mjs through that recorded map — `files` " +
+      "word-boundary records plus `scoped` token-index records; the chunk's fired bindings are recorded " +
+      "here as sources[].renameBindings. Vendor identifiers and public export names keep their served " +
+      "names. Every slice parses standalone under `node --input-type=module --check -` and round-trips " +
+      "byte-exact to its recorded readable line range (through the recorded rename map where the chunk is " +
+      "renamed). Vendor rule — wholeFile sections, never sliced: embed.js (Wavedash platform embed SDK), " +
+      "sw-embed.js (embed service worker), the Vite modulepreload polyfill and the bundled three.js r186 " +
+      "region inside assets/index-gCVK5XnX.js (core + node/TSL + WebGPURenderer/WebGLRenderer), " +
+      "content-anchored and guarded. Boundary note: the app's first slice is the tail of a minifier-merged " +
+      "`var` declaration whose head closes the three.js region, so it starts mid-declaration (flagged " +
+      "`boundary`; still byte-exact and standalone-parsing). Machinery/non-standalone parts are skipped or " +
+      "wholeFile sections, indexed but never sliced. Stylesheet rule — embed.css is wholeFile. Inline " +
+      "<script>/<style> scan: index.html carries one inline <style> block; `embed` (the dynamic platform " +
+      "shell, JWT-bearing) carries the inline window.__WAVEDASH_GAME__ boot script — twins + readable/" +
+      "index-inline-map.json (the `embed` bytes rotate per session: JWT/sessionToken, marked dynamic in " +
+      "the manifest). Binary payloads — tex/*.webp (24 textures) and sfx/*.wav (45 sounds) — are " +
+      "sha256-recorded notRendered: served byte-exact, never text-derived, never re-encoded. Capture bytes " +
+      "are untouched by everything above; re-cut with `node tools/derive.mjs` after any capture refresh. " +
       "`node tools/audit.js` is the gate.",
     renderOptions: {
       _default:
@@ -732,13 +850,25 @@ async function main() {
     source:
       `readable/: ${sources.filter((s) => s.sourceFile?.endsWith(".pretty.js")).length} JS pretties ` +
       `(${appJs.length} app chunk(s) sliced, ${vendorJsS.length} vendor wholeFile) + ` +
-      `${sources.filter((s) => s.sourceFile?.endsWith(".pretty.css")).length} CSS pretties; ` +
-      `src/: ${appJs.reduce((n, s) => n + s.slices, 0)} statement-aligned slices across ${appJs.length} app chunk(s); ` +
+      `${cssSources.length} CSS pretties; ` +
+      `src/: ${appJs.reduce((n, s) => n + s.slices, 0)} statement-aligned slices across ${appJs.length} app chunk(s) ` +
+      `(served-path layout, <chunk>-NN.js); ` +
       `${sections.filter((s) => s.skipped).length} skipped section(s); ` +
       `${sections.filter((s) => s.wholeFile).length} wholeFile section(s); ` +
+      `rename campaign: ${renamedFiles} app chunk(s) with recorded renames ` +
+      `(${renamedNames} name record(s), ${indexedOccurrences} indexed occurrence(s)) through rename-map.json; ` +
       `capture: ${captured.length} files under .upstream/manifest.json; ` +
       `notRendered: ${notRendered.length} binary payload(s) (tex/sfx); inline scan: ${inlineFiles.join(", ")} ` +
       `(${inlineMapBlocks.length} inline content block(s)).`,
+    rename: {
+      map: "rename-map.json",
+      chunks: renamedFiles,
+      names: renamedNames,
+      indexedOccurrences,
+      note:
+        "Semantic renames are recorded per slice in rename-map.json and re-applied on every re-cut. " +
+        "Vendor identifiers and public export names keep their served names (vendor/non-standalone rule).",
+    },
     inline: {
       scanned: inlineFiles,
       contentBlocks: inlineMapBlocks.length,
@@ -753,7 +883,7 @@ async function main() {
     sections,
     notRendered,
   };
-  fs.writeFileSync(path.join(proj, "split-spec.json"), JSON.stringify(spec, null, 2) + "\n");
+  writeDerived("split-spec.json", JSON.stringify(spec, null, 2) + "\n");
 
   // ── 6) self-check (tools/audit.js is the authoritative gate) ────────────
   let bad = 0;
@@ -785,11 +915,13 @@ async function main() {
   for (const s of sections) {
     if (s.wholeFile || s.skipped) continue;
     ranged++;
-    const abs = path.join(srcDir, s.file);
+    const abs = path.join(proj, "src", s.file);
     const text = fs.readFileSync(abs, "utf8");
     const nl2 = text.indexOf("\n", text.indexOf("\n") + 1);
     const body = text.slice(nl2 + 1);
-    const expected = readLines(path.join(proj, s.sourceFile)).slice(s.startLine - 1, s.endLine).join("\n") + "\n";
+    const raw = readLines(path.join(proj, s.sourceFile)).slice(s.startLine - 1, s.endLine).join("\n") + "\n";
+    const record = recordsFor(renameMap, s.file);
+    const expected = record ? applyRecordedMap(raw, record) : raw;
     if (body !== expected) {
       console.error(`ROUND-TRIP FAIL ${s.file}`);
       bad++;
