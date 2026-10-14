@@ -1,7 +1,7 @@
 // assets/index-gCVK5XnX 04 — math
 // Lines 47907-48286 of readable/assets/index-gCVK5XnX.pretty.js (statement-aligned).
-var xI = 2.9,
-  SI = 6.1,
+var TRAIL_HALF_WIDTH = 2.9,
+  TRAIL_FADE = 6.1,
   CI = 0.1,
   wI = (9 * Math.PI) / 180,
   TI = (10 * Math.PI) / 180,
@@ -147,12 +147,12 @@ var xI = 2.9,
       this.path = gI(II, 9);
       let t = Float32Array.from(this.path, (e) => uI(e.x, e.z)),
         n = this.profile(t),
-        r = Math.min(this.path.length, Math.round(BI / dI) + 1);
+        r = Math.min(this.path.length, Math.round(BI / SAMPLE_STEP) + 1);
       ((this.path = this.path.slice(0, r)),
         (this.ground = t.slice(0, r)),
         (this.base = n.slice(0, r)));
       let i = this.path.length;
-      ((this.length = (i - 1) * dI),
+      ((this.length = (i - 1) * SAMPLE_STEP),
         (this.feat = new Float32Array(Math.ceil(this.length / CI) + 2)));
       for (let t of e) this.build(t);
       ((this.finish = this.length - 12),
@@ -160,25 +160,25 @@ var xI = 2.9,
         (this.index = new _I(this.path, 16, 40)));
     }
     at(e) {
-      return this.path[Y(Math.round(e / dI), 0, this.path.length - 1)];
+      return this.path[clamp(Math.round(e / SAMPLE_STEP), 0, this.path.length - 1)];
     }
     pointAt(e, t, n = 0) {
       bI(this.path, e, t, n);
     }
     baseAt(e) {
-      return yI(this.base, e / dI);
+      return yI(this.base, e / SAMPLE_STEP);
     }
     featureAt(e) {
       return yI(this.feat, e / CI);
     }
     bankAt(e) {
-      return yI(this.bank, e / dI);
+      return yI(this.bank, e / SAMPLE_STEP);
     }
     bermAt(e, t) {
       let n = this.bankAt(e);
       if (n === 0) return 0;
-      let r = Y(((n > 0 ? -t : t) + xI) / (2 * xI));
-      return Math.abs(n) * 2 * xI * (0.2 * r + r ** 3 - 0.48 * r ** 5);
+      let r = clamp(((n > 0 ? -t : t) + TRAIL_HALF_WIDTH) / (2 * TRAIL_HALF_WIDTH));
+      return Math.abs(n) * 2 * TRAIL_HALF_WIDTH * (0.2 * r + r ** 3 - 0.48 * r ** 5);
     }
     surface(e, t) {
       return this.baseAt(e) + this.featureAt(e) + this.bermAt(e, t);
@@ -189,7 +189,7 @@ var xI = 2.9,
         n.kind !== `rollers` &&
           (t = Math.max(
             t,
-            X(n.lip - 15, n.lip - 5, e) * (1 - X(n.end + 10, n.end + 25, e)),
+            smoothstep(n.lip - 15, n.lip - 5, e) * (1 - smoothstep(n.end + 10, n.end + 25, e)),
           ));
       return t;
     }
@@ -197,7 +197,7 @@ var xI = 2.9,
       let r = 0;
       for (let n = e; n < e + t; n += 2)
         r = Math.max(r, Math.abs(this.at(n).k));
-      return Math.sqrt((n * J.g) / Math.max(r, 1e-4));
+      return Math.sqrt((n * PHYSICS.g) / Math.max(r, 1e-4));
     }
     featureOf(e) {
       for (let t of this.features) if (e >= t.start && e <= t.end) return t;
@@ -212,22 +212,22 @@ var xI = 2.9,
     profile(e) {
       let t = e.length,
         n = Float32Array.from(fI(e, 60, 120, 2)),
-        r = 0.03 * dI,
-        i = 0.42 * dI,
+        r = 0.03 * SAMPLE_STEP,
+        i = 0.42 * SAMPLE_STEP,
         a = Float32Array.from(n);
       for (let e = 0; e < 300; e++) {
         for (let e = 0; e < t; e++) a[e] += 0.3 * (n[e] - a[e]);
-        for (let e = 1; e < t; e++) a[e] = Y(a[e], a[e - 1] - i, a[e - 1] - r);
+        for (let e = 1; e < t; e++) a[e] = clamp(a[e], a[e - 1] - i, a[e - 1] - r);
       }
       let o = Float32Array.from(a);
       for (let e = 4; e < t - 4; e++)
         o[e] =
           (a[e - 4] + a[e - 2] * 2 + a[e] * 3 + a[e + 2] * 2 + a[e + 4]) / 9;
-      let s = Math.round(80.5 / dI),
-        c = (o[s + 1] - o[s - 1]) / (2 * dI),
+      let s = Math.round(80.5 / SAMPLE_STEP),
+        c = (o[s + 1] - o[s - 1]) / (2 * SAMPLE_STEP),
         l = o[s] - c * VI;
       for (let e = 0; e < s; e++) {
-        let t = Math.max(0, e * dI - 60.5);
+        let t = Math.max(0, e * SAMPLE_STEP - 60.5);
         o[e] = l + (c / 40) * t * t;
       }
       return o;
@@ -243,7 +243,7 @@ var xI = 2.9,
       if (e.kind !== `rollers`) return this.jump(e);
       let { at: t, count: n, pitch: r, height: i } = e;
       for (let e = 0; e <= n * r; e += CI)
-        this.add(t + e, (i * (1 - Math.cos((DF * e) / r))) / 2);
+        this.add(t + e, (i * (1 - Math.cos((TAU * e) / r))) / 2);
       let a = e.creek ? t + r : void 0;
       this.features.push({
         kind: `rollers`,
@@ -306,18 +306,18 @@ var xI = 2.9,
       });
     }
     flight(e, t, n, r) {
-      let i = Math.sqrt(Math.max(1, t * t - 2 * J.g * n)),
+      let i = Math.sqrt(Math.max(1, t * t - 2 * PHYSICS.g * n)),
         a = r * 0.83 - Math.atan(-this.grade(e)),
         o = [],
         s = 0,
         c = 0,
         l = i * Math.cos(a),
         u = i * Math.sin(a),
-        d = J.dragUp / J.mass,
+        d = PHYSICS.dragUp / PHYSICS.mass,
         f = 0.002;
       for (let t = 0; t <= PI;) {
         let n = Math.hypot(l, u);
-        ((l -= d * n * l * f), (u -= (J.airG + d * n * u) * f));
+        ((l -= d * n * l * f), (u -= (PHYSICS.airG + d * n * u) * f));
         let r = s + l * f,
           i = c + u * f;
         for (; t <= r && t <= PI;)
@@ -339,7 +339,7 @@ var xI = 2.9,
         e.kind === `step`
           ? Math.max(s, a - (i - t) * MI)
           : e.kind === `double`
-            ? Y(a - Math.min(i - r[0], r[1] - i) * OI, -0.4, a)
+            ? clamp(a - Math.min(i - r[0], r[1] - i) * OI, -0.4, a)
             : o
               ? Math.min(a, c(i) + Math.max(0, Math.abs(i - n) - o.open / 2))
               : a;
@@ -351,32 +351,32 @@ var xI = 2.9,
       for (let r = 0; r < e; r++) {
         let i = Math.sqrt(n);
         t[r] = i;
-        let a = (this.base[Math.min(e - 1, r + 1)] - this.base[r]) / dI,
-          o = Math.min(J.pedalForce, J.pedalPower / Math.max(1, i)) / J.mass,
+        let a = (this.base[Math.min(e - 1, r + 1)] - this.base[r]) / SAMPLE_STEP,
+          o = Math.min(PHYSICS.pedalForce, PHYSICS.pedalPower / Math.max(1, i)) / PHYSICS.mass,
           s =
-            (-J.g * a) / Math.hypot(1, a) -
-            J.crrDirt * J.g +
+            (-PHYSICS.g * a) / Math.hypot(1, a) -
+            PHYSICS.crrDirt * PHYSICS.g +
             o -
-            (J.dragUp / J.mass) * i * i;
-        n = Math.max(4, n + 2 * s * dI);
+            (PHYSICS.dragUp / PHYSICS.mass) * i * i;
+        n = Math.max(4, n + 2 * s * SAMPLE_STEP);
       }
       return t;
     }
     banking() {
       let e = this.path.length,
         t = new Float32Array(e),
-        n = 8 / dI,
+        n = 8 / SAMPLE_STEP,
         r = this.flatOut();
       for (let i = 0; i < e; i++) {
         let e = this.path[i].k,
-          a = Math.min(FI, (r[i] * r[i] * Math.abs(e)) / J.g),
-          o = X(1 / 140, 1 / 60, Math.abs(e)),
+          a = Math.min(FI, (r[i] * r[i] * Math.abs(e)) / PHYSICS.g),
+          o = smoothstep(1 / 140, 1 / 60, Math.abs(e)),
           s = 0;
         for (let e = -n; e <= n; e += 4)
-          s = Math.max(s, this.featureAt((i + e) * dI));
-        ((o *= 1 - X(0.05, 0.4, s)), (t[i] = Math.sign(e) * a * o));
+          s = Math.max(s, this.featureAt((i + e) * SAMPLE_STEP));
+        ((o *= 1 - smoothstep(0.05, 0.4, s)), (t[i] = Math.sign(e) * a * o));
       }
-      let i = 8 / dI;
+      let i = 8 / SAMPLE_STEP;
       return Float32Array.from(fI(t, i, 3 * i, 2, !1));
     }
   };

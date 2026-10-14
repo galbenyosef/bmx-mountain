@@ -30,16 +30,16 @@ function G6(e) {
 }
 function K6(e) {
   let t = new nS(),
-    n = (e) => oB(`rock${e}`, `vec4`),
+    n = (e) => tslAttribute(`rock${e}`, `vec4`),
     r = BB(n(0), n(1), n(2), n(3)),
-    i = oB(`rockLook`, `vec2`),
+    i = tslAttribute(`rockLook`, `vec2`),
     a = i.x.toInt(),
-    o = (t) => OV(e, jB(kB(BV), t)).xyz;
-  t.positionNode = qz(() => {
+    o = (t) => OV(e, jB(tslInt(BV), t)).xyz;
+  t.positionNode = tslFn(() => {
     let e = r.mul(o(a)).xyz;
     return (cV.assign(e), YB.assign(AV(o(a.add(4)), r)), e);
   })();
-  let s = O$(a$.boulder, 2.2, 0.3);
+  let s = O$(FOLIAGE.boulder, 2.2, 0.3);
   return (
     (t.colorNode = IV(i.y).mul(s.color)),
     (t.roughnessNode = s.roughness),
@@ -84,10 +84,10 @@ function q6(e, t) {
 function J6(e, t, n, { data: r, balls: i, cells: a }) {
   let o = i.length / 4,
     s = uH(t),
-    c = r.map((e, t) => dH(o, t < 4 ? 4 : 2));
+    c = r.map((e, t) => makeBuffer(o, t < 4 ? 4 : 2));
   (c.forEach((e, t) => s.setAttribute(t < 4 ? `rock${t}` : `rockLook`, e)),
     (s.instanceCount = 0));
-  let l = eH(s, n, e !== f3.Eye);
+  let l = addMesh(s, n, e !== f3.Eye);
   return (
     l.layers.set(e),
     (l.frustumCulled = !1),
@@ -137,10 +137,10 @@ var X6 = { high: 1, driven: 0.15, foot: 0.017, top: 0.013 },
   a8 = new Yn(RG);
 function o8() {
   let e = new nS({ roughness: 0.4, side: 2 }),
-    t = FV().x.add(FV().y.mul(e8)).div(r8),
+    t = tslUv().x.add(tslUv().y.mul(e8)).div(r8),
     n = CB(t),
-    r = Q(n.negate().add(0.25), n.add(0.25), eB(SB(t).sub(0.5)));
-  return ((e.colorNode = UB(gH(a8), gH(i8), r)), e);
+    r = tslSmoothstep(n.negate().add(0.25), n.add(0.25), tslAbs(SB(t).sub(0.5)));
+  return ((e.colorNode = tslMix(gH(a8), gH(i8), r)), e);
 }
 function s8(e, t, n) {
   return e.map((e) => {
@@ -148,7 +148,7 @@ function s8(e, t, n) {
       i = new M(e.x, e.y - X6.driven, e.z),
       a = (e) => i.clone().addScaledVector(GV, e).addScaledVector(r, e);
     return (
-      n.push($V(i, a(X6.driven + X6.high), X6.foot, X6.top, 6)),
+      n.push(makeTube(i, a(X6.driven + X6.high), X6.foot, X6.top, 6)),
       a(X6.driven + Q6)
     );
   });
@@ -191,7 +191,7 @@ function m8(e, t, n) {
 var h8 = class {
     group = new Hn();
     constructor(e) {
-      let t = HF(53),
+      let t = makeRng(53),
         n = [],
         r = { pos: [], nor: [], uvs: [], idx: [] };
       for (let i of e) m8(s8(i, t, n), t, r);
@@ -201,11 +201,11 @@ var h8 = class {
         i.setAttribute(`normal`, new Fr(new Float32Array(r.nor), 3)),
         i.setAttribute(`uv`, new Fr(new Float32Array(r.uvs), 2)),
         i.setIndex(r.idx),
-        this.group.add(eH(tH(n), hH(pH.wood)), eH(i, o8())));
+        this.group.add(addMesh(mergeGeometry(n), hH(pH.wood)), addMesh(i, o8())));
     }
   },
   g8 = 32,
-  _8 = (oz - 1) / g8,
+  _8 = (GRID_N - 1) / g8,
   v8 = [1, 2, 4, 8],
   y8 = [140, 380, 850],
   b8 = 12,
@@ -214,7 +214,7 @@ var h8 = class {
   C8 = 5e3;
 function w8() {
   let e = new nS(),
-    t = j$(MB(IU()));
+    t = j$(tslLength(IU()));
   return (
     (e.colorNode = t.color),
     (e.roughnessNode = t.roughness),

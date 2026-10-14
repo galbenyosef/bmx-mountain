@@ -1,6 +1,6 @@
-// assets/index-gCVK5XnX 24 — math
+// assets/index-gCVK5XnX 24 — fixed_step
 // Lines 54938-55366 of readable/assets/index-gCVK5XnX.pretty.js (statement-aligned).
-var cq = (function (e) {
+var BONES = (function (e) {
     return (
       (e[(e.pelvis = 0)] = `pelvis`),
       (e[(e.chest = 1)] = `chest`),
@@ -29,7 +29,7 @@ var cq = (function (e) {
   ],
   dq = uq.reduce((e, t) => e + t),
   fq = 0.06,
-  pq = 1 / 120,
+  FIXED_STEP = 1 / 120,
   mq = 14,
   hq = 0.6,
   gq = 0.25,
@@ -70,9 +70,9 @@ var cq = (function (e) {
         ((this.p[i] = e[r].x),
           (this.p[i + 1] = e[r].y),
           (this.p[i + 2] = e[r].z),
-          (this.q[i] = e[r].x - t[r].x * pq),
-          (this.q[i + 1] = e[r].y - (t[r].y + n) * pq),
-          (this.q[i + 2] = e[r].z - t[r].z * pq));
+          (this.q[i] = e[r].x - t[r].x * FIXED_STEP),
+          (this.q[i + 1] = e[r].y - (t[r].y + n) * FIXED_STEP),
+          (this.q[i + 2] = e[r].z - t[r].z * FIXED_STEP));
       }
       let r = (t, n) =>
           Math.hypot(e[t].x - e[n].x, e[t].y - e[n].y, e[t].z - e[n].z),
@@ -139,9 +139,9 @@ var cq = (function (e) {
       );
     }
     update(e) {
-      for (this.acc += Math.min(e, 0.1); this.acc >= pq;)
-        ((this.acc -= pq), this.was.set(this.p), this.step());
-      this.alpha = this.acc / pq;
+      for (this.acc += Math.min(e, 0.1); this.acc >= FIXED_STEP;)
+        ((this.acc -= FIXED_STEP), this.was.set(this.p), this.step());
+      this.alpha = this.acc / FIXED_STEP;
     }
     step() {
       this.follow && this.drift();
@@ -153,12 +153,12 @@ var cq = (function (e) {
         this.limitFixes(),
         this.bounceOff(),
         (this.slide = this.friction() / dq),
-        (this.still = e < 0.3 ? this.still + pq : 0));
+        (this.still = e < 0.3 ? this.still + FIXED_STEP : 0));
     }
     drift() {
       let e = this.p,
         t = this.q,
-        n = Math.min(1, pq * 3),
+        n = Math.min(1, FIXED_STEP * 3),
         r = (this.target.x - e[0]) * n,
         i = (this.target.y - e[1]) * n,
         a = (this.target.z - e[2]) * n;
@@ -183,19 +183,19 @@ var cq = (function (e) {
           (t[i + 1] = e[i + 1]),
           (t[i + 2] = e[i + 2]),
           (e[i] += a),
-          (e[i + 1] += o - J.g * pq * pq),
+          (e[i + 1] += o - PHYSICS.g * FIXED_STEP * FIXED_STEP),
           (e[i + 2] += s),
           (n[i] = e[i]),
           (n[i + 1] = e[i + 1]),
           (n[i + 2] = e[i + 2]),
-          (r = Math.max(r, Math.hypot(a, o, s) / pq)));
+          (r = Math.max(r, Math.hypot(a, o, s) / FIXED_STEP)));
       }
       return r;
     }
     reachOut() {
       let e = this.p;
-      this.braceT -= pq;
-      let t = Math.min(1, pq * vq);
+      this.braceT -= FIXED_STEP;
+      let t = Math.min(1, FIXED_STEP * vq);
       for (let n of [5, 8]) {
         let r = n * 3;
         ((e[r] += (e[3] + this.braceDir.x * 0.55 - e[r]) * t),
@@ -262,9 +262,9 @@ var cq = (function (e) {
         let o = a * 3,
           s = a * 4,
           c = this.touching[a],
-          l = (n[o] - t[o]) / pq,
-          u = (n[o + 1] - t[o + 1]) / pq,
-          d = (n[o + 2] - t[o + 2]) / pq,
+          l = (n[o] - t[o]) / FIXED_STEP,
+          u = (n[o + 1] - t[o + 1]) / FIXED_STEP,
+          d = (n[o + 2] - t[o + 2]) / FIXED_STEP,
           f = e[o + 1] - lq[a] - r[s] < (c & 1 ? fq : 0.02),
           p = i[a * 2] !== 0 || i[a * 2 + 1] !== 0,
           m = 0;
@@ -283,8 +283,8 @@ var cq = (function (e) {
           a = e[r + 1] - n[r + 1],
           o = e[r + 2] - n[r + 2],
           s = Math.hypot(i, a, o);
-        if (s <= _q * pq) continue;
-        let c = 1 - (_q * pq) / s;
+        if (s <= _q * FIXED_STEP) continue;
+        let c = 1 - (_q * FIXED_STEP) / s;
         ((t[r] += i * c), (t[r + 1] += a * c), (t[r + 2] += o * c));
       }
     }
@@ -316,9 +316,9 @@ var cq = (function (e) {
           m = u - s * p,
           h = d - c * p,
           g = f - l * p,
-          _ = Math.hypot(m, h, g) / pq;
+          _ = Math.hypot(m, h, g) / FIXED_STEP;
         r += _ * uq[i];
-        let v = Math.max(0, _ - hq * J.g * c * pq),
+        let v = Math.max(0, _ - hq * PHYSICS.g * c * FIXED_STEP),
           y = Math.sqrt(Math.max(0, 1 - c * c)) / Math.max(0.2, c),
           b = v < gq && y < hq ? 0 : _ > 1e-6 ? v / _ : 0;
         ((m *= b), (h *= b), (g *= b));

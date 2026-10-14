@@ -3,7 +3,7 @@
 function UI(e) {
   let t = 0;
   for (; t < PI && !(e(t) < 0 && e(t) < e(t - NI));) t += NI;
-  return Y(Math.atan(e(t - 0.5) - e(t + 0.5)) - wI, TI, EI);
+  return clamp(Math.atan(e(t - 0.5) - e(t + 0.5)) - wI, TI, EI);
 }
 function WI(e, t) {
   let n = 1.6,
@@ -73,20 +73,20 @@ var GI = [
     constructor(e) {
       ((this.trail = e), (this.path = gI(dL(e), 6)));
       let t = this.path.length;
-      ((this.length = (t - 1) * dI),
+      ((this.length = (t - 1) * SAMPLE_STEP),
         (this.fromTrail = Float32Array.from(this.path, (t) =>
           e.locate(t.x, t.z, sL, 30) ? Math.abs(sL.u) : 30,
         )),
-        (this.over = this.fromTrail.map((e) => 1 - X(SI - 1.5, SI + 0.5, e))));
+        (this.over = this.fromTrail.map((e) => 1 - smoothstep(TRAIL_FADE - 1.5, TRAIL_FADE + 0.5, e))));
       let n = (e) =>
         [0, 1].map((t) =>
-          Float32Array.from(this.path, (n, r) => e(r * dI, r, t)),
+          Float32Array.from(this.path, (n, r) => e(r * SAMPLE_STEP, r, t)),
         );
       ((this.half = n((e, t, n) => {
-        let r = 1 + YI * (1 - X(SI, SI + 10, this.fromTrail[t])),
+        let r = 1 + YI * (1 - smoothstep(TRAIL_FADE, TRAIL_FADE + 10, this.fromTrail[t])),
           i =
-            OF(KI, qI, X(0, 700, e)) * r * (1 + JI * cL.noise(e / 11, n * 7.3)),
-          a = Y((e - (this.length - iL)) / iL),
+            lerp(KI, qI, smoothstep(0, 700, e)) * r * (1 + JI * cL.noise(e / 11, n * 7.3)),
+          a = clamp((e - (this.length - iL)) / iL),
           o = aL * (1 + 0.25 * cL.fbm(e / 9, n * 5.1 + 20, 2));
         return a > 0
           ? Math.max(
@@ -102,7 +102,7 @@ var GI = [
         (this.pool = Float32Array.from(
           this.path,
           (e, t) =>
-            $I * X(0, 0.6, cL.noise((t * dI) / 14, 11.5)) * (1 - this.over[t]),
+            $I * smoothstep(0, 0.6, cL.noise((t * SAMPLE_STEP) / 14, 11.5)) * (1 - this.over[t]),
         )),
         (this.bed = new Float32Array(t)),
         (this.water = new Float32Array(t)),
@@ -118,16 +118,16 @@ var GI = [
       for (let e = 0; e < t; e++) {
         let t = this.path[e];
         this.fromTrail[e] < 6.1 && this.trail.locate(t.x, t.z, sL, 6.1)
-          ? (n[e] = this.trail.surface(sL.s, Y(sL.u, -xI, xI)) - 0.03)
+          ? (n[e] = this.trail.surface(sL.s, clamp(sL.u, -TRAIL_HALF_WIDTH, TRAIL_HALF_WIDTH)) - 0.03)
           : (n[e] -= this.depth(e));
       }
       for (let e = 1; e < t; e++) n[e] = Math.min(n[e], n[e - 1]);
-      let r = Math.round((this.length - iL) / dI),
+      let r = Math.round((this.length - iL) / SAMPLE_STEP),
         i = n[r] + oL;
       for (let e = 0; e < t; e++) {
         this.bed[e] = e > r ? n[r] : n[e];
-        let t = 1 - X(SI, SI + 6, this.fromTrail[e]);
-        this.water[e] = Math.max(i, this.bed[e] + OF(eL, 0.12, t));
+        let t = 1 - smoothstep(TRAIL_FADE, TRAIL_FADE + 6, this.fromTrail[e]);
+        this.water[e] = Math.max(i, this.bed[e] + lerp(eL, 0.12, t));
       }
     }
     nearest(e, t, n) {
@@ -135,7 +135,7 @@ var GI = [
       for (let i = 0; i < this.path.length; i += 8) {
         let a = this.path[i],
           o = (a.x - e) ** 2 + (a.z - t) ** 2;
-        o >= r || ((r = o), (n.x = a.x), (n.z = a.z), (n.t = i * dI));
+        o >= r || ((r = o), (n.x = a.x), (n.z = a.z), (n.t = i * SAMPLE_STEP));
       }
       return ((n.y = this.waterAt(n.t)), Math.sqrt(r));
     }
@@ -146,25 +146,25 @@ var GI = [
       bI(this.path, e, t, n);
     }
     halfWidth(e, t) {
-      return yI(this.half[lL(t)], e / dI);
+      return yI(this.half[lL(t)], e / SAMPLE_STEP);
     }
     reach(e, t) {
       return this.halfWidth(e, t) + XI;
     }
     bedAt(e) {
-      return yI(this.bed, e / dI);
+      return yI(this.bed, e / SAMPLE_STEP);
     }
     waterAt(e) {
-      return yI(this.water, e / dI);
+      return yI(this.water, e / SAMPLE_STEP);
     }
     overTrail(e) {
-      return yI(this.over, e / dI);
+      return yI(this.over, e / SAMPLE_STEP);
     }
     flowAt(e) {
       let t = (this.bedAt(e - 3) - this.bedAt(e + 3)) / 6;
       return (
         (0.4 + 6 * Math.sqrt(Math.max(0, t))) *
-        (1 - X(this.length - iL, this.length - iL + 8, e) * 0.85)
+        (1 - smoothstep(this.length - iL, this.length - iL + 8, e) * 0.85)
       );
     }
     channel(e, t, n) {
@@ -172,21 +172,21 @@ var GI = [
         i = Math.abs(t),
         a = this.bedAt(e);
       return i <= r
-        ? a - (nL * r + yI(this.pool, e / dI)) * (1 - (i / r) ** 2)
-        : OF(a, n, X(r, r + this.riseAt(e, t), i));
+        ? a - (nL * r + yI(this.pool, e / SAMPLE_STEP)) * (1 - (i / r) ** 2)
+        : lerp(a, n, smoothstep(r, r + this.riseAt(e, t), i));
     }
     riseAt(e, t) {
-      return yI(this.rise[lL(t)], e / dI);
+      return yI(this.rise[lL(t)], e / SAMPLE_STEP);
     }
     top(e) {
-      let t = Y(Math.round(e / dI), 0, this.path.length - 1);
+      let t = clamp(Math.round(e / SAMPLE_STEP), 0, this.path.length - 1);
       return Math.max(this.waterAt(e) + 0.12, this.bedAt(e) + this.depth(t));
     }
     gully(e, t) {
       return this.top(e) + rL * Math.max(0, Math.abs(t) - this.reach(e, t));
     }
     depth(e) {
-      return QI * X(SI, SI + 14, this.fromTrail[e]);
+      return QI * smoothstep(TRAIL_FADE, TRAIL_FADE + 14, this.fromTrail[e]);
     }
   };
 function dL(e) {
@@ -244,30 +244,30 @@ function TL(e) {
 }
 function EL(e, t, n, r) {
   if (n >= _L || r >= 1.1) return 0;
-  let i = X(0.4, 0.62, pL.fbm(e / 340 + 4, t / 340 - 2, 4) * 0.5 + 0.5);
+  let i = smoothstep(0.4, 0.62, pL.fbm(e / 340 + 4, t / 340 - 2, 4) * 0.5 + 0.5);
   return (
-    (i *= 0.35 + 0.65 * X(hL[0], hL[1], n)),
-    (i *= 1 - X(430, _L, n)),
-    i * (1 - X(0.75, 1.1, r))
+    (i *= 0.35 + 0.65 * smoothstep(hL[0], hL[1], n)),
+    (i *= 1 - smoothstep(430, _L, n)),
+    i * (1 - smoothstep(0.75, 1.1, r))
   );
 }
 function DL(e, t, n) {
   return n >= gL[1]
     ? 0
-    : X(0.52, 0.66, mL.fbm(e / 210 - 9, t / 210 + 3, 3) * 0.5 + 0.5) *
-        (1 - X(gL[0], gL[1], n));
+    : smoothstep(0.52, 0.66, mL.fbm(e / 210 - 9, t / 210 + 3, 3) * 0.5 + 0.5) *
+        (1 - smoothstep(gL[0], gL[1], n));
 }
 function OL(e, t, n, r) {
   if (r <= 0.25 && n <= 350) return 0;
   let i = pL.fbm(e / 60, t / 60, 3) * 0.5 + 0.5,
-    a = X(0.55, 0.95, r + (i - 0.5) * 0.5),
-    o = X(420, 560, n + i * 60) * 0.8;
+    a = smoothstep(0.55, 0.95, r + (i - 0.5) * 0.5),
+    o = smoothstep(420, 560, n + i * 60) * 0.8;
   return Math.max(a, o);
 }
 function kL(e, t, n, r) {
   return n <= 515
     ? 0
-    : X(560, 620, n + mL.fbm(e / 45, t / 45, 3) * 40) * (1 - X(0.9, 1.4, r));
+    : smoothstep(560, 620, n + mL.fbm(e / 45, t / 45, 3) * 40) * (1 - smoothstep(0.9, 1.4, r));
 }
 function AL(e, t, n, r) {
   let i = Math.floor((2 * e) / t);
@@ -276,13 +276,13 @@ function AL(e, t, n, r) {
 }
 function jL(e, t) {
   let n = [],
-    r = HF(77);
+    r = makeRng(77);
   return (
     AL(t, 5.5, r, (t, i) => {
       let a = r(),
         o = r(),
         s = r(),
-        c = r() * DF,
+        c = r() * TAU,
         l = r(),
         u = e.height(t, i),
         d = e.slope(t, i);
@@ -290,7 +290,7 @@ function jL(e, t) {
         a >
           Math.max(
             EL(t, i, u, d),
-            0.025 * (1 - X(0.7, 1, d)) * (1 - X(470, _L, u)),
+            0.025 * (1 - smoothstep(0.7, 1, d)) * (1 - smoothstep(470, _L, u)),
           ) *
             0.9 ||
         e.trailDistance(t, i, 30) < 8 + 5 * pL.noise(t / 9, i / 9) ** 2 ||
@@ -300,7 +300,7 @@ function jL(e, t) {
       )
         return;
       let f = l < DL(t, i, u),
-        p = 1 - 0.45 * X(380, 500, u),
+        p = 1 - 0.45 * smoothstep(380, 500, u),
         m = f ? 9 + s * 7 : 10 + s * s * 14;
       n.push({ x: t, y: u, z: i, h: m * p, rot: c, species: +!!f, tint: o });
     }),
@@ -309,12 +309,12 @@ function jL(e, t) {
 }
 function ML(e, t) {
   let n = [],
-    r = HF(91);
+    r = makeRng(91);
   return (
     AL(t, 9, r, (t, i) => {
       let a = r(),
         o = r(),
-        s = r() * DF,
+        s = r() * TAU,
         c = r(),
         l = e.height(t, i),
         u = e.slope(t, i);

@@ -19,7 +19,7 @@ var _R = (e) => gR(e, lR, Pee);
 function vR(e, t) {
   let n = Math.max(0, Math.abs(e - lR) - Lee),
     r = Math.max(0, t - 11, -t - 4);
-  return (1 - X(0, hR, n)) * (1 - X(0, hR, r));
+  return (1 - smoothstep(0, hR, n)) * (1 - smoothstep(0, hR, r));
 }
 var yR = 7,
   bR = -30,
@@ -84,7 +84,7 @@ var yR = 7,
     wR(-10, 10, 14.92, 15),
     wR(-10, -9.92, 0, 15),
   ],
-  ER = xI + 0.7,
+  ER = TRAIL_HALF_WIDTH + 0.7,
   DR = 0.24,
   OR = 3.5,
   kR = (e) => gR(e, RI, 0);
@@ -244,7 +244,7 @@ var LR = 0.18,
       this.others = 0;
     }
     step(e) {
-      let t = this.load + this.others - zR * J.g * BR - VR * this.rate;
+      let t = this.load + this.others - zR * PHYSICS.g * BR - VR * this.rate;
       if (
         ((this.load = 0),
         (this.rate += (t / this.inertia) * e),

@@ -1,30 +1,30 @@
 // assets/index-gCVK5XnX 47 — mul
 // Lines 62806-63147 of readable/assets/index-gCVK5XnX.pretty.js (statement-aligned).
-var i3 = qz(() => {
-    let e = eV(IU()).toVar(),
+var i3 = tslFn(() => {
+    let e = tslNormalize(IU()).toVar(),
       t = GW(e).toVar();
     t3(e, t);
     let n = e.y.greaterThan(0.004),
-      r = GW($(0, 1, -0.001)),
-      i = yB(e, hW),
-      a = GW(eV($(hW.x.negate(), 0.12, hW.z.negate()))),
-      o = Q(0.004, 0.14, e.y),
-      s = GW(eV($(e.x, 0.03, e.z))),
-      c = VB(e.y, 0.004),
+      r = GW(tslVec3(0, 1, -0.001)),
+      i = tslDot(e, hW),
+      a = GW(tslNormalize(tslVec3(hW.x.negate(), 0.12, hW.z.negate()))),
+      o = tslSmoothstep(0.004, 0.14, e.y),
+      s = GW(tslNormalize(tslVec3(e.x, 0.03, e.z))),
+      c = tslMax(e.y, 0.004),
       l = Q4(n3(7500, e, c)).mul(n.select(1, 0)),
-      u = gW.mul(dV(VB(i, 0), 5).mul(6).add(2.2)).add(r.mul(0.6));
-    t.assign(UB(t, UB(s, u, o), l.mul(0.55).mul(o)));
+      u = gW.mul(dV(tslMax(i, 0), 5).mul(6).add(2.2)).add(r.mul(0.6));
+    t.assign(tslMix(t, tslMix(s, u, o), l.mul(0.55).mul(o)));
     let d = r3(n3(2200, e, c), n, i, r, a),
-      f = HB(d.density.mul(1.4), 1).mul(UB(0.5, 1, o));
-    (Jz(_W.greaterThan(0), () => {
+      f = HB(d.density.mul(1.4), 1).mul(tslMix(0.5, 1, o));
+    (tslIf(_W.greaterThan(0), () => {
       let n = _W
-        .mul(Q(0.02, 0.3, e.y))
+        .mul(tslSmoothstep(0.02, 0.3, e.y))
         .mul(l.mul(0.8).add(f).oneMinus().max(0));
       t.addAssign($4(G4.mul(e)).mul(n));
     }),
-      t.assign(UB(t, UB(s, d.colour, o), f)));
-    let p = $(0.12, 0.11, 0.07).mul(gW.g.mul(1.4).add(r.g.mul(2)));
-    return (t.assign(UB(t, p, Q(-0.08, 0, e.y).oneMinus())), t);
+      t.assign(tslMix(t, tslMix(s, d.colour, o), f)));
+    let p = tslVec3(0.12, 0.11, 0.07).mul(gW.g.mul(1.4).add(r.g.mul(2)));
+    return (t.assign(tslMix(t, p, tslSmoothstep(-0.08, 0, e.y).oneMinus())), t);
   }),
   a3 = class {
     mesh;
@@ -124,14 +124,14 @@ var i3 = qz(() => {
     sun;
     sky;
     pipeline;
-    blur = MV(0);
-    fringe = MV(0);
-    night = MV(0);
+    blur = tslUniform(0);
+    fringe = tslUniform(0);
+    night = tslUniform(0);
     skyNow = F4();
     envs = [];
     envFrom = null;
     envTo = null;
-    envBlend = MV(0);
+    envBlend = tslUniform(0);
     hemisphere = null;
     exposure = new U4();
     resolution;
@@ -203,7 +203,7 @@ var i3 = qz(() => {
       (e.dispose(),
         (this.envFrom = aV(this.envs[0])),
         (this.envTo = aV(this.envs[1])),
-        (this.scene.environmentNode = UB(
+        (this.scene.environmentNode = tslMix(
           this.envFrom,
           this.envTo,
           this.envBlend,
@@ -219,7 +219,7 @@ var i3 = qz(() => {
         (this.sun.color.setRGB(r.r / i, r.g / i, r.b / i),
         (this.sun.intensity = 22 * i),
         this.sun.position.copy(hW.value),
-        (this.sun.shadow.camera.far = OF(l3, u3, n.night)),
+        (this.sun.shadow.camera.far = lerp(l3, u3, n.night)),
         (this.gl.toneMappingExposure = this.exposure.adapt(n, t)),
         (this.night.value = n.night),
         (rJ.value = n.night),
@@ -265,40 +265,40 @@ var i3 = qz(() => {
         (i.distanceExponent.value = 1.2),
         (i.useTemporalFiltering = !0));
       let a = z2(i.getTextureNode(), t, r, this.camera).r;
-      return RV(e.rgb.mul(UB(Z(1), a, 0.85)), 1);
+      return tslVec4(e.rgb.mul(tslMix(tslFloat(1), a, 0.85)), 1);
     }
     speedBlur(e, t, n) {
-      let r = Q(
+      let r = tslSmoothstep(
           0.03,
           0.05,
           this.gl.reversedDepthBuffer ? t.r : t.r.oneMinus(),
         ).oneMinus(),
         i = n.xy.mul(this.blur).mul(r);
-      return H2(e, i.mul(HB(Z(1), Z(0.006).div(VB(MB(i), 1e-5)))), kB(8));
+      return H2(e, i.mul(HB(tslFloat(1), tslFloat(0.006).div(tslMax(tslLength(i), 1e-5)))), tslInt(8));
     }
     grade(e) {
       let t = P2(e, 0.32, 0.55, 6),
         n = yV.sub(0.5),
         r = n.mul(
-          this.fringe.mul(Q(0.15, 0.7, MB(n.mul(LV(1.6, 1))))).mul(o3 / 0.5),
+          this.fringe.mul(tslSmoothstep(0.15, 0.7, tslLength(n.mul(tslVec2(1.6, 1))))).mul(o3 / 0.5),
         ),
         i = (
-          _Q ? e.rgb : $(e.sample(yV.add(r)).r, e.g, e.sample(yV.sub(r)).b)
+          _Q ? e.rgb : tslVec3(e.sample(yV.add(r)).r, e.g, e.sample(yV.sub(r)).b)
         ).add(t.rgb),
         a = LB(i);
-      ((i = UB($(a), i, 1.12)),
+      ((i = tslMix(tslVec3(a), i, 1.12)),
         (i = i.mul(
-          UB($(1), $(0.93, 0.98, 1.08), Q(0, 0.6, a).oneMinus().mul(0.5)),
+          tslMix(tslVec3(1), tslVec3(0.93, 0.98, 1.08), tslSmoothstep(0, 0.6, a).oneMinus().mul(0.5)),
         )),
-        (i = UB(
+        (i = tslMix(
           i,
-          UB($(a).mul($(0.42, 0.62, 1.08)), i.mul($(0.6, 0.78, 1.08)), 0.35),
+          tslMix(tslVec3(a).mul(tslVec3(0.42, 0.62, 1.08)), i.mul(tslVec3(0.6, 0.78, 1.08)), 0.35),
           this.night,
         )));
-      let o = Q(0.45, 1.25, MB(yV.sub(0.5).mul(LV(1.6, 1))))
+      let o = tslSmoothstep(0.45, 1.25, tslLength(yV.sub(0.5).mul(tslVec2(1.6, 1))))
         .mul(0.42)
         .oneMinus();
-      return RV(i.mul(o), 1);
+      return tslVec4(i.mul(o), 1);
     }
     resize() {
       ((this.camera.aspect = innerWidth / innerHeight),

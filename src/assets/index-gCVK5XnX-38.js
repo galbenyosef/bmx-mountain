@@ -1,4 +1,4 @@
-// assets/index-gCVK5XnX 38 — math
+// assets/index-gCVK5XnX 38 — smoothstep
 // Lines 59505-59851 of readable/assets/index-gCVK5XnX.pretty.js (statement-aligned).
 var r0 = (e, t) => [
     e[1] * t[2] - e[2] * t[1],
@@ -14,7 +14,7 @@ var r0 = (e, t) => [
       let n = ((e >> t) & 255) / 255;
       return n <= 0.04045 ? n / 12.92 : ((n + 0.055) / 1.055) ** 2.4;
     }),
-  o0 = {
+  DEER_COLORS = {
     back: a0(4008474),
     coat: a0(8215612),
     flank: a0(10518362),
@@ -28,8 +28,8 @@ var r0 = (e, t) => [
     innerEar: a0(12887187),
     earRim: a0(3351833),
   },
-  s0 = (e, t, n) => {
-    let r = Y(n);
+  mixColor = (e, t, n) => {
+    let r = clamp(n);
     return [
       e[0] + (t[0] - e[0]) * r,
       e[1] + (t[1] - e[1]) * r,
@@ -248,19 +248,19 @@ function T0(e, t, n, r, i, a) {
     c = -i[0] * Math.sign(t);
   switch (e) {
     case Z1.Hoof:
-      return o0.hoof;
+      return DEER_COLORS.hoof;
     case Z1.Tail:
-      return s0(
-        o0.back,
-        o0.white,
-        Math.max(X(0.3, -0.2, i[2]), X(0.024, 0.038, s)),
+      return mixColor(
+        DEER_COLORS.back,
+        DEER_COLORS.white,
+        Math.max(smoothstep(0.3, -0.2, i[2]), smoothstep(0.024, 0.038, s)),
       );
     case Z1.Leg: {
-      let e = X(0.2, 0.8, c),
-        t = s0(o0.coat, o0.leg, X(0.42, 0.3, n));
+      let e = smoothstep(0.2, 0.8, c),
+        t = mixColor(DEER_COLORS.coat, DEER_COLORS.leg, smoothstep(0.42, 0.3, n));
       return (
-        (t = s0(t, o0.belly, e * (0.4 + 0.5 * X(0.45, 0.6, n)))),
-        s0(t, o0.white, X(0.075, 0.06, n) * 0.7)
+        (t = mixColor(t, DEER_COLORS.belly, e * (0.4 + 0.5 * smoothstep(0.45, 0.6, n)))),
+        mixColor(t, DEER_COLORS.white, smoothstep(0.075, 0.06, n) * 0.7)
       );
     }
     case Z1.Head: {
@@ -269,54 +269,54 @@ function T0(e, t, n, r, i, a) {
         c = (e * B1 - t * V1) / 0.33,
         l = -i[2] * V1 + i[1] * B1,
         u = -i[2] * B1 - i[1] * V1,
-        d = s0(
-          o0.coat,
-          o0.back,
-          X(0.2, 0.85, l) * X(0.05, 0.25, c) * X(0.8, 0.55, c) * 0.75,
+        d = mixColor(
+          DEER_COLORS.coat,
+          DEER_COLORS.back,
+          smoothstep(0.2, 0.85, l) * smoothstep(0.05, 0.25, c) * smoothstep(0.8, 0.55, c) * 0.75,
         ),
         f = Math.hypot(s - a, n - W1[1], r - W1[2]);
       return (
-        (d = s0(d, o0.belly, X(0.018, 0.02, f) * X(0.025, 0.022, f) * 0.75)),
-        (d = s0(d, o0.white, X(0.7, 0.75, c) * X(0.86, 0.81, c))),
-        (d = s0(d, o0.muzzle, X(0.84, 0.9, c))),
-        (d = s0(d, o0.nose, X(0.92, 0.97, c) * X(-0.4, 0.3, u + l))),
-        s0(d, o0.white, X(0.45, 0.6, c) * X(-0.35, -0.7, l) * X(0.95, 0.88, c))
+        (d = mixColor(d, DEER_COLORS.belly, smoothstep(0.018, 0.02, f) * smoothstep(0.025, 0.022, f) * 0.75)),
+        (d = mixColor(d, DEER_COLORS.white, smoothstep(0.7, 0.75, c) * smoothstep(0.86, 0.81, c))),
+        (d = mixColor(d, DEER_COLORS.muzzle, smoothstep(0.84, 0.9, c))),
+        (d = mixColor(d, DEER_COLORS.nose, smoothstep(0.92, 0.97, c) * smoothstep(-0.4, 0.3, u + l))),
+        mixColor(d, DEER_COLORS.white, smoothstep(0.45, 0.6, c) * smoothstep(-0.35, -0.7, l) * smoothstep(0.95, 0.88, c))
       );
     }
     case Z1.Neck: {
       let e = ((o - S0[0]) * w0[0] + (n - S0[1]) * w0[1]) / C0,
         t = -i[2] * -w0[1] + i[1] * w0[0],
-        r = s0(o0.coat, o0.back, X(0.3, 0.9, t) * 0.75);
+        r = mixColor(DEER_COLORS.coat, DEER_COLORS.back, smoothstep(0.3, 0.9, t) * 0.75);
       return (
-        (r = s0(r, o0.flank, X(0, -0.6, t) * 0.7)),
-        s0(
+        (r = mixColor(r, DEER_COLORS.flank, smoothstep(0, -0.6, t) * 0.7)),
+        mixColor(
           r,
-          o0.white,
-          X(0.62, 0.7, e) *
-            X(0.97, 0.9, e) *
-            X(-0.35, -0.7, t) *
-            X(0.05, 0.03, s),
+          DEER_COLORS.white,
+          smoothstep(0.62, 0.7, e) *
+            smoothstep(0.97, 0.9, e) *
+            smoothstep(-0.35, -0.7, t) *
+            smoothstep(0.05, 0.03, s),
         )
       );
     }
     default: {
-      let e = s0(o0.coat, o0.back, X(0.25, 0.85, i[1]));
+      let e = mixColor(DEER_COLORS.coat, DEER_COLORS.back, smoothstep(0.25, 0.85, i[1]));
       return (
-        (e = s0(e, o0.back, X(0.95, 0.99, i[1]) * X(0.03, 0.01, s) * 0.6)),
-        (e = s0(e, o0.flank, X(0.25, -0.3, i[1]) * X(-0.75, -0.45, i[1]))),
-        (e = s0(e, o0.belly, X(-0.5, -0.8, i[1]) * X(0.75, 0.6, n))),
-        (e = s0(
+        (e = mixColor(e, DEER_COLORS.back, smoothstep(0.95, 0.99, i[1]) * smoothstep(0.03, 0.01, s) * 0.6)),
+        (e = mixColor(e, DEER_COLORS.flank, smoothstep(0.25, -0.3, i[1]) * smoothstep(-0.75, -0.45, i[1]))),
+        (e = mixColor(e, DEER_COLORS.belly, smoothstep(-0.5, -0.8, i[1]) * smoothstep(0.75, 0.6, n))),
+        (e = mixColor(
           e,
-          o0.belly,
-          X(0.3, 0.8, c) * X(-0.3, -0.45, o) * X(0.8, 0.65, n),
+          DEER_COLORS.belly,
+          smoothstep(0.3, 0.8, c) * smoothstep(-0.3, -0.45, o) * smoothstep(0.8, 0.65, n),
         )),
-        s0(
+        mixColor(
           e,
-          o0.white,
-          X(-0.52, -0.6, o) *
-            X(0.92, 0.84, n) *
-            X(0.55, 0.6, n) *
-            X(0.09, 0.06, s),
+          DEER_COLORS.white,
+          smoothstep(-0.52, -0.6, o) *
+            smoothstep(0.92, 0.84, n) *
+            smoothstep(0.55, 0.6, n) *
+            smoothstep(0.09, 0.06, s),
         )
       );
     }
@@ -326,9 +326,9 @@ function E0(e, t, n) {
   let r = Math.floor(e),
     i = Math.floor(t),
     a = Math.floor(n),
-    o = X(0, 1, e - r),
-    s = X(0, 1, t - i),
-    c = X(0, 1, n - a),
+    o = smoothstep(0, 1, e - r),
+    s = smoothstep(0, 1, t - i),
+    c = smoothstep(0, 1, n - a),
     l = (e, t, n) => {
       let r =
         Math.imul(e, 668265261) ^
@@ -340,10 +340,10 @@ function E0(e, t, n) {
       );
     },
     u = (e) =>
-      OF(
-        OF(l(r, i, e), l(r + 1, i, e), o),
-        OF(l(r, i + 1, e), l(r + 1, i + 1, e), o),
+      lerp(
+        lerp(l(r, i, e), l(r + 1, i, e), o),
+        lerp(l(r, i + 1, e), l(r + 1, i + 1, e), o),
         s,
       );
-  return OF(u(a), u(a + 1), c);
+  return lerp(u(a), u(a + 1), c);
 }

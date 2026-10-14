@@ -18,26 +18,26 @@ var qU = 6371e3,
   cW = 0.002,
   lW = -0.02,
   uW = 0.04,
-  dW = MV(new M(0, 1, 0)),
-  fW = MV(new Yn(1, 1, 1)),
-  pW = MV(new M(0, -1, 0)),
-  mW = MV(new Yn(0, 0, 0)),
-  hW = MV(new M(0, 1, 0)),
-  gW = MV(new Yn(1, 1, 1)),
-  _W = MV(0),
-  vW = MV(1),
-  yW = MV(0),
-  bW = MV(19e-5),
+  dW = tslUniform(new M(0, 1, 0)),
+  fW = tslUniform(new Yn(1, 1, 1)),
+  pW = tslUniform(new M(0, -1, 0)),
+  mW = tslUniform(new Yn(0, 0, 0)),
+  hW = tslUniform(new M(0, 1, 0)),
+  gW = tslUniform(new Yn(1, 1, 1)),
+  _W = tslUniform(0),
+  vW = tslUniform(1),
+  yW = tslUniform(0),
+  bW = tslUniform(19e-5),
   xW = 420,
   SW = 256,
   CW = 128,
-  wW = MV(new M(0, 1, 0)),
-  TW = MV(22),
-  EW = MV(0),
-  DW = MV(0),
+  wW = tslUniform(new M(0, 1, 0)),
+  TW = tslUniform(22),
+  EW = tslUniform(0),
+  DW = tslUniform(0),
   OW = (e, t) => {
     let n = e.mul(t);
-    return n.negate().add(wV(VB(n.mul(n).sub(e.sub(JU).mul(e.add(JU))), 0)));
+    return n.negate().add(wV(tslMax(n.mul(n).sub(e.sub(JU).mul(e.add(JU))), 0)));
   },
   kW = (e) =>
     e
@@ -51,11 +51,11 @@ var qU = 6371e3,
       .mul(((3 / (8 * Math.PI)) * (1 - rW * rW)) / 2.64)
       .div(dV(e.mul(-2 * rW).add(1.6400000000000001), 1.5)),
   jW = (e) =>
-    Z(1)
-      .sub(eB(e.sub($U)).div(eW))
+    tslFloat(1)
+      .sub(tslAbs(e.sub($U)).div(eW))
       .max(0);
 function MW(e, t, n, r) {
-  let i = yB(e.div(t), r),
+  let i = tslDot(e.div(t), r),
     a = t.mul(i),
     o = i.lessThan(0).and(
       a
@@ -64,12 +64,12 @@ function MW(e, t, n, r) {
         .greaterThan(0),
     ),
     s = OW(t, i).div(sW),
-    c = Z(0).toVar(),
-    l = Z(0).toVar(),
-    u = Z(0).toVar();
+    c = tslFloat(0).toVar(),
+    l = tslFloat(0).toVar(),
+    u = tslFloat(0).toVar();
   return (
     Yz(sW, ({ i: t }) => {
-      let n = MB(e.add(r.mul(s.mul(Z(t).add(0.5))))).sub(qU);
+      let n = tslLength(e.add(r.mul(s.mul(tslFloat(t).add(0.5))))).sub(qU);
       (c.addAssign(bB(n.div(-8e3)).mul(s)),
         l.addAssign(bB(n.div(-1200)).mul(s)),
         u.addAssign(jW(n).mul(s)));
@@ -77,32 +77,32 @@ function MW(e, t, n, r) {
     { shadowed: o, r: c, m: l, o: u }
   );
 }
-var NW = qz(([e, t]) => {
+var NW = tslFn(([e, t]) => {
     let n = 6371600,
       r = e.y.mul(n),
       i = r.mul(r).sub(764556e4),
       a = bV(
         i.greaterThan(0).and(r.lessThan(0)),
-        r.negate().sub(wV(VB(i, 0))),
-        OW(Z(n), e.y),
+        r.negate().sub(wV(tslMax(i, 0))),
+        OW(tslFloat(n), e.y),
       ).div(oW),
-      o = yB(e, t),
-      s = Z(0).toVar(),
-      c = Z(0).toVar(),
-      l = Z(0).toVar(),
-      u = $(0).toVar(),
-      d = $(0).toVar(),
-      f = $(...YU);
+      o = tslDot(e, t),
+      s = tslFloat(0).toVar(),
+      c = tslFloat(0).toVar(),
+      l = tslFloat(0).toVar(),
+      u = tslVec3(0).toVar(),
+      d = tslVec3(0).toVar(),
+      f = tslVec3(...YU);
     return (
       Yz(oW, ({ i: r }) => {
-        let i = e.mul(a.mul(Z(r).add(0.5))).add($(0, n, 0)),
-          o = MB(i),
+        let i = e.mul(a.mul(tslFloat(r).add(0.5))).add(tslVec3(0, n, 0)),
+          o = tslLength(i),
           p = o.sub(qU),
           m = bB(p.div(-8e3)).mul(a),
           h = bB(p.div(-1200)).mul(a);
         (s.addAssign(m), c.addAssign(h), l.addAssign(jW(p).mul(a)));
         let g = MW(i, o, p, t),
-          _ = $(...QU)
+          _ = tslVec3(...QU)
             .mul(l.add(g.o))
             .mul(DW),
           v = bB(f.mul(s.add(g.r)).add(c.add(g.m).mul(ZU)).add(_).negate()).mul(
@@ -124,29 +124,29 @@ var NW = qz(([e, t]) => {
     minFilter: s,
   });
 ((PW.texture.wrapS = t), (PW.texture.wrapT = n));
-var FW = DV(PW.texture),
+var FW = tslTexture(PW.texture),
   IW = new Wy({ depthTest: !1, depthWrite: !1 });
 ((IW.fog = !1),
-  (IW.colorNode = qz(() => {
-    let e = FV().y.mul(2).sub(1),
-      t = VB(
+  (IW.colorNode = tslFn(() => {
+    let e = tslUv().y.mul(2).sub(1),
+      t = tslMax(
         SV(e)
           .mul(e)
           .mul(e)
           .mul(Math.PI / 2),
         -0.02,
       ),
-      n = FV().x.sub(0.5).mul(DF),
-      r = $(CV(n).mul(hB(t)), CV(t), hB(n).mul(hB(t)).negate()),
-      i = $(0).toVar();
+      n = tslUv().x.sub(0.5).mul(TAU),
+      r = tslVec3(tslSin(n).mul(hB(t)), tslSin(t), hB(n).mul(hB(t)).negate()),
+      i = tslVec3(0).toVar();
     return (
-      Jz(TW.greaterThan(1e-4), () => {
+      tslIf(TW.greaterThan(1e-4), () => {
         i.addAssign(NW(r, wW).mul(TW));
       }),
-      Jz(EW.greaterThan(0).and(pW.y.greaterThan(-0.3)), () => {
+      tslIf(EW.greaterThan(0).and(pW.y.greaterThan(-0.3)), () => {
         i.addAssign(NW(r, pW).mul(EW));
       }),
-      RV(i, 1)
+      tslVec4(i, 1)
     );
   })()));
 var LW = new Gw(IW),
@@ -164,12 +164,12 @@ function VW(e, t) {
       c = Math.hypot(e.x * s, n + e.y * s, e.z * s) - qU;
     ((a += Math.exp(-c / tW) * i), (o += Math.exp(-c / nW) * i));
   }
-  let s = X(-iW - aW, -iW + aW, Math.asin(Y(e.y, -1, 1)));
+  let s = smoothstep(-iW - aW, -iW + aW, Math.asin(clamp(e.y, -1, 1)));
   return t.setRGB(...YU.map((e) => s * Math.exp(-(e * a + ZU * o))));
 }
 function HW(e, t, n, r, i) {
   (dW.value.copy(e), pW.value.copy(t));
-  let a = Math.asin(Y(e.y, -1, 1)) - lW,
+  let a = Math.asin(clamp(e.y, -1, 1)) - lW,
     o = Math.hypot(e.x, e.z) || 1;
   (a < 0
     ? wW.value.set(
@@ -179,7 +179,7 @@ function HW(e, t, n, r, i) {
       )
     : wW.value.copy(e),
     (TW.value = 22 * Math.exp(Math.min(0, a) / uW)),
-    (DW.value = X(0.03, -0.01, e.y)),
+    (DW.value = smoothstep(0.03, -0.01, e.y)),
     (EW.value = 22 * n),
     VW(e, fW.value),
     VW(t, mW.value).multiplyScalar(n),
@@ -205,32 +205,32 @@ function UW(e, t, n = !1) {
 function WW(e, t, n) {
   if (!zW) return n.setRGB(0, 0, 0);
   let r = 0.5 + 0.5 * Math.sign(t) * Math.sqrt(Math.abs(t) / (Math.PI / 2)),
-    i = Y(Math.floor((e / DF + 0.5) * SW), 0, 255),
-    a = (Y(Math.floor(r * CW), 0, 127) * SW + i) * 4;
+    i = clamp(Math.floor((e / TAU + 0.5) * SW), 0, 255),
+    a = (clamp(Math.floor(r * CW), 0, 127) * SW + i) * 4;
   return n.setRGB(
     jr.fromHalfFloat(zW[a]),
     jr.fromHalfFloat(zW[a + 1]),
     jr.fromHalfFloat(zW[a + 2]),
   );
 }
-var GW = qz(([e]) => {
+var GW = tslFn(([e]) => {
     let t = aB(e.x, e.z.negate().sub(1e-5)),
       n = iB(e.y.clamp(-1, 1)),
-      r = Z(0.5).add(
-        Z(0.5)
+      r = tslFloat(0.5).add(
+        tslFloat(0.5)
           .mul(SV(n))
-          .mul(wV(eB(n).div(Math.PI / 2))),
+          .mul(wV(tslAbs(n).div(Math.PI / 2))),
       );
-    return FW.sample(LV(t.div(DF).add(0.5), r)).rgb;
+    return FW.sample(tslVec2(t.div(TAU).add(0.5), r)).rgb;
   }),
-  KW = qz(([e, t]) => {
+  KW = tslFn(([e, t]) => {
     let n = t.sub(lB),
-      r = MB(n),
-      i = n.div(VB(r, 0.001)),
+      r = tslLength(n),
+      i = n.div(tslMax(r, 0.001)),
       a = n.y.div(xW),
-      o = eB(a)
+      o = tslAbs(a)
         .greaterThan(1e-4)
-        .select(bB(a.negate()).oneMinus().div(a), Z(1)),
+        .select(bB(a.negate()).oneMinus().div(a), tslFloat(1)),
       s = bB(
         bW
           .mul(bB(lB.y.sub(lI(40)).div(xW).negate()))
@@ -238,14 +238,14 @@ var GW = qz(([e]) => {
           .mul(o)
           .negate(),
       ).oneMinus(),
-      c = eV($(i.x, VB(i.y, 0).mul(0.5).add(0.02), i.z)),
-      l = dV(VB(yB(i, hW), 0), 12)
+      c = tslNormalize(tslVec3(i.x, tslMax(i.y, 0).mul(0.5).add(0.02), i.z)),
+      l = dV(tslMax(tslDot(i, hW), 0), 12)
         .mul(0.06)
         .mul(s);
-    return UB(e, GW(c).add(gW.mul(l)), s);
+    return tslMix(e, GW(c).add(gW.mul(l)), s);
   }),
-  qW = qz(() => RV(KW(tV.rgb, uV), tV.a)),
-  JW = () => dV(VB(yB(eV(IU()), hW), 0), 4).mul(vW),
+  qW = tslFn(() => tslVec4(KW(tV.rgb, uV), tV.a)),
+  JW = () => dV(tslMax(tslDot(tslNormalize(IU()), hW), 0), 4).mul(vW),
   YW = `"Arial Black", "Helvetica Neue", Arial, sans-serif`;
 function XW(e, t) {
   let n = document.createElement(`canvas`);
@@ -313,7 +313,7 @@ function _G(e, t, n) {
     i = t - uG.y,
     a = n - uG.z;
   return [
-    kF(Math.atan2(r, a), DF),
+    wrap(Math.atan2(r, a), TAU),
     Math.acos(i / Math.sqrt(r * r + i * i + a * a)),
   ];
 }
@@ -347,4 +347,4 @@ function bG(e, t) {
     )
     .normalize();
 }
-var xG = (e) => -0.128 + 0.034 * X(-0.15, -0.035, e) - 0.008 * X(0.04, 0.16, e);
+var xG = (e) => -0.128 + 0.034 * smoothstep(-0.15, -0.035, e) - 0.008 * smoothstep(0.04, 0.16, e);

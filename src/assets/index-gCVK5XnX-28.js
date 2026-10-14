@@ -4,7 +4,7 @@ function TY(e) {
   let t = new Hn();
   return (
     t.add(
-      eH(
+      addMesh(
         new ua(0.046, 0.15, 6, 12)
           .rotateX(Math.PI / 2)
           .scale(1, 0.72, 1)
@@ -13,7 +13,7 @@ function TY(e) {
       ),
     ),
     t.add(
-      eH(
+      addMesh(
         new ua(0.05, 0.17, 4, 12)
           .rotateX(Math.PI / 2)
           .scale(1.02, 0.28, 1)
@@ -23,7 +23,7 @@ function TY(e) {
       ),
     ),
     t.add(
-      eH(
+      addMesh(
         new la(0.032, 0.008, 0.08).translate(0, 0.036, -0.075),
         e.plateBack,
         !1,
@@ -49,8 +49,8 @@ function EY(e) {
       upperArmR: new Vn(),
       foreArmL: new Vn(),
       foreArmR: new Vn(),
-      handL: eH(CY(!0), e.gloves),
-      handR: eH(CY(!1), e.gloves),
+      handL: addMesh(CY(!0), e.gloves),
+      handR: addMesh(CY(!1), e.gloves),
       thighL: new Vn(),
       thighR: new Vn(),
       shinL: wY(e),
@@ -60,9 +60,9 @@ function EY(e) {
     };
   for (let e of Object.keys(r)) e !== `root` && t.add(r[e]);
   DY(r);
-  let { skin: i, knees: a } = eJ(r, e.cloth, XJ);
+  let { skin: i, knees: a } = eJ(r, e.cloth, LIMB_LENGTHS);
   t.add(i);
-  for (let t of a) t.add(eH(new jo(0.062, 14, 10), e.pads));
+  for (let t of a) t.add(addMesh(new jo(0.062, 14, 10), e.pads));
   return r;
 }
 function DY(e) {
@@ -80,7 +80,7 @@ function DY(e) {
     );
   for (let o of [-1, 1]) {
     let s = OY(i, t, n, o, gY),
-      c = _Y.copy(s).addScaledVector(a(nY.arm, nY.armOut, o, rY), XJ.upper);
+      c = _Y.copy(s).addScaledVector(a(nY.arm, nY.armOut, o, rY), LIMB_LENGTHS.upper);
     MY(
       e,
       o,
@@ -88,11 +88,11 @@ function DY(e) {
       c,
       vY
         .copy(c)
-        .addScaledVector(a(nY.arm + nY.elbow, nY.armOut, o, rY), XJ.fore),
+        .addScaledVector(a(nY.arm + nY.elbow, nY.armOut, o, rY), LIMB_LENGTHS.fore),
       n,
     );
     let l = kY(r, o, yY),
-      u = bY.copy(l).addScaledVector(a(nY.thigh, nY.legOut, o, rY), XJ.thigh);
+      u = bY.copy(l).addScaledVector(a(nY.thigh, nY.legOut, o, rY), LIMB_LENGTHS.thigh);
     NY(
       e,
       o,
@@ -100,7 +100,7 @@ function DY(e) {
       u,
       xY
         .copy(u)
-        .addScaledVector(a(nY.thigh - nY.knee, nY.legOut, o, rY), XJ.shin),
+        .addScaledVector(a(nY.thigh - nY.knee, nY.legOut, o, rY), LIMB_LENGTHS.shin),
       KV,
     );
   }
@@ -135,8 +135,8 @@ function jY(e, t, n, r, i) {
 function MY(e, t, n, r, i, a) {
   return (
     uY.copy(a).multiplyScalar(t),
-    jY(t < 0 ? e.upperArmL : e.upperArmR, n, r, uY, XJ.upper),
-    jY(t < 0 ? e.foreArmL : e.foreArmR, r, i, uY, XJ.fore),
+    jY(t < 0 ? e.upperArmL : e.upperArmR, n, r, uY, LIMB_LENGTHS.upper),
+    jY(t < 0 ? e.foreArmL : e.foreArmR, r, i, uY, LIMB_LENGTHS.fore),
     uY
   );
 }
@@ -147,8 +147,8 @@ function NY(e, t, n, r, i, a) {
     s.addScaledVector(o, -s.dot(o)),
     s.lengthSq() < 1e-6 && s.copy(a),
     s.normalize(),
-    jY(t < 0 ? e.thighL : e.thighR, n, r, s, XJ.thigh),
-    jY(t < 0 ? e.shinL : e.shinR, r, i, s, XJ.shin),
+    jY(t < 0 ? e.thighL : e.thighR, n, r, s, LIMB_LENGTHS.thigh),
+    jY(t < 0 ? e.shinL : e.shinR, r, i, s, LIMB_LENGTHS.shin),
     s
   );
 }
@@ -206,30 +206,30 @@ function gX(e, t, n, r, i, a) {
     c = r - t,
     l = Math.hypot(s, c),
     u = (YJ * YJ + l * l - o * o) / (2 * YJ * l);
-  return -Math.acos(Y(u, -1, 1)) - Math.atan2(c, s);
+  return -Math.acos(clamp(u, -1, 1)) - Math.atan2(c, s);
 }
 function _X(e, t, n, r, i, a, o, s) {
   let c = t.crouch,
-    l = t.style === CH.Superman ? t.styled : 0,
-    u = t.style === CH.CanCan ? t.styled : 0;
+    l = t.style === TRICK.Superman ? t.styled : 0,
+    u = t.style === TRICK.CanCan ? t.styled : 0;
   (XY.set(-tY.x, tY.y, tY.z).applyQuaternion(n).add(r),
     ZY.copy(tY).applyQuaternion(n).add(i));
   let d = (XY.y + ZY.y) / 2,
     f = (XY.z + ZY.z) / 2,
     p = Math.max(0, (ZY.x - XY.x) / 2 - JJ),
     m = 0.74 - c * 0.3 + l * 0.12,
-    h = ZJ * Y(0.8 - c * 0.06 + t.reach + l * 0.13, 0.68, 0.95),
-    g = Y(0.5 + c * 0.24 + t.lean + l * 0.8, 0.1, 1.15 + l * 0.35),
+    h = ZJ * clamp(0.8 - c * 0.06 + t.reach + l * 0.13, 0.68, 0.95),
+    g = clamp(0.5 + c * 0.24 + t.lean + l * 0.8, 0.1, 1.15 + l * 0.35),
     _ = Math.sqrt(Math.max(1e-4, h * h - p * p));
-  g = Math.max(g, Math.acos(Y((_ + d - m) / YJ, -1, 1)));
+  g = Math.max(g, Math.acos(clamp((_ + d - m) / YJ, -1, 1)));
   let v = m + YJ * Math.cos(g) - d,
     y = f + YJ * Math.sin(g) + Math.sqrt(Math.max(0, _ * _ - v * v)),
-    b = Y(y, 0.1, 0.4 + l * 0.35);
-  b !== y && ((y = b), (g = Y(gX(m, y, d, f, p, h), 0.05, 1.2 + l * 0.35)));
+    b = clamp(y, 0.1, 0.4 + l * 0.35);
+  b !== y && ((y = b), (g = clamp(gX(m, y, d, f, p, h), 0.05, 1.2 + l * 0.35)));
   let x = WY.set(0, m, y);
-  uX.setFromAxisAngle(IY, -Y(t.roll, -0.22, 0.22));
+  uX.setFromAxisAngle(IY, -clamp(t.roll, -0.22, 0.22));
   let S = KY.set(0, Math.cos(g), -Math.sin(g)).applyQuaternion(uX),
-    C = Y(t.twist, -0.35, 0.35);
+    C = clamp(t.twist, -0.35, 0.35);
   lX.setFromAxisAngle(S, C).multiply(uX);
   let w = qY.set(1, 0, 0).applyQuaternion(lX),
     T = JY.crossVectors(w, S).negate(),
@@ -256,7 +256,7 @@ function _X(e, t, n, r, i, a, o, s) {
     ));
   for (let a of [-1, 1]) vX(e, t, a, E, S, w, T, a < 0 ? r : i, n, s);
   for (let n of [-1, 1]) yX(e, t, n, x, n < 0 ? a : o, l, u, s);
-  (s[cq.pelvis].copy(x), s[cq.chest].copy(E), s[cq.head].copy(e.head.position));
+  (s[BONES.pelvis].copy(x), s[BONES.chest].copy(E), s[BONES.head].copy(e.head.position));
 }
 function vX(e, t, n, r, i, a, o, s, c, l) {
   let u = OY(r, i, a, n, QY),
@@ -286,14 +286,14 @@ function vX(e, t, n, r, i, a, o, s, c, l) {
     .addScaledVector(a, n * 0.32)
     .addScaledVector(i, -0.5)
     .addScaledVector(o, 0.3);
-  let h = PY(u, m, XJ.upper, XJ.fore, $Y, eX),
-    g = zY.subVectors(m, h).setLength(XJ.fore).add(h);
+  let h = PY(u, m, LIMB_LENGTHS.upper, LIMB_LENGTHS.fore, $Y, eX),
+    g = zY.subVectors(m, h).setLength(LIMB_LENGTHS.fore).add(h);
   (f.position.add(RY.subVectors(g, m)),
     m.copy(g),
     MY(e, n, u, h, m, a),
-    l[n < 0 ? cq.shL : cq.shR].copy(u),
-    l[n < 0 ? cq.elL : cq.elR].copy(h),
-    l[n < 0 ? cq.haL : cq.haR].copy(m));
+    l[n < 0 ? BONES.shL : BONES.shR].copy(u),
+    l[n < 0 ? BONES.elL : BONES.elR].copy(h),
+    l[n < 0 ? BONES.haL : BONES.haR].copy(m));
 }
 function yX(e, t, n, r, i, a, o, s) {
   let c = kY(r, n, rX),
@@ -320,12 +320,12 @@ function yX(e, t, n, r, i, a, o, s) {
   }
   let d = RY.set(n * (0.14 + 0.3 * Math.max(0, n * t.turn)), 0.1, -0.6);
   d.lerp(LY.set(n * 0.15, -0.7, 0), a).lerp(LY.set(t.side * 0.3, 0.6, -0.3), u);
-  let f = PY(c, l, XJ.thigh, XJ.shin, zY.copy(c).add(d), aX);
-  (l.sub(f).setLength(XJ.shin).add(f), NY(e, n, c, f, l, KV));
+  let f = PY(c, l, LIMB_LENGTHS.thigh, LIMB_LENGTHS.shin, zY.copy(c).add(d), aX);
+  (l.sub(f).setLength(LIMB_LENGTHS.shin).add(f), NY(e, n, c, f, l, KV));
   let p = n < 0 ? e.footL : e.footR;
   (p.position.copy(l).add(RY.set(0, -0.015, 0)),
     p.quaternion.setFromAxisAngle(FY, t.ankle * n),
-    s[n < 0 ? cq.hipL : cq.hipR].copy(c),
-    s[n < 0 ? cq.knL : cq.knR].copy(f),
-    s[n < 0 ? cq.ftL : cq.ftR].copy(l));
+    s[n < 0 ? BONES.hipL : BONES.hipR].copy(c),
+    s[n < 0 ? BONES.knL : BONES.knR].copy(f),
+    s[n < 0 ? BONES.ftL : BONES.ftR].copy(l));
 }

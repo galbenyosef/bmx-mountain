@@ -5,9 +5,9 @@ var $ee = class {
     pos = new Fr(new Float32Array(A9 * 4 * 3), 3);
     nor = new Fr(new Float32Array(A9 * 4 * 3), 3);
     alpha = new Fr(new Float32Array(A9 * 4), 1);
-    spot = dH(2, 4);
-    along = dH(2, 4);
-    across = dH(2, 3);
+    spot = makeBuffer(2, 4);
+    along = makeBuffer(2, 4);
+    across = makeBuffer(2, 3);
     tracks = Zee(this.pos, this.nor, this.alpha);
     shadows = Qee(this.spot, this.along, this.across);
     next = 0;
@@ -73,7 +73,7 @@ var $ee = class {
         i = this.across.array;
       (t.forEach((t, a) => {
         let o = this.terrain.height(t.x, t.z),
-          s = Math.max(0, t.y - J.wheelRadius - o),
+          s = Math.max(0, t.y - PHYSICS.wheelRadius - o),
           c = e.mode === `crash` ? 0 : Math.max(0, 1 - s / M9),
           l = this.terrain.normal(t.x, t.z, Xee, 0.4);
         (I9.set(-Math.sin(e.yaw), 0, -Math.cos(e.yaw)),
@@ -96,36 +96,36 @@ var $ee = class {
   nte = 0.012,
   rte = class {
     mesh;
-    vel = MV(new M());
+    vel = tslUniform(new M());
     constructor() {
       let e = QV(),
-        t = HF(9),
+        t = makeRng(9),
         n = new Float32Array(880);
       for (let e = 0; e < R9; e++)
         n.set([t() * z9, t() * z9, t() * z9, t()], e * 4);
       (e.setAttribute(`mote`, new Vi(n, 4)), (e.instanceCount = R9));
       let r = new Wy({ transparent: !0, depthWrite: !1, blending: 2 }),
-        i = oB(`mote`, `vec4`),
+        i = tslAttribute(`mote`, `vec4`),
         a = i.xyz.add(xB(lB.sub(i.xyz).div(z9).add(0.5)).mul(z9)),
         o = this.vel,
-        s = MB(o),
-        c = o.div(VB(s, 0.001)),
-        l = eV(gB(c, eV(lB.sub(a))).add($(0, 1e-4, 0))),
+        s = tslLength(o),
+        c = o.div(tslMax(s, 0.001)),
+        l = tslNormalize(gB(c, tslNormalize(lB.sub(a))).add(tslVec3(0, 1e-4, 0))),
         u = oV;
       r.positionNode = a
         .add(c.mul(u.y.mul(s.mul(tte))))
         .add(l.mul(u.x.mul(nte)));
-      let d = MB(a.sub(lB)),
-        f = Q(1.2, -0.5, a.y.sub(lB.y)),
-        p = Q(0.5, 0.2, MB(FV().sub(0.5).mul(LV(2, 1)))),
-        m = Q(B9, ete, s)
-          .mul(Q(1.5, 3, d))
-          .mul(Q(z9 * 0.5, z9 * 0.3, d))
+      let d = tslLength(a.sub(lB)),
+        f = tslSmoothstep(1.2, -0.5, a.y.sub(lB.y)),
+        p = tslSmoothstep(0.5, 0.2, tslLength(tslUv().sub(0.5).mul(tslVec2(2, 1)))),
+        m = tslSmoothstep(B9, ete, s)
+          .mul(tslSmoothstep(1.5, 3, d))
+          .mul(tslSmoothstep(z9 * 0.5, z9 * 0.3, d))
           .mul(f),
         h = p.mul(m).mul(i.w.mul(0.5).add(0.5)).mul(0.16);
-      ((r.colorNode = RV(gW.mul(0.25).add(0.08), h)),
+      ((r.colorNode = tslVec4(gW.mul(0.25).add(0.08), h)),
         (r.fog = !1),
-        (r.alphaTestNode = Z(0.002)),
+        (r.alphaTestNode = tslFloat(0.002)),
         (r.mrtNode = zU()),
         (this.mesh = new wi(e, r)),
         (this.mesh.frustumCulled = !1),
@@ -158,7 +158,7 @@ var $ee = class {
       this.hit(0.25, 0.1, 0.06);
     }
     land(e, t, n, r) {
-      let i = Y(e / 12);
+      let i = clamp(e / 12);
       if ((this.hit(0.1 + 0.8 * i, 0.15 + 0.5 * i, 0.1 + 0.15 * i), n))
         for (let e of [0.1, 0.19]) this.hit(0, 0.55, 0.045, e);
       else t && this.hit(0, 0.4, 0.05, 0.1);
@@ -170,7 +170,7 @@ var $ee = class {
     tumble(e) {
       if (e < 1.5 || this.time - this.thumpAt < 0.06) return;
       this.thumpAt = this.time;
-      let t = Y((e - 1.5) / 10);
+      let t = clamp((e - 1.5) / 10);
       this.hit(0.2 + 0.6 * t, 0.15 + 0.4 * t, 0.08 + 0.08 * t);
     }
     slam(e) {
@@ -186,17 +186,17 @@ var $ee = class {
       let i = 0,
         a = 0;
       (t.rolling &&
-        ((a = dz[t.surface] * Y(t.speed / ste) * ote),
-        (a = Math.max(a, t.skid * Y(t.speed / 3) * cte)),
-        (i = Math.max(Y((t.carve - 0.8) / 1.2) * lte, t.pump * ute))),
-        (a = Math.max(a, Y(Math.max(t.scrape, t.bikeScrape) / 10) * dte)),
+        ((a = dz[t.surface] * clamp(t.speed / ste) * ote),
+        (a = Math.max(a, t.skid * clamp(t.speed / 3) * cte)),
+        (i = Math.max(clamp((t.carve - 0.8) / 1.2) * lte, t.pump * ute))),
+        (a = Math.max(a, clamp(Math.max(t.scrape, t.bikeScrape) / 10) * dte)),
         (this.hits = this.hits.filter((e) => r < e.at + e.len)));
       for (let e of this.hits) {
         if (r < e.at) continue;
         let t = 1 - (r - e.at) / e.len;
         ((i += e.strong * t), (a += e.weak * t));
       }
-      this.send(n, Y(i), Y(a));
+      this.send(n, clamp(i), clamp(a));
     }
     send(e, t, n) {
       let r = t > 0.01 || n > 0.01;
@@ -475,7 +475,7 @@ var $ee = class {
           ? ((this.state = `running`),
             (this.time = this.score = this.crashes = 0),
             (this.ridden = new Uint8Array(Math.ceil(this.trail.length / q9))),
-            uQ.presence(`riding`))
+            wavedash.presence(`riding`))
           : this.state === `running` &&
             ((this.time += e),
             t.onTrail &&
@@ -492,14 +492,14 @@ var $ee = class {
         (this.add(t), this.hud.callout(e, `+${t.toLocaleString()}`));
         return;
       }
-      ((this.called = !0), this.link(e, t), uQ.addStat(`TRICKS`, 1));
-      for (let [e, t] of vte) t.some((e) => n.includes(e)) && uQ.achieve(e);
-      (n.filter((e) => !G9.includes(e)).length >= 3 && uQ.achieve(`COMBO`),
-        uQ.flushStats());
+      ((this.called = !0), this.link(e, t), wavedash.addStat(`TRICKS`, 1));
+      for (let [e, t] of vte) t.some((e) => n.includes(e)) && wavedash.achieve(e);
+      (n.filter((e) => !G9.includes(e)).length >= 3 && wavedash.achieve(`COMBO`),
+        wavedash.flushStats());
     }
     landed(e, t) {
-      (e.lastJump >= 20 && uQ.achieve(`LONG_JUMP`),
-        e.peakHeight >= 5 && uQ.achieve(`BIG_AIR`),
+      (e.lastJump >= 20 && wavedash.achieve(`LONG_JUMP`),
+        e.peakHeight >= 5 && wavedash.achieve(`BIG_AIR`),
         !(e.airTime < 0.6) &&
           (t === jH.Sketchy
             ? this.bank()
@@ -512,7 +512,7 @@ var $ee = class {
       ((this.links = 0),
         this.state === `running` && this.crashes++,
         this.hud.callout(e, t ? `Chain lost` : ``, 1.6),
-        uQ.addStat(`CRASHES`, 1));
+        wavedash.addStat(`CRASHES`, 1));
     }
     link(e, t) {
       (this.links === 0 && (this.chained = 0),
@@ -540,7 +540,7 @@ var $ee = class {
     }
     add(e) {
       this.state === `running` &&
-        ((this.score += e), this.score >= Ste && uQ.achieve(`SCORE_10K`));
+        ((this.score += e), this.score >= Ste && wavedash.achieve(`SCORE_10K`));
     }
     finish() {
       (this.bank(), (this.state = `done`));
@@ -555,14 +555,14 @@ var $ee = class {
           : `off the trail: not timed`;
       (this.hud.callout(W9(this.time), a, 6),
         this.hud.hint(V9.finished, 8),
-        uQ.addStat(`RUNS`, 1),
-        uQ.achieve(`FIRST_RUN`),
+        wavedash.addStat(`RUNS`, 1),
+        wavedash.achieve(`FIRST_RUN`),
         i &&
-          (uQ.submit(`fastest-descent`, this.time * 1e3),
-          uQ.submit(`best-run`, this.score),
-          e && uQ.achieve(`CLEAN_RUN`),
-          this.time < xte && uQ.achieve(`SUB_150`),
-          uQ.presence(`riding`, `Last run ${W9(this.time)}`)),
-        uQ.flushStats());
+          (wavedash.submit(`fastest-descent`, this.time * 1e3),
+          wavedash.submit(`best-run`, this.score),
+          e && wavedash.achieve(`CLEAN_RUN`),
+          this.time < xte && wavedash.achieve(`SUB_150`),
+          wavedash.presence(`riding`, `Last run ${W9(this.time)}`)),
+        wavedash.flushStats());
     }
   };

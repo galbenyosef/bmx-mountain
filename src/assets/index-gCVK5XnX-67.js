@@ -1,16 +1,16 @@
-// assets/index-gCVK5XnX 67 — block
+// assets/index-gCVK5XnX 67 — makeel
 // Lines 68447-68503 of readable/assets/index-gCVK5XnX.pretty.js (statement-aligned).
-function J9(e, t, n = ``, r = ``) {
+function makeEl(e, t, n = ``, r = ``) {
   let i = document.createElement(e);
   return (n && (i.className = n), r && (i.textContent = r), t?.append(i), i);
 }
 function Y9(e) {
-  J9(`style`, document.head, ``, e);
+  makeEl(`style`, document.head, ``, e);
 }
 function X9(e, t) {
-  for (let n of t) J9(`kbd`, e, ``, n);
+  for (let n of t) makeEl(`kbd`, e, ``, n);
 }
-var Z9 = {
+var CSS_VARS = {
     color: {
       text: `#fff`,
       textSoft: `rgba(255, 255, 255, 0.72)`,

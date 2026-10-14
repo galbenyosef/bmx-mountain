@@ -69,7 +69,7 @@ var JB = K.normalGeometry,
 K.normalViewGeometry;
 var QB = K.normalWorld,
   $B = K.normalWorldGeometry,
-  eV = K.normalize;
+  tslNormalize = K.normalize;
 (K.not,
   K.notEqual,
   K.numWorkgroups,
@@ -161,9 +161,9 @@ var xV = K.shadowPositionWorld;
   K.shiftRight,
   K.shininess);
 var SV = K.sign,
-  CV = K.sin;
+  tslSin = K.sin;
 (K.sinc, K.sinh, K.skinning);
-var Q = K.smoothstep;
+var tslSmoothstep = K.smoothstep;
 (K.smoothstepElement,
   K.specularColor,
   K.specularColorBlended,
@@ -213,7 +213,7 @@ var EV = K.struct;
   K.tangentViewFrame,
   K.tangentWorld,
   K.tanh);
-var DV = K.texture;
+var tslTexture = K.texture;
 (K.texture3D,
   K.texture3DLevel,
   K.texture3DLoad,
@@ -245,7 +245,7 @@ var AV = K.transformNormal;
   K.trunc);
 var jV = K.uint;
 K.uintBitsToFloat;
-var MV = K.uniform,
+var tslUniform = K.uniform,
   NV = K.uniformArray;
 (K.uniformCubeTexture,
   K.uniformFlow,
@@ -262,13 +262,13 @@ var PV = K.unpackRGBToNormal;
   K.unpackUnorm4x8,
   K.unpremultiplyAlpha,
   K.userData);
-var FV = K.uv;
+var tslUv = K.uv;
 (K.uvec2, K.uvec3, K.uvec4);
 var IV = K.varying;
 K.varyingProperty;
-var LV = K.vec2,
-  $ = K.vec3,
-  RV = K.vec4;
+var tslVec2 = K.vec2,
+  tslVec3 = K.vec3,
+  tslVec4 = K.vec4;
 K.vectorComponents;
 var zV = K.velocity;
 K.vertexColor;

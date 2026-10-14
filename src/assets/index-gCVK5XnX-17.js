@@ -38,7 +38,7 @@ function SH(e) {
       e.add(r));
   }
 }
-var CH = (function (e) {
+var TRICK = (function (e) {
     return (
       (e[(e.None = 0)] = `None`),
       (e[(e.Superman = 1)] = `Superman`),
@@ -88,7 +88,7 @@ var CH = (function (e) {
       return Math.round(Math.abs(this.spun) / Math.PI);
     }
     get flips() {
-      return Math.floor(Math.abs(this.flipped) / DF + 0.15);
+      return Math.floor(Math.abs(this.flipped) / TAU + 0.15);
     }
     get corks() {
       return Math.round(this.corked / Math.PI);
@@ -136,7 +136,7 @@ var CH = (function (e) {
       );
     }
   },
-  kH = (function (e) {
+  RIDE_MODE = (function (e) {
     return (
       (e[(e.Ride = 0)] = `Ride`),
       (e[(e.Air = 1)] = `Air`),
@@ -154,7 +154,7 @@ var CH = (function (e) {
     barspin: !1,
     tailwhip: !1,
     nohand: !1,
-    style: CH.None,
+    style: TRICK.None,
   },
   jH = (function (e) {
     return (
@@ -197,40 +197,40 @@ var CH = (function (e) {
   IH = new M(0, 0.79, 0.07),
   LH = new M(0, 0, 1),
   RH = [
-    [J.wheelbase / 2, -J.bodyLift, 0, J.wheelRadius + 0.02],
-    [-J.wheelbase / 2, -J.bodyLift, 0, J.wheelRadius + 0.02],
+    [PHYSICS.wheelbase / 2, -PHYSICS.bodyLift, 0, PHYSICS.wheelRadius + 0.02],
+    [-PHYSICS.wheelbase / 2, -PHYSICS.bodyLift, 0, PHYSICS.wheelRadius + 0.02],
     [0.32, 0.75, 0.33, 0.07],
     [0.32, 0.75, -0.33, 0.07],
     [-0.05, 0.85, 0, 0.2],
     [0.1, 1.45, 0, 0.17],
   ],
   zH = {
-    [uz.Trail]: J.gripDirt,
-    [uz.Dirt]: J.gripDirt,
-    [uz.Wood]: J.gripDirt,
-    [uz.Grass]: J.gripGrass,
-    [uz.Forest]: J.gripGrass,
-    [uz.Rock]: J.gripRock,
-    [uz.Water]: J.gripGrass,
+    [SURFACE.Trail]: PHYSICS.gripDirt,
+    [SURFACE.Dirt]: PHYSICS.gripDirt,
+    [SURFACE.Wood]: PHYSICS.gripDirt,
+    [SURFACE.Grass]: PHYSICS.gripGrass,
+    [SURFACE.Forest]: PHYSICS.gripGrass,
+    [SURFACE.Rock]: PHYSICS.gripRock,
+    [SURFACE.Water]: PHYSICS.gripGrass,
   },
   BH = {
-    [uz.Trail]: J.crrDirt,
-    [uz.Wood]: J.crrDirt * 0.7,
-    [uz.Dirt]: J.crrDirt * 1.6,
-    [uz.Grass]: J.crrGrass,
-    [uz.Forest]: J.crrRough,
-    [uz.Rock]: J.crrRough,
-    [uz.Water]: J.crrWater,
+    [SURFACE.Trail]: PHYSICS.crrDirt,
+    [SURFACE.Wood]: PHYSICS.crrDirt * 0.7,
+    [SURFACE.Dirt]: PHYSICS.crrDirt * 1.6,
+    [SURFACE.Grass]: PHYSICS.crrGrass,
+    [SURFACE.Forest]: PHYSICS.crrRough,
+    [SURFACE.Rock]: PHYSICS.crrRough,
+    [SURFACE.Water]: PHYSICS.crrWater,
   },
   VH = { ride: 0, air: 1, crash: 2 },
   HH = {
-    [uz.Trail]: 0,
-    [uz.Wood]: 0,
-    [uz.Dirt]: 0.5,
-    [uz.Grass]: 0.7,
-    [uz.Forest]: 0.9,
-    [uz.Rock]: 1,
-    [uz.Water]: 0.4,
+    [SURFACE.Trail]: 0,
+    [SURFACE.Wood]: 0,
+    [SURFACE.Dirt]: 0.5,
+    [SURFACE.Grass]: 0.7,
+    [SURFACE.Forest]: 0.9,
+    [SURFACE.Rock]: 1,
+    [SURFACE.Water]: 0.4,
   },
   UH = new qt(),
   WH = new M(),
@@ -250,7 +250,7 @@ var CH = (function (e) {
   iU = new M(),
   aU = new M(),
   oU = new qt(),
-  sU = [0, 1, 0],
+  scratchNormal = [0, 1, 0],
   cU = { s: 0, u: 0 },
   lU = { pitch: 0, yaw: 0, roll: 0 },
   uU = { y: 0, nx: 0, ny: 1, nz: 0, block: null, a: 0 },
@@ -277,9 +277,9 @@ function pU(e, t, n) {
     let t = e === 0 ? nU.x : Math.PI - nU.x,
       s = e === 0 ? nU.y : nU.y + Math.PI,
       c = e === 0 ? -nU.z : -nU.z - Math.PI,
-      l = r + AF(t - r),
-      u = i + AF(s - i),
-      d = a + AF(c - a),
+      l = r + wrapAngle(t - r),
+      u = i + wrapAngle(s - i),
+      d = a + wrapAngle(c - a),
       f = (l - r) ** 2 + (u - i) ** 2 + (d - a) ** 2;
     f < o && ((o = f), (n.pitch = l), (n.yaw = u), (n.roll = d));
   }
@@ -287,15 +287,15 @@ function pU(e, t, n) {
 }
 var mU = (e, t, n, r) => r.setFromEuler(XH.set(e, t, -n, `YXZ`));
 function hU(e, t, n) {
-  return Math.min(t, Math.sqrt(1.4 * n * e), e * J.catchRate);
+  return Math.min(t, Math.sqrt(1.4 * n * e), e * PHYSICS.catchRate);
 }
 function gU(e, t, n, r, i, a, o) {
   let s = (t * Math.abs(t)) / (2 * i),
-    c = n + DF * Math.round((e + s - n) / DF) - e,
+    c = n + TAU * Math.round((e + s - n) / TAU) - e,
     l = 0;
   return (
     Math.abs(c) < a && (l = Math.sign(c) * hU(Math.abs(c), r, i)),
-    NF(t, l, o * i)
+    approach(t, l, o * i)
   );
 }
 function _U(e, t, n, r, i = 1) {

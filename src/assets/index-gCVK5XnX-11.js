@@ -1,6 +1,6 @@
-// assets/index-gCVK5XnX 11 — math
+// assets/index-gCVK5XnX 11 — creekprobe
 // Lines 49817-50182 of readable/assets/index-gCVK5XnX.pretty.js (statement-aligned).
-var uz = (function (e) {
+var SURFACE = (function (e) {
     return (
       (e[(e.Trail = 0)] = `Trail`),
       (e[(e.Dirt = 1)] = `Dirt`),
@@ -19,14 +19,14 @@ var uz = (function (e) {
   hz = 4,
   gz = 10,
   _z = { s: 0, u: 0 },
-  vz = { s: 0, u: 0 },
+  creekProbe = { s: 0, u: 0 },
   yz = { x: 0, z: 0, tx: 0, tz: 0 },
   bz = class {
     trail;
-    h = new Float32Array(oz * oz);
-    cover = new Uint8Array(oz * oz * 4);
-    grass = new Uint8Array(oz * oz);
-    cover2 = new Uint8Array(oz * oz * 4);
+    h = new Float32Array(GRID_N * GRID_N);
+    cover = new Uint8Array(GRID_N * GRID_N * 4);
+    grass = new Uint8Array(GRID_N * GRID_N);
+    cover2 = new Uint8Array(GRID_N * GRID_N * 4);
     obstacles = new FR();
     lift;
     creek;
@@ -55,7 +55,7 @@ var uz = (function (e) {
       await e(0.6);
       let i = this.bench(r, n);
       await e(0.75);
-      for (let e = 0; e < oz * oz; e++) this.h[e] = r[e] + i[e];
+      for (let e = 0; e < GRID_N * GRID_N; e++) this.h[e] = r[e] + i[e];
       let a = this.levelPads(n),
         o = this.carveCreek(),
         s = this.sinkRibbon(n);
@@ -91,30 +91,30 @@ var uz = (function (e) {
     }
     water(e, t) {
       if (
-        !this.creek.locate(e, t, vz, 14) ||
-        Math.abs(vz.u) > this.creek.halfWidth(vz.s, vz.u) + 0.6
+        !this.creek.locate(e, t, creekProbe, 14) ||
+        Math.abs(creekProbe.u) > this.creek.halfWidth(creekProbe.s, creekProbe.u) + 0.6
       )
         return -1 / 0;
-      let n = this.creek.overTrail(vz.s);
-      return OF(
-        this.creek.waterAt(vz.s),
+      let n = this.creek.overTrail(creekProbe.s);
+      return lerp(
+        this.creek.waterAt(creekProbe.s),
         n > 0 ? this.baseHeight(e, t) + tL : 0,
         n,
       );
     }
     creekClearance(e, t) {
-      return this.creek.locate(e, t, vz, 14)
-        ? Math.abs(vz.u) - this.creek.reach(vz.s, vz.u)
+      return this.creek.locate(e, t, creekProbe, 14)
+        ? Math.abs(creekProbe.u) - this.creek.reach(creekProbe.s, creekProbe.u)
         : 1 / 0;
     }
     ribbonHeight(e, t) {
       let n = Math.abs(t);
       if (n <= 2.9) return this.trail.surface(e, t);
       let r = t < 0 ? -1 : 1;
-      return OF(
-        this.trail.surface(e, r * xI),
+      return lerp(
+        this.trail.surface(e, r * TRAIL_HALF_WIDTH),
         this.ribbonEdge(e, r),
-        X(xI, SI, n),
+        smoothstep(TRAIL_HALF_WIDTH, TRAIL_FADE, n),
       );
     }
     normal(e, t, n, r, i = !1) {
@@ -138,31 +138,31 @@ var uz = (function (e) {
         i = _z.u * r < 0;
       return (
         Math.abs(_z.u) -
-        (i ? 14 * X(1 / 160, 1 / 45, Math.abs(r)) : 0) -
+        (i ? 14 * smoothstep(1 / 160, 1 / 45, Math.abs(r)) : 0) -
         gz * this.trail.jumpClearing(_z.s)
       );
     }
     surface(e, t) {
       if (this.water(e, t) > this.baseHeight(e, t) + 0.02) return 6;
       if (this.trail.locate(e, t, _z, 6.1)) return Math.abs(_z.u) < 3.3 ? 0 : 1;
-      let n = (cz(t) * oz + cz(e)) * 4,
+      let n = (cz(t) * GRID_N + cz(e)) * 4,
         r = this.cover;
       return r[n + 2] > 150 ? 4 : r[n] > 120 ? 1 : r[n + 1] > 140 ? 3 : 2;
     }
     gridHeight(e, t) {
-      let n = (e + ZF) / 2,
-        r = (t + ZF) / 2;
-      if (n < 0 || r < 0 || n >= oz - 1 || r >= oz - 1) return uI(e, t);
+      let n = (e + WORLD_HALF) / 2,
+        r = (t + WORLD_HALF) / 2;
+      if (n < 0 || r < 0 || n >= GRID_N - 1 || r >= GRID_N - 1) return uI(e, t);
       let i = Math.floor(n),
         a = Math.floor(r),
         o = n - i,
         s = r - a,
-        c = a * oz + i,
+        c = a * GRID_N + i,
         l = this.h,
         u = l[c],
         d = l[c + 1],
-        f = l[c + oz],
-        p = l[c + oz + 1];
+        f = l[c + GRID_N],
+        p = l[c + GRID_N + 1];
       return (i + a) & 1
         ? o + s <= 1
           ? u + (d - u) * o + (f - u) * s
@@ -173,18 +173,18 @@ var uz = (function (e) {
     }
     ribbonEdge(e, t) {
       return (
-        this.trail.pointAt(e, yz, t * SI),
+        this.trail.pointAt(e, yz, t * TRAIL_FADE),
         this.groundHeight(yz.x, yz.z) - 0.04
       );
     }
     groundHeight(e, t) {
-      return this.creek.locate(e, t, vz, 14) &&
-        Math.abs(vz.u) < this.creek.reach(vz.s, vz.u)
-        ? this.channelHeight(vz.s, vz.u)
+      return this.creek.locate(e, t, creekProbe, 14) &&
+        Math.abs(creekProbe.u) < this.creek.reach(creekProbe.s, creekProbe.u)
+        ? this.channelHeight(creekProbe.s, creekProbe.u)
         : this.gridHeight(e, t);
     }
     nearTrail() {
-      let e = oz,
+      let e = GRID_N,
         t = {
           d2: new Float32Array(e * e).fill(1 / 0),
           s: new Float32Array(e * e),
@@ -204,7 +204,7 @@ var uz = (function (e) {
               l = n * e + c;
             o < t.d2[l] &&
               ((t.d2[l] = o),
-              (t.s[l] = i * dI),
+              (t.s[l] = i * SAMPLE_STEP),
               (t.u[l] = (r - a.x) * -a.tz + (s - a.z) * a.tx));
           }
         }
@@ -212,7 +212,7 @@ var uz = (function (e) {
       return t;
     }
     bench(e, t) {
-      let n = oz,
+      let n = GRID_N,
         r = new Float32Array(n * n);
       for (let i = 0; i < n * n; i++) {
         if (t.d2[i] === 1 / 0) continue;
@@ -221,19 +221,19 @@ var uz = (function (e) {
         let a = t.s[i],
           o = Math.abs(t.u[i]),
           s = this.trail.baseAt(a),
-          c = this.trail.ground[Math.round(a / dI)],
-          l = X(xI + 2, fz, o),
+          c = this.trail.ground[Math.round(a / SAMPLE_STEP)],
+          l = smoothstep(TRAIL_HALF_WIDTH + 2, fz, o),
           u =
             s +
-            this.trail.bermAt(a, t.u[i]) * (1 - X(xI, xI + 12, o)) +
+            this.trail.bermAt(a, t.u[i]) * (1 - smoothstep(TRAIL_HALF_WIDTH, TRAIL_HALF_WIDTH + 12, o)) +
             (e[i] - c) * l,
-          d = 1 - X(fz * 0.75, pz, n);
+          d = 1 - smoothstep(fz * 0.75, pz, n);
         r[i] = (u - e[i]) * d;
       }
       return (xz(r, n, 3), r);
     }
     levelPads(e) {
-      let t = oz,
+      let t = GRID_N,
         n = this.h,
         r = [!1, !0].map((e) => {
           let r = this.lift,
@@ -257,7 +257,7 @@ var uz = (function (e) {
       return i;
     }
     carveCreek() {
-      let e = oz,
+      let e = GRID_N,
         t = this.h,
         n = this.creek;
       n.settle((e, t) => this.gridHeight(e, t));
@@ -267,24 +267,24 @@ var uz = (function (e) {
         for (let a = cz(i - 28); a <= cz(o + 28); a++) {
           let i = sz(a),
             o = sz(c);
-          if (!n.locate(i, o, vz, 28)) continue;
+          if (!n.locate(i, o, creekProbe, 28)) continue;
           let s = c * e + a,
-            l = Math.abs(vz.u) - n.reach(vz.s, vz.u),
-            u = Math.abs(vz.u) - n.halfWidth(vz.s, vz.u) - n.riseAt(vz.s, vz.u);
-          if (((r[s] = Y(u, 0, 255)), this.trail.locate(i, o, _z, 5.8)))
+            l = Math.abs(creekProbe.u) - n.reach(creekProbe.s, creekProbe.u),
+            u = Math.abs(creekProbe.u) - n.halfWidth(creekProbe.s, creekProbe.u) - n.riseAt(creekProbe.s, creekProbe.u);
+          if (((r[s] = clamp(u, 0, 255)), this.trail.locate(i, o, _z, 5.8)))
             continue;
-          let d = n.top(vz.s);
+          let d = n.top(creekProbe.s);
           t[s] =
             l >= 0
-              ? OF(t[s], n.gully(vz.s, vz.u), 1 - X(0, 14, l))
+              ? lerp(t[s], n.gully(creekProbe.s, creekProbe.u), 1 - smoothstep(0, 14, l))
               : u > 0
                 ? d
-                : n.channel(vz.s, vz.u, d) - mz;
+                : n.channel(creekProbe.s, creekProbe.u, d) - mz;
         }
       return r;
     }
     sinkRibbon(e) {
-      let t = oz,
+      let t = GRID_N,
         n = this.h,
         r = new Uint8Array(t * t);
       for (let i = 0; i < t; i++)
@@ -296,8 +296,8 @@ var uz = (function (e) {
           }
           let s = this.trail.locate(sz(a), sz(i), _z, 14.1)
             ? Math.abs(_z.u)
-            : SI + 8;
-          ((r[o] = s), (n[o] -= mz * (1 - X(SI - 2, SI + 0.6, s))));
+            : TRAIL_FADE + 8;
+          ((r[o] = s), (n[o] -= mz * (1 - smoothstep(TRAIL_FADE - 2, TRAIL_FADE + 0.6, s))));
         }
       let i = [];
       for (let n = 0; n < t; n++)
@@ -316,7 +316,7 @@ var uz = (function (e) {
       return r;
     }
     async bakeCover(e, t, n) {
-      let r = oz;
+      let r = GRID_N;
       await VF(r, async (i, a) => {
         let o = Math.max(0, i - 1),
           s = {
@@ -348,7 +348,7 @@ var uz = (function (e) {
       });
     }
     wearRoundStunts(e) {
-      let t = oz,
+      let t = GRID_N,
         n = new Uint8Array(t * t);
       for (let [r, i, a] of e.reaches(6))
         for (let e = cz(i - a); e <= cz(i + a); e++)
@@ -359,7 +359,7 @@ var uz = (function (e) {
           if (!n[a]) continue;
           let o = e.clearance(sz(i), sz(r));
           if (o > hz) continue;
-          let s = 1 - X(0.5, 3.5, o);
+          let s = 1 - smoothstep(0.5, 3.5, o);
           ((this.grass[a] *= 1 - s),
             (this.cover2[a * 4 + 1] = this.grass[a]),
             (this.cover[a * 4] = Math.max(this.cover[a * 4], 230 * s)));

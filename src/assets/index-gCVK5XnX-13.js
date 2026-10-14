@@ -241,14 +241,14 @@ var Gz = class {
       c = a.air.to(+!!t.air, e, 12, 18),
       l = t.air ? 0.008 : 0.06,
       u = t.surface,
-      d = a.hard.to(+(u === uz.Trail), e, 4),
-      f = a.loose.to(+(u === uz.Dirt || u === uz.Rock), e, 4),
-      p = a.grass.to(+(u === uz.Grass || u === uz.Forest), e, 4),
-      m = a.wood.to(+(u === uz.Wood), e, 10),
-      h = a.wet.to(u === uz.Water && t.rolling ? 1 : 0, e, 14, 4),
-      g = Y(o / 26),
-      _ = Y(o / 7) ** 0.8,
-      v = _ * (0.55 + 0.45 * Y((o - 5) / 15)),
+      d = a.hard.to(+(u === SURFACE.Trail), e, 4),
+      f = a.loose.to(+(u === SURFACE.Dirt || u === SURFACE.Rock), e, 4),
+      p = a.grass.to(+(u === SURFACE.Grass || u === SURFACE.Forest), e, 4),
+      m = a.wood.to(+(u === SURFACE.Wood), e, 10),
+      h = a.wet.to(u === SURFACE.Water && t.rolling ? 1 : 0, e, 14, 4),
+      g = clamp(o / 26),
+      _ = clamp(o / 7) ** 0.8,
+      v = _ * (0.55 + 0.45 * clamp((o - 5) / 15)),
       y =
         0.85 +
         0.15 * Math.sin(this.time * 0.37) * Math.sin(this.time * 0.13 + 1);
@@ -259,29 +259,29 @@ var Gz = class {
     (i(this.rush.gain.gain, Math.sqrt(c) * b * wz * (0.9 + 0.1 * y), 0.05),
       i(this.rush.filter.frequency, 450 + g * 900, 0.15));
     let x = a.pump.to(t.pump, e, 14, 4),
-      S = s * Y(o / 9) * (1 + 0.6 * x);
+      S = s * clamp(o / 9) * (1 + 0.6 * x);
     (i(this.rumble.gain.gain, S * (0.0315 + 0.009 * d + 0.0135 * f), l),
       i(this.rumble.filter.frequency, 260 + Math.min(o, 22) * 26, 0.1),
       i(this.swish.gain.gain, S * p * 0.06, t.air ? l : 0.08),
-      i(this.boards.osc.frequency, Y(o / 0.13, 4, 200), 0.04),
+      i(this.boards.osc.frequency, clamp(o / 0.13, 4, 200), 0.04),
       i(this.boards.gain.gain, S * m * 0.09, t.air ? l : 0.05));
-    let C = a.rot.to(t.air ? Y(t.rotation / 9) : 0, e, 6, 4);
+    let C = a.rot.to(t.air ? clamp(t.rotation / 9) : 0, e, 6, 4);
     (i(this.swirl.gain.gain, C * C * 0.08, 0.06),
       i(this.swirl.filter.frequency, 450 + C * 900, 0.08));
     let w = t.bump;
     w >= 0 && this.knock(r, w * 0.12);
-    let T = Y((t.carve - 0.8) / 1.2),
-      E = a.scrub.to(t.rolling ? X(0.7, 1, t.grip) * Y(o / 10) : 0, e, 10, 5);
+    let T = clamp((t.carve - 0.8) / 1.2),
+      E = a.scrub.to(t.rolling ? smoothstep(0.7, 1, t.grip) * clamp(o / 10) : 0, e, 10, 5);
     t.air && (a.skid.v = 0);
     let D = a.skid.to(
         t.rolling
-          ? Math.max(t.skid * Y(o / 3), T * 0.45, E * 0.6)
-          : Y(t.bikeScrape / 8) * 0.7,
+          ? Math.max(t.skid * clamp(o / 3), T * 0.45, E * 0.6)
+          : clamp(t.bikeScrape / 8) * 0.7,
         e,
         12,
         6,
       ),
-      O = a.scrape.to(Y(t.scrape / 10) ** 0.7, e, 14, 6),
+      O = a.scrape.to(clamp(t.scrape / 10) ** 0.7, e, 14, 6),
       ee = a.coast.to(
         (t.air || !t.pedalling) && t.wheelRate > 0.3 ? 1 : 0,
         e,
@@ -318,14 +318,14 @@ var Gz = class {
           0.1 + w * 0.15,
         ),
       i(ie.skid.gain.gain, D * 0.13, t.air ? l : 0.05),
-      i(ie.skid.src.playbackRate, Y(0.85 + o / 40, 0.85, 1.25), 0.1),
+      i(ie.skid.src.playbackRate, clamp(0.85 + o / 40, 0.85, 1.25), 0.1),
       i(ie.scrape.gain.gain, O * 0.12, 0.05),
       i(ie.scrape.src.playbackRate, 0.6 + 0.3 * O, 0.1),
       i(ie.breeze.gain.gain, 0.012 * y, 0.5),
-      i(ie.spray.gain.gain, h * Y(o / 6) * 0.2, 0.04),
-      i(ie.spray.src.playbackRate, 0.9 + Y(o / 25) * 0.4, 0.1));
+      i(ie.spray.gain.gain, h * clamp(o / 6) * 0.2, 0.04),
+      i(ie.spray.src.playbackRate, 0.9 + clamp(o / 25) * 0.4, 0.1));
     let ae = a.effort.to(
-      t.pedalling && !t.air ? Y((o - 6) / 14) : 0,
+      t.pedalling && !t.air ? clamp((o - 6) / 14) : 0,
       e,
       0.35,
       0.2,
@@ -335,8 +335,8 @@ var Gz = class {
   }
   drivetrain(e, t, n, r, i, a, o) {
     let s = Rz(i),
-      c = X(Dz, Oz, s),
-      l = r * (0.014 + 0.01 * Y(n / 20));
+      c = smoothstep(Dz, Oz, s),
+      l = r * (0.014 + 0.01 * clamp(n / 20));
     (e.hub.gain.gain.setTargetAtTime(l * c, t, 0.05),
       e.hub.src.playbackRate.setTargetAtTime(Lz(s), t, 0.04));
     let u = l * (1 - c) * 0.65 * Math.sqrt(90 / Math.max(20, s));
@@ -346,9 +346,9 @@ var Gz = class {
     )
       (this.play(`click`, this.nextClick, u, this.clickBus),
         (this.nextClick += (1 / s) * (0.94 + Math.random() * 0.12)));
-    (e.pedal.gain.gain.setTargetAtTime(a * (0.018 + 0.012 * Y(o / 3)), t, 0.06),
+    (e.pedal.gain.gain.setTargetAtTime(a * (0.018 + 0.012 * clamp(o / 3)), t, 0.06),
       e.pedal.src.playbackRate.setTargetAtTime(
-        Y(Math.sqrt(o / jz), 0.8, 1.35),
+        clamp(Math.sqrt(o / jz), 0.8, 1.35),
         t,
         0.08,
       ));
@@ -356,7 +356,7 @@ var Gz = class {
   land(e, t, n) {
     let r = this.ctx;
     if (!r) return;
-    let i = Y(e / 10, t ? 0.45 : 0.06, 1),
+    let i = clamp(e / 10, t ? 0.45 : 0.06, 1),
       a = r.currentTime;
     (this.play(
       n ? `wood` : `land`,
@@ -367,11 +367,11 @@ var Gz = class {
     ),
       this.thud(a, 50 + 20 * (1 - i), 0.2 * i, 0.18 + 0.1 * i),
       t && this.thud(a + 0.01, 44, 0.18, 0.3),
-      e > 6 && this.duck(Y((e - 6) / 8)),
+      e > 6 && this.duck(clamp((e - 6) / 8)),
       e > 5 &&
         a - this.gruntAt > 2.5 &&
         ((this.gruntAt = a),
-        this.play(`grunt`, a + 0.04, 0.22 * Y((e - 4) / 6, 0.4, 1), this.fx)));
+        this.play(`grunt`, a + 0.04, 0.22 * clamp((e - 4) / 6, 0.4, 1), this.fx)));
   }
   stinger(e) {
     let t = this.ctx;
@@ -404,9 +404,9 @@ var Gz = class {
       this.play(
         `splash`,
         this.ctx.currentTime,
-        0.55 * Y(e / 18, 0.2, 1),
+        0.55 * clamp(e / 18, 0.2, 1),
         this.fx,
-        1.1 - 0.2 * Y(e / 25),
+        1.1 - 0.2 * clamp(e / 25),
       );
   }
   creek(e, t) {
@@ -481,7 +481,7 @@ var Gz = class {
       (this.thumpSpeed = Math.max(this.thumpSpeed, e)));
   }
   thump(e, t) {
-    let n = Y((t - 1.5) / 10),
+    let n = clamp((t - 1.5) / 10),
       r = Math.sqrt(n);
     (this.play(
       `bodyfall`,
@@ -502,8 +502,8 @@ var Gz = class {
     let r = this.ctx;
     if (!r) return;
     let i = r.currentTime,
-      a = Y(0.45 + n / 5, 0.45, 1);
-    if (e === uz.Water) {
+      a = clamp(0.45 + n / 5, 0.45, 1);
+    if (e === SURFACE.Water) {
       this.play(`slosh`, i, 0.3 * a, this.fx);
       return;
     }
@@ -512,7 +512,7 @@ var Gz = class {
         this.puff(i, 900, 1.4, 0.035 * a, 0.05));
       return;
     }
-    let o = e === uz.Grass || e === uz.Forest;
+    let o = e === SURFACE.Grass || e === SURFACE.Forest;
     (this.thud(i, 70 + Math.random() * 15, 0.035 * a, 0.06),
       this.puff(
         i,
@@ -611,8 +611,8 @@ var Gz = class {
         i = e.z - t.z,
         a = Math.hypot(n, r, i) || 1,
         o = ((t.x - l.x) * n + (t.y - l.y) * r + (t.z - l.z) * i) / (u * a),
-        s = Y(
-          (Pz - (e.vx * n + e.vy * r + e.vz * i) / a) / (Pz - Y(o, -40, 40)),
+        s = clamp(
+          (Pz - (e.vx * n + e.vy * r + e.vz * i) / a) / (Pz - clamp(o, -40, 40)),
           0.8,
           1.25,
         );
@@ -623,13 +623,13 @@ var Gz = class {
       (l.z = t.z),
       (l.t = c),
       Hz(l.panner, t, c, 0.05),
-      l.roll.gain.gain.setTargetAtTime(i ? Y(n / 7) * 0.4 : 0, c, 0.15),
+      l.roll.gain.gain.setTargetAtTime(i ? clamp(n / 7) * 0.4 : 0, c, 0.15),
       l.roll.filter.frequency.setTargetAtTime(Bz(n), c, 0.1),
       l.roll.src.playbackRate.setTargetAtTime(zz(n) * l.doppler, c, 0.1));
     let d = (a || (!r && i)) && n > 0.3,
       f = Rz(n / Mz);
     (l.hub.gain.gain.setTargetAtTime(
-      d ? 0.024 * X(Dz * 0.5, Oz, f) : 0,
+      d ? 0.024 * smoothstep(Dz * 0.5, Oz, f) : 0,
       c,
       0.12,
     ),

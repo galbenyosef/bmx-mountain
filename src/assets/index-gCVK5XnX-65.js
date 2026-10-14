@@ -14,8 +14,8 @@ function Zee(e, t, n) {
     );
   (r.setIndex(new Fr(i, 1)), (r.drawRange.count = 6));
   let a = new nS({ transparent: !0, depthWrite: !1, roughness: 0.95, side: 2 });
-  ((a.colorNode = RV(...mH.track, oB(`alpha`, `float`))),
-    (a.normalNode = LU(oB(`normal`, `vec3`))),
+  ((a.colorNode = tslVec4(...mH.track, tslAttribute(`alpha`, `float`))),
+    (a.normalNode = LU(tslAttribute(`normal`, `vec3`))),
     BU(a));
   let o = new wi(r, a);
   return ((o.frustumCulled = !1), (o.receiveShadow = !0), o);
@@ -27,14 +27,14 @@ function Qee(e, t, n) {
     r.setAttribute(`across`, n),
     (r.instanceCount = 2));
   let i = new Wy({ transparent: !0, depthWrite: !1 }),
-    a = oB(`spot`, `vec4`),
-    o = oB(`along`, `vec4`),
+    a = tslAttribute(`spot`, `vec4`),
+    o = tslAttribute(`along`, `vec4`),
     s = oV;
   i.positionNode = a.xyz
     .add(o.xyz.mul(s.y.mul(j9[0] * 2)))
-    .add(oB(`across`, `vec3`).mul(s.x.mul(j9[1] * 2)));
-  let c = MB(FV().sub(0.5).mul(2));
-  ((i.colorNode = RV(0, 0, 0, Q(1, o.w.mul(0.6), c).mul(a.w))),
+    .add(tslAttribute(`across`, `vec3`).mul(s.x.mul(j9[1] * 2)));
+  let c = tslLength(tslUv().sub(0.5).mul(2));
+  ((i.colorNode = tslVec4(0, 0, 0, tslSmoothstep(1, o.w.mul(0.6), c).mul(a.w))),
     (i.mrtNode = zU()),
     BU(i));
   let l = new wi(r, i);

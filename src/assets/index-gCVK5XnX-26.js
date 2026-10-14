@@ -19,7 +19,7 @@ function nJ(e, t, n, r, i) {
       let t = [],
         r = 1;
       for (let n of i) {
-        let i = n.share * (1 - X(n.from, n.to, e.distanceTo(n.at)));
+        let i = n.share * (1 - smoothstep(n.from, n.to, e.distanceTo(n.at)));
         (i > 0 && t.push([n.bone, i]), (r -= i));
       }
       return (t.push([n, r]), t);
@@ -40,10 +40,10 @@ function nJ(e, t, n, r, i) {
   let l = Array.from({ length: 6 }, (e, t) => {
     let n = t / 5;
     return qq(
-      o(OF(Fq.from, Fq.to, n)).addScaledVector(a.z, 0.004),
+      o(lerp(Fq.from, Fq.to, n)).addScaledVector(a.z, 0.004),
       a.x,
       a.z,
-      OF(Fq.r[0], Fq.r[1], n),
+      lerp(Fq.r[0], Fq.r[1], n),
       n,
     );
   });
@@ -51,7 +51,7 @@ function nJ(e, t, n, r, i) {
     `neck`,
     l,
     (e, t) => {
-      let i = X(1, 4, t);
+      let i = smoothstep(1, 4, t);
       return [
         [n, 1 - i],
         [r, i],
@@ -60,7 +60,7 @@ function nJ(e, t, n, r, i) {
     Dq.neck,
   );
 }
-var rJ = MV(0),
+var rJ = tslUniform(0),
   iJ = new M(0, 0.118, -0.118),
   aJ = new M(0, 0.14, -1).normalize(),
   oJ = new Yn(16773596),
@@ -78,36 +78,36 @@ var rJ = MV(0),
   vJ = new M(),
   yJ = new M();
 function bJ() {
-  let e = oB(`lampAt`, `vec3`),
+  let e = tslAttribute(`lampAt`, `vec3`),
     t = lB.sub(e),
-    n = MB(t),
+    n = tslLength(t),
     r = t.div(n),
-    i = eV(gB($(0, 1, 0), r)),
+    i = tslNormalize(gB(tslVec3(0, 1, 0), r)),
     a = gB(r, i),
-    o = VB(Z(mJ), n.mul(hJ)),
+    o = tslMax(tslFloat(mJ), n.mul(hJ)),
     s = oV,
     c = new Wy({ transparent: !0, depthWrite: !1, blending: 2 });
   c.positionNode = e
-    .add(r.mul(VB(o, 0.12)))
+    .add(r.mul(tslMax(o, 0.12)))
     .add(i.mul(s.x.mul(o)))
     .add(a.mul(s.y.mul(o)));
-  let l = yB(oB(`lampAim`, `vec3`), r),
-    u = Q(-0.1, 0.35, l)
+  let l = tslDot(tslAttribute(`lampAim`, `vec3`), r),
+    u = tslSmoothstep(-0.1, 0.35, l)
       .mul(0.15)
-      .add(Q(0.55, 0.97, l).mul(0.85)),
-    d = yB(FV().sub(0.5), FV().sub(0.5)).mul(4),
+      .add(tslSmoothstep(0.55, 0.97, l).mul(0.85)),
+    d = tslDot(tslUv().sub(0.5), tslUv().sub(0.5)).mul(4),
     f = bB(d.mul(-90))
       .mul(gJ)
       .add(bB(d.mul(-14)).mul(1.5))
       .add(bB(d.mul(-3)).mul(0.25))
-      .mul(Q(1, 0.6, d))
+      .mul(tslSmoothstep(1, 0.6, d))
       .mul(u)
-      .mul(Q(_J, _J * 0.6, n))
+      .mul(tslSmoothstep(_J, _J * 0.6, n))
       .mul(rJ);
   return (
-    (c.colorNode = RV(gH(oJ).mul(f), HB(f, 1))),
+    (c.colorNode = tslVec4(gH(oJ).mul(f), HB(f, 1))),
     (c.fog = !1),
-    (c.alphaTestNode = Z(0.004)),
+    (c.alphaTestNode = tslFloat(0.004)),
     (c.mrtNode = zU()),
     c
   );
@@ -144,8 +144,8 @@ var SJ = class {
     constructor(e) {
       this.most = e;
       let t = QV(-1, 1, -1, 1);
-      ((this.at = dH(e, 3).setUsage(ot)),
-        (this.aim = dH(e, 3).setUsage(ot)),
+      ((this.at = makeBuffer(e, 3).setUsage(ot)),
+        (this.aim = makeBuffer(e, 3).setUsage(ot)),
         t.setAttribute(`lampAt`, this.at),
         t.setAttribute(`lampAim`, this.aim),
         (t.instanceCount = 0),
@@ -189,7 +189,7 @@ var SJ = class {
         (n.length = Math.min(n.length, dJ)));
       for (let r of this.beams)
         (r.head && !t.has(r.head) && (r.k = 0),
-          (r.k = NF(r.k, r.head && n.includes(r.head) ? 1 : 0, e / pJ)),
+          (r.k = approach(r.k, r.head && n.includes(r.head) ? 1 : 0, e / pJ)),
           r.k === 0 && (r.head = null));
       for (let e of n) {
         let t = this.beams.find((e) => e.head === null);
@@ -197,7 +197,7 @@ var SJ = class {
       }
       for (let e of this.beams)
         e.head
-          ? e.lamp.update(e.head, e.k * (1 - X(fJ * 0.7, fJ, t.get(e.head))))
+          ? e.lamp.update(e.head, e.k * (1 - smoothstep(fJ * 0.7, fJ, t.get(e.head))))
           : (e.lamp.light.intensity = 0);
     }
     show(e) {
@@ -218,7 +218,7 @@ var SJ = class {
     1 -
     wJ.nose *
       Math.exp(
-        -((kF(e - Math.PI / 2 + Math.PI, DF) - Math.PI) ** 2) /
+        -((wrap(e - Math.PI / 2 + Math.PI, TAU) - Math.PI) ** 2) /
           wJ.noseWidth ** 2,
       ),
   EJ = { half: 0.13, k: 1.018, from: 0.92 },
@@ -264,7 +264,7 @@ function PJ(e, t, n, r) {
       for (let r = 0; r <= t; r++) e.add(g(h(n, r), l));
       _.push(e.divideScalar(t + 1));
     }
-  let v = (e, t, n, r) => (r ? kF(e + t, n) : Math.min(Math.max(e + t, 0), n));
+  let v = (e, t, n, r) => (r ? wrap(e + t, n) : Math.min(Math.max(e + t, 0), n));
   for (let n = 0; n <= t; n++)
     for (let i = 0; i <= e; i++)
       (g(h(i, n), c),
@@ -325,10 +325,10 @@ var IJ = (e) => (t, n) => {
 function LJ() {
   let e = new M(),
     t = new M(),
-    n = (e) => (e / kJ) * DF,
+    n = (e) => (e / kJ) * TAU,
     r = Array.from({ length: 129 }, (e, t) => SG(n(t))),
     i = (e) => {
-      let t = kF(e, kJ),
+      let t = wrap(e, kJ),
         n = Math.floor(t);
       return r[n] + (r[n + 1] - r[n]) * (t - n);
     },

@@ -487,7 +487,7 @@ var $0 = class {
             let s = a === `colour` ? t.colour : t.normal;
             n.add(new wi(t.bark, s[0]), new wi(t.leaves, s[1]));
             for (let t = 0; t < l2; t++) {
-              let a = (t / l2) * DF;
+              let a = (t / l2) * TAU;
               (r.position.set(Math.sin(a) * 5, 0, Math.cos(a) * 5),
                 r.lookAt(0, 0, 0),
                 r.updateMatrixWorld(),

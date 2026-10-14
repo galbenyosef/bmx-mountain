@@ -89,7 +89,7 @@ var a7 = 0.12,
             !this.clock.synced ||
             e.some((e) => this.clock.samplesFrom(e.id) < l7);
         this.pingAt = t + (n ? s7 : c7);
-        let r = Y5(H5.ping, t);
+        let r = Y5(OPCODE.ping, t);
         for (let n of e) this.sendTo(n, r, t);
       }
       if (t >= this.helloAt) {
@@ -116,7 +116,7 @@ var a7 = 0.12,
       this.net &&
         this.inWorld &&
         !this.solo &&
-        this.broadcast($5(H5.trick, { name: e, pts: t, t: this.clock.now() }));
+        this.broadcast($5(OPCODE.trick, { name: e, pts: t, t: this.clock.now() }));
     }
     update(e) {
       let t = this.clock.now() - a7,
@@ -132,8 +132,8 @@ var a7 = 0.12,
           o ? i.avatar.bike.root.position : null,
           a.speed,
           a.pedal > 0,
-          a.mode === kH.Ride,
-          a.mode === kH.Air,
+          a.mode === RIDE_MODE.Ride,
+          a.mode === RIDE_MODE.Air,
         );
       }
       this.shown > 1 && (this.together += e);
@@ -142,7 +142,7 @@ var a7 = 0.12,
       for (let e of this.peers.values()) {
         let t = e.rider;
         t?.live &&
-          (t.state.mode === kH.Ride || t.state.mode === kH.Air) &&
+          (t.state.mode === RIDE_MODE.Ride || t.state.mode === RIDE_MODE.Air) &&
           (yield t.state);
       }
     }
@@ -167,8 +167,8 @@ var a7 = 0.12,
       for (let e of this.peers.values()) {
         let t = e.rider?.state;
         if (!t || !e.rider.live || t.chair < 0) continue;
-        let n = t.mode !== kH.Seated;
-        (n && t.mode !== kH.Ride) ||
+        let n = t.mode !== RIDE_MODE.Seated;
+        (n && t.mode !== RIDE_MODE.Ride) ||
           (yield {
             id: e.id,
             chair: Math.round(t.chair),
@@ -179,7 +179,7 @@ var a7 = 0.12,
     }
     close() {
       this.net &&
-        (this.inWorld && this.broadcast(new Uint8Array([H5.bye])),
+        (this.inWorld && this.broadcast(new Uint8Array([OPCODE.bye])),
         this.net.close());
     }
     onJoined(e) {
@@ -213,35 +213,35 @@ var a7 = 0.12,
       let r = this.peers.get(e);
       if (r && t.length !== 0)
         switch (((r.heard = e$()), n || (r.direct = r.heard), t[0])) {
-          case H5.state:
+          case OPCODE.state:
             return this.onState(r, t);
-          case H5.ping: {
+          case OPCODE.ping: {
             let e = X5(t);
             e &&
               this.sendTo(
                 r,
-                Y5(H5.pong, e.a, this.clock.now(), this.clock.synced),
+                Y5(OPCODE.pong, e.a, this.clock.now(), this.clock.synced),
                 r.heard,
               );
             return;
           }
-          case H5.pong: {
+          case OPCODE.pong: {
             let n = X5(t);
             if (!n?.synced || !this.references(r.heard).includes(r)) return;
             ((r.synced = !0), this.clock.pong(e, n.a, n.b));
             return;
           }
-          case H5.hello:
+          case OPCODE.hello:
             return this.onHello(r, t);
-          case H5.trick:
+          case OPCODE.trick:
             return this.onTrick(r, t);
-          case H5.bye:
+          case OPCODE.bye:
             ((r.bye = !0), (r.heard = -1 / 0), this.farewell(r));
             return;
-          case H5.hears:
+          case OPCODE.hears:
             ((r.hears = new Set(n7(t))), (r.hearsAt = r.heard));
             return;
-          case H5.relay: {
+          case OPCODE.relay: {
             let e = i7(t),
               i = e && !n && this.byHash(e.hash);
             i &&
@@ -249,16 +249,16 @@ var a7 = 0.12,
               this.net.send(
                 i.id,
                 U5(e.payload[0]),
-                r7(H5.relayed, r.hash, e.payload),
+                r7(OPCODE.relayed, r.hash, e.payload),
               );
             return;
           }
-          case H5.relayed: {
+          case OPCODE.relayed: {
             let e = i7(t),
               r = e && !n && this.byHash(e.hash);
             r &&
-              e.payload[0] !== H5.relay &&
-              e.payload[0] !== H5.relayed &&
+              e.payload[0] !== OPCODE.relay &&
+              e.payload[0] !== OPCODE.relayed &&
               this.onMessage(r.id, e.payload, !0);
             return;
           }
@@ -320,14 +320,14 @@ var a7 = 0.12,
     hello(e, t) {
       this.sendTo(
         e,
-        $5(H5.hello, { v: 7, arrived: this.arrived, kit: this.kit, ack: t }),
+        $5(OPCODE.hello, { v: 7, arrived: this.arrived, kit: this.kit, ack: t }),
         e$(),
       );
     }
     sendTo(e, t, n) {
       let r = this.via(e, n);
       r
-        ? this.net.send(r.id, U5(t[0]), r7(H5.relay, e.hash, t))
+        ? this.net.send(r.id, U5(t[0]), r7(OPCODE.relay, e.hash, t))
         : e.linked && this.net.send(e.id, U5(t[0]), t);
     }
     broadcast(e) {
@@ -336,7 +336,7 @@ var a7 = 0.12,
       this.net.send(null, n, e);
       for (let r of this.peers.values()) {
         let i = this.via(r, t);
-        i && this.net.send(i.id, n, r7(H5.relay, r.hash, e));
+        i && this.net.send(i.id, n, r7(OPCODE.relay, r.hash, e));
       }
     }
     via(e, t) {

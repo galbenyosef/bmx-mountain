@@ -32,10 +32,10 @@ function C5(e, t, n) {
     s = new Uint8Array(a);
   for (let c = 0; c < a; c++) {
     let a = r.at(c).k,
-      l = n[Math.round(c / dI)],
-      u = a * t < 0 ? X(f5[0] * J.g, f5[1] * J.g, l * l * Math.abs(a)) : 0,
-      d = x5(e, c, t * SI).y - x5(e, c, t * (SI + d5)).y;
-    o[c] = +(Math.max(u * X(p5[0], p5[1], d), X(m5[0], m5[1], d)) > 0.5);
+      l = n[Math.round(c / SAMPLE_STEP)],
+      u = a * t < 0 ? smoothstep(f5[0] * PHYSICS.g, f5[1] * PHYSICS.g, l * l * Math.abs(a)) : 0,
+      d = x5(e, c, t * TRAIL_FADE).y - x5(e, c, t * (TRAIL_FADE + d5)).y;
+    o[c] = +(Math.max(u * smoothstep(p5[0], p5[1], d), smoothstep(m5[0], m5[1], d)) > 0.5);
     let f = x5(e, c, t * l5);
     s[c] =
       c > y5 &&
@@ -81,7 +81,7 @@ async function E5(e) {
     i = new HI(),
     a = new bz(i);
   (await a.bake(async (e) => {
-    (uQ.progress(0.05 + e * 0.6), await n$());
+    (wavedash.progress(0.05 + e * 0.6), await n$());
   }),
     x$(a));
   let o = new T8(a),
@@ -92,9 +92,9 @@ async function E5(e) {
     d = new p6(a.lift);
   d.update(0);
   let f = new c5(a.trials, (e, t) => a.baseHeight(e, t));
-  (uQ.progress(0.8), await n$());
-  let p = jL(a, ZF),
-    m = [...ML(a, ZF), ...FL(a.creek, a), ...NL(i, a)];
+  (wavedash.progress(0.8), await n$());
+  let p = jL(a, WORLD_HALF),
+    m = [...ML(a, WORLD_HALF), ...FL(a.creek, a), ...NL(i, a)];
   a.setObstacles(p, m);
   let h = await B3.create(e.gl, p, a),
     g = [...Y6(m), ...Y6(PL(i, a), !1)],
@@ -120,7 +120,7 @@ async function E5(e) {
   return (
     e.scene.add(...b, d.group, f.group),
     await t,
-    uQ.progress(0.98),
+    wavedash.progress(0.98),
     {
       trail: i,
       terrain: a,
@@ -167,7 +167,7 @@ async function D5(e, { ground: t, grass: n, trees: r, terrain: i }, a, o, s) {
       r === 0 && u(),
       e.render(1 / 60),
       await n$(),
-      uQ.progress(0.985 + r * 0.002));
+      wavedash.progress(0.985 + r * 0.002));
 }
 var O5 = [`steer`, `bars`, `whip`, `spin`, `crank`],
   k5 = [
@@ -233,7 +233,7 @@ var O5 = [`steer`, `bars`, `whip`, `spin`, `crank`],
       if (a === 0) this.copy(r[0], 0);
       else if (a === r.length) {
         let e = r[r.length - 1];
-        this.copy(e, e.mode === kH.Crash ? 0 : Y(t - e.t, 0, 0.25));
+        this.copy(e, e.mode === RIDE_MODE.Crash ? 0 : clamp(t - e.t, 0, 0.25));
       } else {
         let e = r[a - 1],
           n = r[a],
@@ -253,8 +253,8 @@ var O5 = [`steer`, `bars`, `whip`, `spin`, `crank`],
             s,
           ),
           pU(j5, o, o));
-        for (let t of O5) o[t] = jF(e[t], n[t], s);
-        for (let t of k5) o[t] = OF(e[t], n[t], s);
+        for (let t of O5) o[t] = lerpAngle(e[t], n[t], s);
+        for (let t of k5) o[t] = lerp(e[t], n[t], s);
         let m = s < 0.5 ? e : n;
         for (let e of A5) o[e] = m[e];
         (j5
@@ -265,7 +265,7 @@ var O5 = [`steer`, `bars`, `whip`, `spin`, `crank`],
           (o.bqz = j5.z),
           (o.bqw = j5.w));
       }
-      (o.mode === kH.Seated && this.seated?.(o),
+      (o.mode === RIDE_MODE.Seated && this.seated?.(o),
         this.avatar.pose(o, e),
         (this.live = !0));
     }
@@ -301,7 +301,7 @@ function B5(e, t, n, r, i) {
       : {
           x: ((s.x + 1) / 2) * r,
           y: ((1 - s.y) / 2) * i,
-          scale: Y(1 - (o - I5) / 140),
+          scale: clamp(1 - (o - I5) / 140),
         }
   );
 }
@@ -315,7 +315,7 @@ function V5(e, t, n, r) {
   }
   return !1;
 }
-var H5 = {
+var OPCODE = {
     state: 1,
     ping: 2,
     pong: 3,
@@ -326,7 +326,7 @@ var H5 = {
     trick: 12,
     bye: 13,
   },
-  U5 = (e) => e === H5.hello || e === H5.trick || e === H5.bye,
+  U5 = (e) => e === OPCODE.hello || e === OPCODE.trick || e === OPCODE.bye,
   W5 = 2,
   G5 =
     `x.y.z.vx.vy.vz.yaw.pitch.roll.steer.bars.whip.spin.crank.crouch.hands.speed.compF.compR.bx.by.bz.bqx.bqy.bqz.bqw.chair.seat.wobble.pump.lift.bail.style.styleSide.styled`.split(
@@ -335,7 +335,7 @@ var H5 = {
   K5 = 12 + G5.length * 4;
 function q5(e, t, n, r, i) {
   let a = new DataView(e.buffer, e.byteOffset, K5);
-  (a.setUint8(0, H5.state),
+  (a.setUint8(0, OPCODE.state),
     a.setUint8(1, t.mode),
     a.setUint8(2, +!!i | (t.pedal ? W5 : 0)),
     a.setFloat64(4, r, !0));

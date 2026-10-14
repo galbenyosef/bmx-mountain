@@ -1,4 +1,4 @@
-// assets/index-gCVK5XnX 21 — math
+// assets/index-gCVK5XnX 21 — csscolor
 // Lines 54198-54530 of readable/assets/index-gCVK5XnX.pretty.js (statement-aligned).
 function SG(e) {
   let t = new M(),
@@ -33,7 +33,7 @@ var TG = (e, t) =>
   MG = [2024, 1008],
   NG = (e, t) => [e / EG, 1 - t / DG],
   PG = (e, t, n) => [e.x0 + t * (e.x1 - e.x0), e.y0 + n * (e.y1 - e.y0)],
-  FG = (e, t) => [(e / DF) * EG, (t / OG) * 768],
+  FG = (e, t) => [(e / TAU) * EG, (t / OG) * 768],
   IG = 1381914,
   LG = 15921906,
   RG = 15263456,
@@ -57,7 +57,7 @@ var TG = (e, t) =>
   YG = 1024,
   XG = { w: 256, h: 192 },
   ZG = `rgb(128,128,128)`,
-  QG = (e, t = 1) => e.clone().multiplyScalar(t).getStyle(),
+  cssColor = (e, t = 1) => e.clone().multiplyScalar(t).getStyle(),
   $G = (e) => `#${e.toString(16).padStart(6, `0`)}`;
 function eK(e, t) {
   let { width: n, height: r } = e.canvas,
@@ -102,9 +102,9 @@ function rK(e, t, n, r, i, a) {
   ((e.fillStyle = a), e.fillRect(0, o, t, n(0, r)[1] - o));
 }
 function iK(e, t, n, r, i) {
-  ((e.fillStyle = QG(t.shirt)),
+  ((e.fillStyle = cssColor(t.shirt)),
     e.fillRect(0, 0, n, r),
-    (e.fillStyle = QG(t.accent)));
+    (e.fillStyle = cssColor(t.accent)));
   for (let [t, n] of [
     [-0.13, 0.05],
     [-0.06, 0.03],
@@ -121,7 +121,7 @@ function iK(e, t, n, r, i) {
         e.fill());
     }
   for (let a of [0.25, 0.75])
-    ((e.fillStyle = QG(t.trim)),
+    ((e.fillStyle = cssColor(t.trim)),
       e.beginPath(),
       e.moveTo(...i(a - 0.055, 0)),
       e.lineTo(...i(a + 0.055, 0)),
@@ -129,17 +129,17 @@ function iK(e, t, n, r, i) {
       e.lineTo(...i(a - 0.07, 0.62)),
       e.closePath(),
       e.fill(),
-      (e.fillStyle = QG(t.accent)),
+      (e.fillStyle = cssColor(t.accent)),
       e.fillRect(...i(a + 0.047, 0.78), 0.012 * n, 0.78 * r));
-  (rK(e, n, i, 0.84, 1, QG(t.trim)),
-    rK(e, n, i, 0.822, 0.84, QG(t.accent)),
-    rK(e, n, i, 0.965, 1, QG(t.accent)),
-    rK(e, n, i, 0, 0.05, QG(t.trim)));
+  (rK(e, n, i, 0.84, 1, cssColor(t.trim)),
+    rK(e, n, i, 0.822, 0.84, cssColor(t.accent)),
+    rK(e, n, i, 0.965, 1, cssColor(t.accent)),
+    rK(e, n, i, 0, 0.05, cssColor(t.trim)));
   let [a, o] = i(0.5, 0.5);
-  (tK(e, t.number, a, o, 170, $G(GG), QG(t.trim, 0.6)),
+  (tK(e, t.number, a, o, 170, $G(GG), cssColor(t.trim, 0.6)),
     (e.font = `900 34px ${YW}`),
     (e.textAlign = `center`),
-    (e.fillStyle = QG(t.accent)),
+    (e.fillStyle = cssColor(t.accent)),
     e.fillText(t.name.toUpperCase().slice(0, KG), a, i(0.5, 0.76)[1]));
 }
 function aK(e) {
@@ -148,32 +148,32 @@ function aK(e) {
     nK(t, `jersey`, (n, r, i) => iK(t, e, n, r, i)),
     nK(t, `sleeve`, (n, r, i) => {
       let a = JG.shoulder;
-      (rK(t, n, i, 0, 1, QG(e.shirt)),
-        rK(t, n, i, 0, a + 0.05, QG(e.trim)),
-        rK(t, n, i, a + 0.05, a + 0.062, QG(e.accent)),
-        rK(t, n, i, a + 0.08, a + 0.087, QG(e.accent)),
-        rK(t, n, i, 0.93, 1, QG(e.accent)));
+      (rK(t, n, i, 0, 1, cssColor(e.shirt)),
+        rK(t, n, i, 0, a + 0.05, cssColor(e.trim)),
+        rK(t, n, i, a + 0.05, a + 0.062, cssColor(e.accent)),
+        rK(t, n, i, a + 0.08, a + 0.087, cssColor(e.accent)),
+        rK(t, n, i, 0.93, 1, cssColor(e.accent)));
     }),
     nK(t, `pelvis`, (n, r, i) => {
-      (rK(t, n, i, 0, 1, QG(e.pants)),
-        rK(t, n, i, 0.86, 1, QG(e.pants, 0.8)),
-        (t.fillStyle = QG(e.pants, 0.72)));
+      (rK(t, n, i, 0, 1, cssColor(e.pants)),
+        rK(t, n, i, 0.86, 1, cssColor(e.pants, 0.8)),
+        (t.fillStyle = cssColor(e.pants, 0.72)));
       for (let e of [0.25, 0.75])
         t.fillRect(...i(e - 0.004, 0.86), n * 0.008, r * 0.86);
     }),
     nK(t, `thigh`, (n, r, i) => {
-      (rK(t, n, i, 0, 1, QG(e.pants)),
-        (t.fillStyle = QG(e.pants, 0.72)),
+      (rK(t, n, i, 0, 1, cssColor(e.pants)),
+        (t.fillStyle = cssColor(e.pants, 0.72)),
         t.fillRect(...i(0.496, 1), n * 0.008, r),
-        rK(t, n, i, 0.96, 1, QG(e.pants, 0.85)));
+        rK(t, n, i, 0.96, 1, cssColor(e.pants, 0.85)));
     }),
     nK(t, `sock`, (n, r, i) => {
       let a = JG.knee;
-      (rK(t, n, i, 0, 1, QG(e.socks)),
-        rK(t, n, i, a + 0.17, a + 0.2, QG(e.accent)),
-        rK(t, n, i, a + 0.42, a + 0.45, QG(e.accent)));
+      (rK(t, n, i, 0, 1, cssColor(e.socks)),
+        rK(t, n, i, a + 0.17, a + 0.2, cssColor(e.accent)),
+        rK(t, n, i, a + 0.42, a + 0.45, cssColor(e.accent)));
     }),
-    nK(t, `neck`, (n, r, i) => rK(t, n, i, 0, 1, QG(e.skin))),
+    nK(t, `neck`, (n, r, i) => rK(t, n, i, 0, 1, cssColor(e.skin))),
     eK(t, 0.05),
     ZW(t)
   );
@@ -223,7 +223,7 @@ function lK(e, t, n, r) {
     e.stroke());
 }
 function uK(e) {
-  let t = HF(31),
+  let t = makeRng(31),
     n = (n, r, i, a, o, s, c, l) => {
       for (let u = 0; u < o; u++) {
         let d = a + (u - (o - 1) / 2) * s + (t() - 0.5) * s * 0.5,
@@ -318,7 +318,7 @@ function fK(e) {
   return (
     (t.fillStyle = $G(WG)),
     t.fillRect(0, 0, XG.w, XG.h),
-    (t.fillStyle = QG(e.accent)),
+    (t.fillStyle = cssColor(e.accent)),
     t.fillRect(0, 0, XG.w, 30),
     tK(t, e.number, XG.w / 2, 112, 128, $G(IG), $G(IG)),
     eK(t, 0.03),

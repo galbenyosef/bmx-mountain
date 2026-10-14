@@ -78,8 +78,8 @@ var qR = class {
       let a = null;
       for (let o of i) {
         let { a: i, l: s } = KR(o, e, n),
-          c = Y(i, -o.half, o.half),
-          l = Y(s, -o.w, o.w),
+          c = clamp(i, -o.half, o.half),
+          l = clamp(s, -o.w, o.w),
           u = i - c,
           d = s - l;
         if ((u < -1e-6 && o.joinedBefore) || (u > 1e-6 && o.joinedAfter))
@@ -173,8 +173,8 @@ var qR = class {
       for (let t of this.seesaws) t.step(e);
     }
     idle(e) {
-      for (this.acc += Math.min(e, 0.1); this.acc >= J.step;)
-        ((this.acc -= J.step), this.step(J.step));
+      for (this.acc += Math.min(e, 0.1); this.acc >= PHYSICS.step;)
+        ((this.acc -= PHYSICS.step), this.step(PHYSICS.step));
     }
     weighOthers(e) {
       for (let e of this.seesaws) e.clearOthers();
@@ -186,7 +186,7 @@ var qR = class {
             let { a: e, l: r } = KR(n, t.x, t.z);
             if (Math.abs(e) > n.half || Math.abs(r) > n.w + 0.2) continue;
             let i = t.y - n.seesaw.top(e);
-            i > -0.2 && i < 0.7 && n.seesaw.weigh(e, J.mass * J.g);
+            i > -0.2 && i < 0.7 && n.seesaw.weigh(e, PHYSICS.mass * PHYSICS.g);
           }
       }
     }

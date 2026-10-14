@@ -6,7 +6,7 @@ function xz(e, t, n) {
     for (let i = 0; i < t; i++) {
       for (let a = 0; a < t; a++) {
         let o = 0;
-        for (let r = -n; r <= n; r++) o += e[i * t + Y(a + r, 0, t - 1)];
+        for (let r = -n; r <= n; r++) o += e[i * t + clamp(a + r, 0, t - 1)];
         r[a] = o / (2 * n + 1);
       }
       for (let n = 0; n < t; n++) e[i * t + n] = r[n];
@@ -14,7 +14,7 @@ function xz(e, t, n) {
     for (let i = 0; i < t; i++) {
       for (let a = 0; a < t; a++) {
         let o = 0;
-        for (let r = -n; r <= n; r++) o += e[Y(a + r, 0, t - 1) * t + i];
+        for (let r = -n; r <= n; r++) o += e[clamp(a + r, 0, t - 1) * t + i];
         r[a] = o / (2 * n + 1);
       }
       for (let n = 0; n < t; n++) e[n * t + i] = r[n];
@@ -31,7 +31,7 @@ var Sz = 44100,
   kz = 0.08,
   Az = 2.75,
   jz = 1.47,
-  Mz = DF * J.wheelRadius,
+  Mz = TAU * PHYSICS.wheelRadius,
   Nz = 0.06,
   Pz = 343,
   Fz = (e, t) => Array.from({ length: t }, (t, n) => `${e}${n}`),
@@ -60,8 +60,8 @@ function Lz(e) {
   let t = e / Ez;
   return t <= 1 ? t : t ** 0.7;
 }
-var Rz = (e) => Y(e * Tz, 4, 400),
-  zz = (e) => Y(0.85 + e / 45, 0.85, 1.3),
+var Rz = (e) => clamp(e * Tz, 4, 400),
+  zz = (e) => clamp(0.85 + e / 45, 0.85, 1.3),
   Bz = (e) => 900 + Math.min(e, 22) * 130,
   Vz = (e, t, n = 0.5) => ({ type: e, frequency: t, Q: n });
 function Hz(e, t, n, r) {

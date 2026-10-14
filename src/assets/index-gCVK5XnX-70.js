@@ -1,7 +1,7 @@
 // assets/index-gCVK5XnX 70 — update
 // Lines 68899-69248 of readable/assets/index-gCVK5XnX.pretty.js (statement-aligned).
 async function Hte() {
-  uQ.progress(0.02);
+  wavedash.progress(0.02);
   let e = document.getElementById(`game`),
     t = await m3.create(e),
     n = await E5(t),
@@ -98,8 +98,8 @@ async function Hte() {
     c.update(t.camera),
     l.update(t.camera),
     t.render(0),
-    uQ.progress(1),
-    uQ.init());
+    wavedash.progress(1),
+    wavedash.init());
   try {
     D.start(Vte());
   } catch (e) {
@@ -140,7 +140,7 @@ async function Hte() {
     be = new M(),
     xe = { x: 0, y: 0, z: 0, t: 0 },
     Se = () => {
-      (oe.getOff(O), b.reset(), uQ.presence(`walking`), v.hint(V9.foot, 6));
+      (oe.getOff(O), b.reset(), wavedash.presence(`walking`), v.hint(V9.foot, 6));
     },
     Ce = () => {
       let e = () => {
@@ -148,7 +148,7 @@ async function Hte() {
           O.placeAt(O.pos.x, O.pos.z, -Math.sin(O.yaw), -Math.cos(O.yaw), 0),
           ce(),
           v.hideHint(),
-          uQ.presence(`top`));
+          wavedash.presence(`top`));
       };
       oe.near(O) ? e() : v.fade(e);
     },
@@ -185,7 +185,7 @@ async function Hte() {
         ae.update(O, T.now(), D.aboard()))
       ) {
         case `seated`:
-          (uQ.presence(`lift`), v.hint(V9.lift));
+          (wavedash.presence(`lift`), v.hint(V9.lift));
           break;
         case `moved`:
           ce();
@@ -265,7 +265,7 @@ async function Hte() {
       for (let t of d.seesaws) {
         if (t.slam > 0.4) {
           let n = Math.hypot(e.x - t.x, e.y - t.pivotY, e.z - t.z) / Lte,
-            r = Y(t.slam / 3) * Y(1 - n);
+            r = clamp(t.slam / 3) * clamp(1 - n);
           (x.slam(r), S.slam(r));
         }
         t.slam = 0;
@@ -285,7 +285,7 @@ async function Hte() {
         S.update(e, o, he.isOpen ? null : y.gamepad),
         x.listen(a, t.camera.getWorldDirection(_e)),
         i.creek.nearest(a.x, a.z, xe) < Rte
-          ? x.creek(xe, Y((i.creek.flowAt(xe.t) - 2) / 4))
+          ? x.creek(xe, clamp((i.creek.flowAt(xe.t) - 2) / 4))
           : x.creek(null, 0));
     },
     Me = (e, n, r, i) => {
@@ -302,8 +302,8 @@ async function Hte() {
       return (
         !n && (r || oe.on || O.mode === `ride`) && l.press(a.x, a.z),
         h.update(i ? O.vel : be),
-        (t.fringe.value = i ? Y((O.speed - 20) / 10) : 0),
-        (t.blur.value = Y((O.speed - 8) / 40, 0, 0.3)),
+        (t.fringe.value = i ? clamp((O.speed - 20) / 10) : 0),
+        (t.blur.value = clamp((O.speed - 8) / 40, 0, 0.3)),
         a
       );
     },
@@ -325,7 +325,7 @@ async function Hte() {
         g.update(T.now(), i ? null : oe.on ? oe.walker.pos : O.pos, D.riders()),
         u.update([g.doe, g.fawn]),
         _.update(T.now(), n),
-        D.together > Bte && uQ.achieve(`TOGETHER`),
+        D.together > Bte && wavedash.achieve(`TOGETHER`),
         ke(n, i, p),
         o.update(T.now()),
         t.setTime(T.now(), n),
@@ -348,5 +348,5 @@ async function Hte() {
       (D.poll(), T.frame(0, D.solo), D.send(ie, O.vel));
   }, 250),
     Ne(),
-    uQ.presence(`top`));
+    wavedash.presence(`top`));
 }

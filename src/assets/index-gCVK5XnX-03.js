@@ -44,14 +44,14 @@ var _I = class {
         a = u[r + 1],
         d = a.x - i.x,
         f = a.z - i.z,
-        p = Y(((e - i.x) * d + (t - i.z) * f) / (d * d + f * f)),
+        p = clamp(((e - i.x) * d + (t - i.z) * f) / (d * d + f * f)),
         m = i.x + d * p,
         h = i.z + f * p,
         g = (e - m) ** 2 + (t - h) ** 2;
       g < s &&
         ((s = g),
-        (c = (r + p) * dI),
-        (l = (e - m) * -OF(i.tz, a.tz, p) + (t - h) * OF(i.tx, a.tx, p)));
+        (c = (r + p) * SAMPLE_STEP),
+        (l = (e - m) * -lerp(i.tz, a.tz, p) + (t - h) * lerp(i.tx, a.tx, p)));
     }
     return c < 0 ? !1 : ((n.s = c), (n.u = l), !0);
   }
@@ -73,20 +73,20 @@ function yI(e, t) {
   let n = e.length - 1;
   if (t >= n) return e[n];
   let r = Math.floor(t);
-  return OF(e[r], e[r + 1], t - r);
+  return lerp(e[r], e[r + 1], t - r);
 }
 function bI(e, t, n, r = 0) {
-  let i = Y(t / dI, 0, e.length - 1.001),
+  let i = clamp(t / SAMPLE_STEP, 0, e.length - 1.001),
     a = Math.floor(i),
     o = i - a,
     s = e[a],
     c = e[a + 1],
-    l = OF(s.tx, c.tx, o),
-    u = OF(s.tz, c.tz, o),
+    l = lerp(s.tx, c.tx, o),
+    u = lerp(s.tz, c.tz, o),
     d = Math.hypot(l, u) || 1;
   ((n.tx = l / d),
     (n.tz = u / d),
-    (n.x = OF(s.x, c.x, o)),
-    (n.z = OF(s.z, c.z, o)),
+    (n.x = lerp(s.x, c.x, o)),
+    (n.z = lerp(s.z, c.z, o)),
     r && ((n.x -= n.tz * r), (n.z += n.tx * r)));
 }

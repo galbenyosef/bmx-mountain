@@ -1,4 +1,4 @@
-// assets/index-gCVK5XnX 53 — board
+// assets/index-gCVK5XnX 53 — lodge_half
 // Lines 64329-64783 of readable/assets/index-gCVK5XnX.pretty.js (statement-aligned).
 var R6 = (e) => uR + fR - Math.abs(e) * E6,
   z6 = class {
@@ -6,7 +6,7 @@ var R6 = (e) => uR + fR - Math.abs(e) * E6,
     stone = [];
     steel = [];
     glass = [];
-    t = new w6(HF(777));
+    t = new w6(makeRng(777));
     f;
     y0;
     land;
@@ -18,7 +18,7 @@ var R6 = (e) => uR + fR - Math.abs(e) * E6,
           t(n.x + n.ax * e + n.cx * r, n.z + n.az * e + n.cz * r) - n.ground));
     }
     at(e, t, n) {
-      return rH(e, this.y0 + t, n);
+      return trailToWorld(e, this.y0 + t, n);
     }
     board(e, t, n, r, i, a, o, s, c) {
       this.wood.push(
@@ -38,15 +38,15 @@ var R6 = (e) => uR + fR - Math.abs(e) * E6,
     }
     foundation() {
       let e = 0;
-      for (let t = -T6; t <= T6; t += 1)
+      for (let t = -LODGE_HALF; t <= LODGE_HALF; t += 1)
         for (let n = 0; n <= 12; n += 1) e = Math.min(e, this.land(t, n));
-      (this.box(this.stone, -T6 - 0.06, e - 0.5, -0.06, T6 + 0.06, uR, 12.06),
+      (this.box(this.stone, -LODGE_HALF - 0.06, e - 0.5, -0.06, LODGE_HALF + 0.06, uR, 12.06),
         this.box(
           this.stone,
-          -T6,
-          Math.min(this.land(-T6, -pR), this.land(T6, -pR), 0) - 0.4,
+          -LODGE_HALF,
+          Math.min(this.land(-LODGE_HALF, -pR), this.land(LODGE_HALF, -pR), 0) - 0.4,
           -pR,
-          T6 + 3,
+          LODGE_HALF + 3,
           uR - 0.06,
           0,
         ),
@@ -58,8 +58,8 @@ var R6 = (e) => uR + fR - Math.abs(e) * E6,
       for (let t = uR; t < uR + dR - 0.01; t += O6) {
         let n = t + O6 / 2;
         for (let t of [-1, 1])
-          e(t * (T6 - 0.15), n, -0.3, t * (T6 - 0.15), 12.3);
-        for (let t of [0.15, 11.85]) e(-T6 - 0.3, n, t, T6 + 0.3, t);
+          e(t * (LODGE_HALF - 0.15), n, -0.3, t * (LODGE_HALF - 0.15), 12.3);
+        for (let t of [0.15, 11.85]) e(-LODGE_HALF - 0.3, n, t, LODGE_HALF + 0.3, t);
       }
       for (let t = uR + dR; t < uR + fR - 0.3; t += O6) {
         let n = (uR + fR - t - O6) / E6;
@@ -70,7 +70,7 @@ var R6 = (e) => uR + fR - Math.abs(e) * E6,
     roof() {
       let e = -pR - 0.3,
         t = 12 + D6,
-        n = T6 + D6,
+        n = LODGE_HALF + D6,
         r = uR + fR + 0.1,
         i = r - n * E6;
       for (let a of [-1, 1]) {
@@ -126,7 +126,7 @@ var R6 = (e) => uR + fR - Math.abs(e) * E6,
         for (let t of [2.4, 6, 9.6])
           this.window(
             `a`,
-            e * T6,
+            e * LODGE_HALF,
             e,
             t - 0.65,
             t + 0.65,
@@ -197,7 +197,7 @@ var R6 = (e) => uR + fR - Math.abs(e) * E6,
       o - a > 1.2 && h(r, (a + o) / 2 + 0.25, i, (a + o) / 2 + 0.25, 0.05);
     }
     sign() {
-      let e = eH(new la(5, 0.62, 0.08), L6(`BMX MOUNTAIN`, 1024));
+      let e = addMesh(new la(5, 0.62, 0.08), L6(`BMX MOUNTAIN`, 1024));
       (e.position.copy(this.at(0, uR + 2.75, -0.42).applyMatrix4(this.f)),
         e.lookAt(this.at(0, uR + 2.75, -5).applyMatrix4(this.f)));
       for (let e of [-1, 1])
@@ -215,17 +215,17 @@ var R6 = (e) => uR + fR - Math.abs(e) * E6,
     porch() {
       for (let e = -pR + 0.1; e < 0; e += 0.2)
         this.board(
-          -T6,
+          -LODGE_HALF,
           uR - 0.03,
           e,
-          T6 + 3,
+          LODGE_HALF + 3,
           uR - 0.03,
           e,
           0.18,
           0.05,
           this.stained(0.9),
         );
-      for (let e of [-T6 + 0.35, -2.2, 2.2, T6 - 0.35])
+      for (let e of [-LODGE_HALF + 0.35, -2.2, 2.2, LODGE_HALF - 0.35])
         this.board(
           e,
           uR,
@@ -239,10 +239,10 @@ var R6 = (e) => uR + fR - Math.abs(e) * E6,
         );
       for (let e = -pR + 0.1; e < -0.4; e += 0.2)
         this.board(
-          -T6 - Fee,
+          -LODGE_HALF - Fee,
           0.03,
           e,
-          -T6,
+          -LODGE_HALF,
           uR - 0.03,
           e,
           0.18,
@@ -252,9 +252,9 @@ var R6 = (e) => uR + fR - Math.abs(e) * E6,
     }
     deck() {
       let e = [
-        [T6, T6 + 3, 0, 15],
-        [-T6 - 3, T6, 12, 15],
-        [-T6 - 3, -T6, 0, 12],
+        [LODGE_HALF, LODGE_HALF + 3, 0, 15],
+        [-LODGE_HALF - 3, LODGE_HALF, 12, 15],
+        [-LODGE_HALF - 3, -LODGE_HALF, 0, 12],
       ];
       for (let [t, n, r, i] of e)
         if (n - t > i - r)
@@ -284,9 +284,9 @@ var R6 = (e) => uR + fR - Math.abs(e) * E6,
               this.stained(0.9),
             );
       let t = [
-        [T6 + 3, -0.1, T6 + 3, 15],
-        [T6 + 3, 15, -T6 - 3, 15],
-        [-T6 - 3, 15, -T6 - 3, 0],
+        [LODGE_HALF + 3, -0.1, LODGE_HALF + 3, 15],
+        [LODGE_HALF + 3, 15, -LODGE_HALF - 3, 15],
+        [-LODGE_HALF - 3, 15, -LODGE_HALF - 3, 0],
       ];
       for (let [e, n, r, i] of t) {
         this.board(
@@ -410,8 +410,8 @@ var R6 = (e) => uR + fR - Math.abs(e) * E6,
         this.wood.push(
           this.t.board(
             n,
-            rH(0, t.ground - 0.6, e * ER),
-            rH(0, r, e * ER),
+            trailToWorld(0, t.ground - 0.6, e * ER),
+            trailToWorld(0, r, e * ER),
             DR,
             DR,
             this.trim(),
@@ -420,17 +420,17 @@ var R6 = (e) => uR + fR - Math.abs(e) * E6,
       this.wood.push(
         this.t.board(
           n,
-          rH(0, r - 0.15, -ER - 0.35),
-          rH(0, r - 0.15, ER + 0.35),
+          trailToWorld(0, r - 0.15, -ER - 0.35),
+          trailToWorld(0, r - 0.15, ER + 0.35),
           0.26,
           0.3,
           this.trim(),
         ),
       );
-      let i = eH(new la(2 * ER - 0.5, 0.62, 0.06), L6(`START`, 640));
+      let i = addMesh(new la(2 * ER - 0.5, 0.62, 0.06), L6(`START`, 640));
       return (
-        i.position.copy(rH(0, r - 0.75, 0).applyMatrix4(n)),
-        i.lookAt(rH(-5, r - 0.75, 0).applyMatrix4(n)),
+        i.position.copy(trailToWorld(0, r - 0.75, 0).applyMatrix4(n)),
+        i.lookAt(trailToWorld(-5, r - 0.75, 0).applyMatrix4(n)),
         i
       );
     }
@@ -443,12 +443,12 @@ var R6 = (e) => uR + fR - Math.abs(e) * E6,
       let r = n.sign();
       (n.porch(), n.deck(), n.tables(), this.group.add(n.gate(e)));
       let i = [
-        [n.wood, m6(`wood_rough`, FV(), 0.86), !0],
+        [n.wood, m6(`wood_rough`, tslUv(), 0.86), !0],
         [n.stone, P6(), !0],
         [n.steel, F6(), !0],
         [n.glass, I6(), !1],
       ];
-      for (let [e, t, n] of i) this.group.add(eH(tH(e, x6), t, n));
+      for (let [e, t, n] of i) this.group.add(addMesh(mergeGeometry(e, x6), t, n));
       this.group.add(r);
     }
   },

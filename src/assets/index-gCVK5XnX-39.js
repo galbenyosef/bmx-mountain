@@ -13,7 +13,7 @@ var O0 = [0.02, 0.05, 0.1],
 function A0(e, t, n, r, i, a) {
   let o = 0;
   for (let s of O0)
-    o += Y(t0(e, t, n + a[0] * s, r + a[1] * s, i + a[2] * s) / s);
+    o += clamp(t0(e, t, n + a[0] * s, r + a[1] * s, i + a[2] * s) / s);
   return 1 - k0 * (1 - o / O0.length);
 }
 function j0(e, t, n) {
@@ -70,7 +70,7 @@ function N0(e, t, n) {
     7,
     10,
     (e, t) => {
-      let n = e * DF,
+      let n = e * TAU,
         a = t * Math.PI;
       return {
         p: [
@@ -78,7 +78,7 @@ function N0(e, t, n) {
           r[1] + i * Math.cos(a),
           r[2] + i * Math.sin(a) * Math.sin(n),
         ],
-        c: o0.eye,
+        c: DEER_COLORS.eye,
       };
     },
     L1.Head,
@@ -107,13 +107,13 @@ function I0(e, t, n) {
           u = [0, 1, 2].map(
             (e) => r[e] + i[e] * P0 * n + a[e] * s * c + o[e] * l,
           ),
-          d = Math.max(X(0.75, 1, Math.abs(s)), X(0.88, 1, n));
+          d = Math.max(smoothstep(0.75, 1, Math.abs(s)), smoothstep(0.88, 1, n));
         return {
           p: u,
           c:
             t > 0
-              ? s0(o0.innerEar, o0.earRim, d)
-              : s0(o0.coat, o0.earRim, d * 0.6),
+              ? mixColor(DEER_COLORS.innerEar, DEER_COLORS.earRim, d)
+              : mixColor(DEER_COLORS.coat, DEER_COLORS.earRim, d * 0.6),
         };
       },
       n,
@@ -184,12 +184,12 @@ function W0(e, t) {
   ((n.vertexColors = !0),
     (n.maskNode = WU().lessThan(e)),
     (n.maskShadowNode = n.maskNode));
-  let r = WB.mul(RV(sV, 1)).xyz,
+  let r = WB.mul(tslVec4(sV, 1)).xyz,
     i = lB.sub(r),
-    a = MB(i);
+    a = tslLength(i);
   return (
     (n.positionNode = GB.mul(
-      RV(r.add(i.div(a).mul(HB(a.mul(x1), 4).mul(t))), 1),
+      tslVec4(r.add(i.div(a).mul(HB(a.mul(x1), 4).mul(t))), 1),
     ).xyz),
     (n.castShadowPositionNode = sV),
     n
@@ -202,8 +202,8 @@ function G0(e) {
     let [o, s, c] = U0[i];
     (t[a].position.set(e - o, n - s, r - c), t[i].add(t[a]));
   });
-  let n = MV(1),
-    r = MV(1),
+  let n = tslUniform(1),
+    r = tslUniform(1),
     i = new Fi(e, W0(n, r));
   return (
     i.add(t[0]),
@@ -265,9 +265,9 @@ var K0 = class e {
       let i = t.gallop ? B0.gallop : B0.walk,
         a = t.gallop ? R0 : z0,
         o = t.pace,
-        s = t.stride * DF,
+        s = t.stride * TAU,
         c = r[L1.Body],
-        l = t.gallop ? 0.14 * Math.cos(s - 0.75 * DF) : 0.012 * Math.cos(2 * s);
+        l = t.gallop ? 0.14 * Math.cos(s - 0.75 * TAU) : 0.012 * Math.cos(2 * s);
       ((c.position.y = G1[L1.Body][1] + l * o - 0.03 * t.graze),
         (c.rotation.x =
           (t.gallop ? 0.11 : 0.015) * Math.sin(s) * o - 0.05 * t.graze));
@@ -299,7 +299,7 @@ var K0 = class e {
 function J0(e) {
   let t = Math.cos(e),
     n = Math.sin(e),
-    r = (ZF - 6) / Math.max(Math.abs(t), Math.abs(n));
+    r = (WORLD_HALF - 6) / Math.max(Math.abs(t), Math.abs(n));
   return [t * r, n * r];
 }
 function Y0() {
@@ -309,7 +309,7 @@ function Y0() {
   for (let e = 0; e <= 110; e++) {
     let r = ((1 + (e / 110) * 60) ** 1.6 - 1) / (61 ** 1.6 - 1);
     for (let i = 0; i <= 512; i++) {
-      let [a, o] = J0((i / 512) * DF),
+      let [a, o] = J0((i / 512) * TAU),
         s = Math.hypot(a, o),
         c = s + (q0 - s) * r,
         l = (a / s) * c,
@@ -322,26 +322,26 @@ function Y0() {
           Math.hypot(uI(l + p, u) - uI(l - p, u), uI(l, u + p) - uI(l, u - p)) /
           (2 * p);
       ((n[d * 4 + 1] = EL(l, u, f, m) * 0.9 + 0.1 * (1 - Math.min(1, m))),
-        (n[d * 4 + 2] = Math.max(OL(l, u, f, m), Y((f - 1300) / 500))),
+        (n[d * 4 + 2] = Math.max(OL(l, u, f, m), clamp((f - 1300) / 500))),
         (n[d * 4 + 3] = Math.max(
           kL(l, u, f, m),
-          Y((f - 1500) / 300) * (1 - Y((m - 0.9) * 2)),
+          clamp((f - 1500) / 300) * (1 - clamp((m - 0.9) * 2)),
         )));
     }
   }
   return { pos: t, cover: n };
 }
 function X0(e, t) {
-  let n = eV(e.xz.add(1e-4)),
-    r = LV(n.y.negate(), n.x),
-    i = LV(yB(t, r).div(55), yB(t, n).div(260)),
-    a = PU(i, 4),
-    o = PU(i.add(LV(0.05, 0)), 4),
-    s = PU(t.div(60), 3),
-    c = PU(t.add(LV(6, 0)).div(60), 3),
-    l = PU(t.add(LV(0, 6)).div(60), 3),
-    u = $(r.x, 0, r.y)
+  let n = tslNormalize(e.xz.add(1e-4)),
+    r = tslVec2(n.y.negate(), n.x),
+    i = tslVec2(tslDot(t, r).div(55), tslDot(t, n).div(260)),
+    a = fbmNoise(i, 4),
+    o = fbmNoise(i.add(tslVec2(0.05, 0)), 4),
+    s = fbmNoise(t.div(60), 3),
+    c = fbmNoise(t.add(tslVec2(6, 0)).div(60), 3),
+    l = fbmNoise(t.add(tslVec2(0, 6)).div(60), 3),
+    u = tslVec3(r.x, 0, r.y)
       .mul(a.sub(o).mul(14))
-      .add($(s.sub(c), 0, s.sub(l)).mul(5));
-  return { n: eV(e.add(u)), gully: a, across: r };
+      .add(tslVec3(s.sub(c), 0, s.sub(l)).mul(5));
+  return { n: tslNormalize(e.add(u)), gully: a, across: r };
 }

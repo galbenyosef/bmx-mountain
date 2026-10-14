@@ -87,18 +87,18 @@ var UZ = 4.2,
       (this.onFoot ||
         ((this.onFoot = !0),
         a.getWorldDirection(NZ),
-        (this.footYaw = MF(NZ.x, NZ.z)),
-        (this.footTilt = Y(-Math.asin(NZ.y), $Z[0], $Z[1])),
+        (this.footYaw = headingFromXZ(NZ.x, NZ.z)),
+        (this.footTilt = clamp(-Math.asin(NZ.y), $Z[0], $Z[1])),
         (this.lookedAt = -1 / 0),
         this.footAt.set(a.position)),
         (this.onLift = !1),
         (this.time += e));
       let [o, s] = this.looked(i, e);
-      ((this.footYaw = AF(this.footYaw - o)),
-        (this.footTilt = Y(this.footTilt + s, $Z[0], $Z[1])),
+      ((this.footYaw = wrapAngle(this.footYaw - o)),
+        (this.footTilt = clamp(this.footTilt + s, $Z[0], $Z[1])),
         r &&
           this.time - this.lookedAt > eQ &&
-          (this.footYaw += AF(n - this.footYaw) * PF(tQ, e)));
+          (this.footYaw += wrapAngle(n - this.footYaw) * approachExp(tQ, e)));
       let c = FZ.set(t.x, t.y + QZ, t.z),
         l = LZ.set(
           Math.sin(this.footYaw) * Math.cos(this.footTilt),
@@ -130,8 +130,8 @@ var UZ = 4.2,
     ride(e, t, n) {
       ((this.onFoot = !1), (this.time += e));
       let r = this.cam,
-        i = 0.5 - 0.5 * Math.cos((this.time * DF) / KZ),
-        a = OF(GZ[0], GZ[1], i),
+        i = 0.5 - 0.5 * Math.cos((this.time * TAU) / KZ),
+        a = lerp(GZ[0], GZ[1], i),
         o = Math.asin((0.25 * i) / UZ);
       (this.onLift ||
         ((this.onLift = !0),
@@ -147,11 +147,11 @@ var UZ = 4.2,
       let [s, c] = this.looked(n, e);
       if (
         ((this.liftYaw += s),
-        (this.liftTilt = Y(this.liftTilt + c, YZ[0], YZ[1])),
+        (this.liftTilt = clamp(this.liftTilt + c, YZ[0], YZ[1])),
         this.time - this.lookedAt > XZ)
       ) {
-        let t = PF(0.25, e);
-        ((this.liftYaw += AF(a - this.liftYaw) * t),
+        let t = approachExp(0.25, e);
+        ((this.liftYaw += wrapAngle(a - this.liftYaw) * t),
           (this.liftTilt += (o - this.liftTilt) * t));
       }
       let l = this.liftYaw,
@@ -161,11 +161,11 @@ var UZ = 4.2,
           WZ + Math.sin(u) * UZ,
           -Math.cos(l) * UZ * Math.cos(u),
         ),
-        f = this.time - this.lookedAt < XZ ? 1 : X(1, 3, this.liftT),
-        p = this.liftAt.to(d, OF(1.4, 0.08, f), e),
+        f = this.time - this.lookedAt < XZ ? 1 : smoothstep(1, 3, this.liftT),
+        p = this.liftAt.to(d, lerp(1.4, 0.08, f), e),
         m = this.liftAim.to(
           d.set(0, 0.75, Math.cos(l) * 1.2),
-          OF(1.1, 0.08, f),
+          lerp(1.1, 0.08, f),
           e,
         );
       (HZ(t, p, r.position),
@@ -176,7 +176,7 @@ var UZ = 4.2,
     }
     land(e, t = !1) {
       ((this.dip.v -= Math.min(e, 12) * 0.09),
-        this.hit(Y((e - 2) / 10) * 0.7),
+        this.hit(clamp((e - 2) / 10) * 0.7),
         t && (this.fov.v += 30));
     }
     hit(e) {
@@ -193,21 +193,21 @@ var UZ = 4.2,
           : this.body.set(t.centre(FZ));
       if (n) {
         let t = PZ.subVectors(i, this.lastBody).divideScalar(e);
-        t.lengthSq() < 900 && this.bodyVel.lerp(t, PF(3, e));
+        t.lengthSq() < 900 && this.bodyVel.lerp(t, approachExp(3, e));
       } else this.bodyVel.copy(t.vel);
       this.lastBody.copy(i);
       let a = this.bodyVel,
         o = Math.hypot(a.x, a.z),
-        s = MF(a.x, a.z),
+        s = headingFromXZ(a.x, a.z),
         c = o > 1.5 || t.mode !== `ride` ? s : t.yaw;
-      ((n && o < 2) || this.heading.turn(c, n ? 0.8 : OF(0.32, 0.85, r), e),
+      ((n && o < 2) || this.heading.turn(c, n ? 0.8 : lerp(0.32, 0.85, r), e),
         this.dist.to(this.backFor(t), n ? 0.6 : 0.7, e),
         this.ahead.to(this.aheadFor(t), 0.35, e),
-        this.lead.to(n ? 0 : Y(this.heading.v * 2.2, -2, 2) * (1 - r), 0.3, e));
+        this.lead.to(n ? 0 : clamp(this.heading.v * 2.2, -2, 2) * (1 - r), 0.3, e));
       let l = this.camYFor(t),
         u = l > this.camY.x;
-      (this.camY.to(l, n ? 0.25 : OF(0.14, u ? 0.5 : 0.2, r), e),
-        this.aimY.to(this.aimYFor(t), n ? 0.12 : OF(0.09, 0.12, r), e),
+      (this.camY.to(l, n ? 0.25 : lerp(0.14, u ? 0.5 : 0.2, r), e),
+        this.aimY.to(this.aimYFor(t), n ? 0.12 : lerp(0.09, 0.12, r), e),
         this.fov.to(this.fovFor(t), 0.6, e),
         this.roll.to(
           t.mode === `ride` ? t.roll * 0.25 + this.bank(t) * xZ : 0,
@@ -221,7 +221,7 @@ var UZ = 4.2,
           Math.min(1, this.trauma + d * 0.01) - kZ * e,
         )),
         (this.buzz =
-          t.mode === `ride` ? Y((t.speed - 6) / 20) * dz[t.surface] : 0),
+          t.mode === `ride` ? clamp((t.speed - 6) / 20) * dz[t.surface] : 0),
         this.dodge.to(this.clearView(t), 0.4, e),
         this.dip.step(0, e),
         this.apply(t));
@@ -250,7 +250,7 @@ var UZ = 4.2,
         for (let e = 0.3; e <= 1 && i; e += 0.175) {
           let a = t.x + Math.sin(r) * n * e,
             o = t.z + Math.cos(r) * n * e;
-          i = !this.terrain.obstacleAt(a, OF(t.y, this.camY.x, e), o, 0.45);
+          i = !this.terrain.obstacleAt(a, lerp(t.y, this.camY.x, e), o, 0.45);
         }
         if (i) return e;
       }
@@ -267,14 +267,14 @@ var UZ = 4.2,
       if (e.mode === `crash`) return this.body.p.y + 1.3;
       let t = Math.hypot(1, e.carve) - 1;
       return (
-        e.centre(FZ).y + vZ + yZ * Y((e.speed - 6) / 14) - bZ * Math.min(t, 1.5)
+        e.centre(FZ).y + vZ + yZ * clamp((e.speed - 6) / 14) - bZ * Math.min(t, 1.5)
       );
     }
     bank(e) {
       let t = e.centre(FZ),
         n = this.terrain.normal(t.x, t.z, zZ, 0.6, !0);
       return Math.asin(
-        Y(
+        clamp(
           n[0] * Math.cos(this.heading.x) - n[2] * Math.sin(this.heading.x),
           -1,
           1,
@@ -290,8 +290,8 @@ var UZ = 4.2,
       let t = e.speed;
       return (
         SZ +
-        Y((t - 6) / 14) * CZ +
-        Y((t - 20) / 8) * wZ +
+        clamp((t - 6) / 14) * CZ +
+        clamp((t - 20) / 8) * wZ +
         (e.mode === `air` ? TZ : 0)
       );
     }
@@ -320,7 +320,7 @@ var UZ = 4.2,
         d = this.camY.x;
       (d < l + u && (d = l + u * Math.exp((d - l - u) / u)), (d += this.dip.x));
       let f = this.time,
-        p = e.mode === `ride` ? 0.01 * Y((e.speed - 8) / 12) : 0,
+        p = e.mode === `ride` ? 0.01 * clamp((e.speed - 8) / 12) : 0,
         m = Math.sin(f * 1.3) * p,
         h = Math.sin(f * 1.7 + 1) * p;
       this.cam.position.set(s + m * a, d + h, c - m * i);
@@ -345,7 +345,7 @@ var UZ = 4.2,
       (this.cam.rotateY(n(0)), this.cam.rotateX(n(1)), this.cam.rotateZ(n(2)));
     }
     applyFov() {
-      let e = Y(this.fov.x, 40, 90);
+      let e = clamp(this.fov.x, 40, 90);
       Math.abs(this.cam.fov - e) <= 0.02 ||
         ((this.cam.fov = e), this.cam.updateProjectionMatrix());
     }

@@ -15,9 +15,9 @@ var Kz = K.Break;
   K.EPSILON,
   K.EnvironmentBRDF,
   K.F_Schlick);
-var qz = K.Fn;
+var tslFn = K.Fn;
 (K.HALF_PI, K.INFINITY);
-var Jz = K.If;
+var tslIf = K.If;
 (K.LTC_Evaluate, K.LTC_Evaluate_Volume, K.LTC_Uv);
 var Yz = K.Loop;
 (K.NodeAccess, K.NodeShaderStage, K.NodeType);
@@ -42,7 +42,7 @@ var $z = K.PI;
   K.V_GGX_SmithCorrelated_Anisotropic,
   K.Var,
   K.VarIntent);
-var eB = K.abs;
+var tslAbs = K.abs;
 K.acesFilmicToneMapping;
 var tB = K.acos;
 K.acosh;
@@ -75,7 +75,7 @@ var aB = K.atan;
   K.atomicXor,
   K.attenuationColor,
   K.attenuationDistance);
-var oB = K.attribute;
+var tslAttribute = K.attribute;
 (K.attributeArray,
   K.backgroundBlurriness,
   K.backgroundIntensity,
@@ -173,7 +173,7 @@ var _B = K.dFdx,
   K.dispersion,
   K.distance,
   K.div);
-var yB = K.dot;
+var tslDot = K.dot;
 (K.dot4I8Packed,
   K.dot4U8Packed,
   K.drawIndex,
@@ -190,7 +190,7 @@ var bB = K.exp;
   K.faceDirection,
   K.faceForward,
   K.faceforward);
-var Z = K.float;
+var tslFloat = K.float;
 (K.floatBitsToInt, K.floatBitsToUint);
 var xB = K.floor;
 K.fog;
@@ -229,7 +229,7 @@ var OB = K.instanceIndex;
   K.instancedBufferAttribute,
   K.instancedDynamicBufferAttribute,
   K.instancedMesh);
-var kB = K.int;
+var tslInt = K.int;
 K.intBitsToFloat;
 var AB = K.interleavedGradientNoise;
 (K.inverse,
@@ -244,7 +244,7 @@ var AB = K.interleavedGradientNoise;
   K.isolate);
 var jB = K.ivec2;
 (K.ivec3, K.ivec4, K.js, K.label);
-var MB = K.length;
+var tslLength = K.length;
 (K.lengthSq, K.lessThan, K.lessThanEqual);
 var NB = K.lightPosition;
 (K.lightProjectionUV,
@@ -308,10 +308,10 @@ var PB = K.log,
   K.materialSpecularStrength,
   K.materialThickness,
   K.materialTransmission);
-var VB = K.max;
+var tslMax = K.max;
 (K.maxMipLevel, K.mediumpModelViewMatrix, K.metalness);
 var HB = K.min,
-  UB = K.mix;
+  tslMix = K.mix;
 (K.mixElement,
   K.mod,
   K.modelDirection,

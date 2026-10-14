@@ -42,8 +42,8 @@ var G7 = (e) => e.metadata?.game === w7 && e.metadata?.v === 7,
         m = Math.hypot(f, p),
         h = Math.min(1, (Y7 * e) / (m || 1));
       ((this.vx += f * h), (this.vz += p * h));
-      let g = Y(a.x + this.vx * e, -ZF + 12, ZF - 12),
-        _ = Y(a.z + this.vz * e, -ZF + 12, ZF - 12),
+      let g = clamp(a.x + this.vx * e, -WORLD_HALF + 12, WORLD_HALF - 12),
+        _ = clamp(a.z + this.vz * e, -WORLD_HALF + 12, WORLD_HALF - 12),
         v = Math.hypot(g - a.x, _ - a.z),
         y = this.ground(g, _, a.y),
         b = v > 1e-6 ? (g - a.x) / v : 0,
@@ -63,16 +63,16 @@ var G7 = (e) => e.metadata?.game === w7 && e.metadata?.v === 7,
       }
       let w = this.ground(a.x, a.z, a.y);
       (a.y > w + 0.4 || this.vy > 0
-        ? ((this.vy -= J.g * e),
+        ? ((this.vy -= PHYSICS.g * e),
           (a.y = Math.max(w, a.y + this.vy * e)),
           a.y <= w && (this.vy = 0))
         : ((a.y = w), (this.vy = 0)),
         (this.speed = Math.hypot(this.vx, this.vz)),
         this.speed > 0.2 &&
-          (this.yaw = jF(this.yaw, MF(this.vx, this.vz), Math.min(1, X7 * e))),
+          (this.yaw = lerpAngle(this.yaw, headingFromXZ(this.vx, this.vz), Math.min(1, X7 * e))),
         this.speed > 0.05 &&
           (this.phase =
-            (this.phase + (Math.PI * this.speed * e) / AX(this.speed)) % DF));
+            (this.phase + (Math.PI * this.speed * e) / AX(this.speed)) % TAU));
     }
     ground(e, t, n) {
       let r = this.terrain.height(e, t);
@@ -123,18 +123,18 @@ var G7 = (e) => e.metadata?.game === w7 && e.metadata?.v === 7,
           this.terrain.height(e, t) > this.terrain.baseHeight(e, t) + 0.1,
           r.speed,
         ),
-          n === uz.Water && this.dust.spray(r.pos, i9, 3));
+          n === SURFACE.Water && this.dust.spray(r.pos, i9, 3));
       }
       this.footfall = i;
     }
     pose(e, t) {
       e.state(t);
-      let n = X(0, r9, this.laidT),
+      let n = smoothstep(0, r9, this.laidT),
         r = this.walker;
       Object.assign(t, {
-        mode: kH.Walk,
+        mode: RIDE_MODE.Walk,
         chair: -1,
-        y: OF(t.y, this.terrain.height(t.x, t.z) + 0.12, n),
+        y: lerp(t.y, this.terrain.height(t.x, t.z) + 0.12, n),
         roll: 1.4 * n,
         pitch: t.pitch * (1 - n),
         steer: 0,
@@ -187,28 +187,28 @@ var G7 = (e) => e.metadata?.game === w7 && e.metadata?.v === 7,
     constructor(e, t) {
       ((this.trail = e), (this.ground = t));
       let n = Uee();
-      ((this.at = dH(_9, 4)),
-        (this.turn = dH(_9, 4)),
-        (this.was = dH(_9, 4)),
-        (this.wasTurn = dH(_9, 4)),
+      ((this.at = makeBuffer(_9, 4)),
+        (this.turn = makeBuffer(_9, 4)),
+        (this.was = makeBuffer(_9, 4)),
+        (this.wasTurn = makeBuffer(_9, 4)),
         n.setAttribute(`bird`, this.at),
         n.setAttribute(`birdTurn`, this.turn),
         n.setAttribute(`birdWas`, this.was),
         n.setAttribute(`birdWasTurn`, this.wasTurn),
         (n.instanceCount = 0));
       let r = new nS({ side: 2, roughness: 0.85, metalness: 0 }),
-        i = oB(`bird`, `vec4`),
-        a = oB(`birdTurn`, `vec4`),
-        o = oB(`birdWas`, `vec4`),
-        s = oB(`birdWasTurn`, `vec4`);
-      ((r.positionNode = qz(
+        i = tslAttribute(`bird`, `vec4`),
+        a = tslAttribute(`birdTurn`, `vec4`),
+        o = tslAttribute(`birdWas`, `vec4`),
+        s = tslAttribute(`birdWasTurn`, `vec4`);
+      ((r.positionNode = tslFn(
         () => (
           cV.assign(w9(oV, o.xyz, i.w, s.xyz, o.w, !1)),
-          YB.assign(w9(JB, $(0), 1, a.xyz, a.w, !0)),
+          YB.assign(w9(JB, tslVec3(0), 1, a.xyz, a.w, !0)),
           w9(oV, i.xyz, i.w, a.xyz, a.w, !1)
         ),
       )()),
-        (r.colorNode = UB($(0.025, 0.024, 0.026), $(0.11, 0.072, 0.045), s.w)),
+        (r.colorNode = tslMix(tslVec3(0.025, 0.024, 0.026), tslVec3(0.11, 0.072, 0.045), s.w)),
         (this.mesh = new wi(n, r)),
         (this.mesh.frustumCulled = !1),
         (this.mesh.visible = !1));
@@ -262,11 +262,11 @@ var G7 = (e) => e.metadata?.game === w7 && e.metadata?.v === 7,
       if (n.has(t)) return n.get(t);
       for (let e of n.keys()) e < t - 2 && n.delete(e);
       let r = (e ? 1000003 : 2000003) + t * 11,
-        i = t * (e ? o9 : d9) + UF(r + 1) * 20,
+        i = t * (e ? o9 : d9) + hash01(r + 1) * 20,
         a = null;
       return (
         t >= 1 &&
-          UF(r) < (e ? s9 : f9) &&
+          hash01(r) < (e ? s9 : f9) &&
           P4(i, Vee).elevation > Ree &&
           (a = e ? this.hawk(i, r) : this.flock(i, r)),
         n.set(t, a),
@@ -275,21 +275,21 @@ var G7 = (e) => e.metadata?.game === w7 && e.metadata?.v === 7,
     }
     hawk(e, t) {
       this.trail.pointAt(
-        OF(150, this.trail.length - 150, UF(t + 2)),
+        lerp(150, this.trail.length - 150, hash01(t + 2)),
         y9,
-        (UF(t + 3) - 0.5) * 140,
+        (hash01(t + 3) - 0.5) * 140,
       );
       let { x: n, z: r } = y9,
-        i = this.ground(n, r) + 55 + UF(t + 4) * 45,
-        a = 30 + UF(t + 5) * 25,
-        o = UF(t + 6) < 0.5 ? -1 : 1,
-        s = UF(t + 7) * DF,
-        c = UF(t + 8) * DF,
+        i = this.ground(n, r) + 55 + hash01(t + 4) * 45,
+        a = 30 + hash01(t + 5) * 25,
+        o = hash01(t + 6) < 0.5 ? -1 : 1,
+        s = hash01(t + 7) * TAU,
+        c = hash01(t + 8) * TAU,
         l = Math.ceil(c9 / v9) + 1,
         u = new Float32Array(l * 3);
       for (let e = 0; e < l; e++) {
         let t = e * v9,
-          l = (1 - X(0, u9, t)) ** 2 + X(63, c9, t) ** 2,
+          l = (1 - smoothstep(0, u9, t)) ** 2 + smoothstep(63, c9, t) ** 2,
           d = a + 240 * l;
         c += (o * l9 * v9) / d;
         let f = n + Math.cos(s) * 1.2 * t + Math.cos(c) * d,
@@ -310,17 +310,17 @@ var G7 = (e) => e.metadata?.game === w7 && e.metadata?.v === 7,
         from: e,
         path: u,
         hawk: !0,
-        birds: [{ right: 0, up: 0, back: 0, beat: UF(t + 9) * 7 }],
+        birds: [{ right: 0, up: 0, back: 0, beat: hash01(t + 9) * 7 }],
       };
     }
     flock(e, t) {
-      this.trail.pointAt(OF(120, this.trail.length - 60, UF(t + 2)), y9);
+      this.trail.pointAt(lerp(120, this.trail.length - 60, hash01(t + 2)), y9);
       let n =
           Math.atan2(y9.tz, y9.tx) +
-          (UF(t + 3) < 0.5 ? -1 : 1) * (Math.PI / 2 + (UF(t + 4) - 0.5) * 1.4),
+          (hash01(t + 3) < 0.5 ? -1 : 1) * (Math.PI / 2 + (hash01(t + 4) - 0.5) * 1.4),
         r = Math.cos(n),
         i = Math.sin(n),
-        a = this.ground(y9.x, y9.z) + 28 + UF(t + 5) * 24,
+        a = this.ground(y9.x, y9.z) + 28 + hash01(t + 5) * 24,
         o = Math.ceil(m9 / p9 / v9) + 1,
         s = p9 * v9,
         c = new Float32Array(o);
@@ -335,16 +335,16 @@ var G7 = (e) => e.metadata?.game === w7 && e.metadata?.v === 7,
         let t = e * s - m9 / 2;
         l.set([y9.x + r * t, c[e], y9.z + i * t], e * 3);
       }
-      let u = 4 + Math.floor(UF(t + 6) * 6);
+      let u = 4 + Math.floor(hash01(t + 6) * 6);
       return {
         from: e,
         path: l,
         hawk: !1,
         birds: Array.from({ length: u }, (e, n) => ({
-          right: (UF(t + 20 + n) - 0.5) * 18,
-          up: (UF(t + 40 + n) - 0.5) * 6,
-          back: UF(t + 60 + n) * 20,
-          beat: UF(t + 80 + n) * 3,
+          right: (hash01(t + 20 + n) - 0.5) * 18,
+          up: (hash01(t + 40 + n) - 0.5) * 6,
+          back: hash01(t + 60 + n) * 20,
+          beat: hash01(t + 80 + n) * 3,
         })),
       };
     }
@@ -353,12 +353,12 @@ var G7 = (e) => e.metadata?.game === w7 && e.metadata?.v === 7,
       if (a < -0.2 || a > (e.path.length / 3 - 2) * v9) return !1;
       let o = S9(e.path, a + 0.5, zee);
       S9(e.path, a, r);
-      let s = MF(o.x - r.x, o.z - r.z),
+      let s = headingFromXZ(o.x - r.x, o.z - r.z),
         c = Math.hypot(o.x - r.x, o.z - r.z),
         l = Math.atan2(o.y - r.y, c),
         u = S9(e.path, a + 1, Bee),
-        d = MF(u.x - o.x, u.z - o.z),
-        f = Y(Math.atan(((c / 0.5) * AF(d - s)) / 0.5 / J.g), -0.7, 0.7),
+        d = headingFromXZ(u.x - o.x, u.z - o.z),
+        f = clamp(Math.atan(((c / 0.5) * wrapAngle(d - s)) / 0.5 / PHYSICS.g), -0.7, 0.7),
         p = -Math.sin(s),
         m = -Math.cos(s);
       return (

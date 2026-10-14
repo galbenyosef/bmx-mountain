@@ -6,10 +6,10 @@ function xK(e, t, n) {
     for (let e = 0; e <= yK.rows; e++)
       for (let t = 0; t <= yK.cols; t++)
         bK[e * (yK.cols + 1) + t] = vG(
-          gG((t / yK.cols) * DF, (e / yK.rows) * OG, n),
+          gG((t / yK.cols) * TAU, (e / yK.rows) * OG, n),
         );
   }
-  let r = kF(e / DF, 1) * yK.cols,
+  let r = wrap(e / TAU, 1) * yK.cols,
     i = Math.min(Math.max(t / OG, 0), 1) * yK.rows,
     a = Math.min(Math.floor(r), yK.cols - 1),
     o = Math.min(Math.floor(i), yK.rows - 1),
@@ -25,7 +25,7 @@ function SK(e, t = 512) {
   let n = new Float32Array(t + 1),
     r = new M();
   for (let i = 0; i <= t; i++) {
-    let a = (i / t) * DF,
+    let a = (i / t) * TAU,
       o = 0.02,
       s = OG;
     for (let t = 0; t < 16; t++) {
@@ -164,9 +164,9 @@ function zK(e, t) {
     (e.fillStyle = hK),
     e.fill());
 }
-var BK = (e) => -0.088 + 0.03 * X(-0.12, 0.16, e),
-  VK = (e) => -0.088 + 0.085 * X(-0.17, 0.15, e),
-  HK = (e) => 0.016 * Math.sin(Math.PI * Y((e + 0.15) / 0.29)) ** 0.8,
+var BK = (e) => -0.088 + 0.03 * smoothstep(-0.12, 0.16, e),
+  VK = (e) => -0.088 + 0.085 * smoothstep(-0.17, 0.15, e),
+  HK = (e) => 0.016 * Math.sin(Math.PI * clamp((e + 0.15) / 0.29)) ** 0.8,
   UK = [
     [EK, PK(-0.026, -0.088, -0.03, -0.038, 0.0055)],
     [EK, PK(-0.031, -0.014, -0.033, 0.042, 0.0055)],
@@ -289,7 +289,7 @@ function KK(e) {
         }));
     }
   e.beginPath();
-  for (let t = 0; t <= 256; t++) e.lineTo(...FG(...wG(1, (t / 256) * DF)));
+  for (let t = 0; t <= 256; t++) e.lineTo(...FG(...wG(1, (t / 256) * TAU)));
   return (e.closePath(), e.fill(), t);
 }
 var qK = null;
@@ -301,16 +301,16 @@ function JK() {
 }
 function YK(e) {
   let t = (qK ??= JK()),
-    n = DV(t.design),
+    n = tslTexture(t.design),
     r = new iS(),
-    i = UB(MV(e.helmet), MV(e.stripe), n.r);
-  ((i = UB(i, fB(IG), n.g)), (r.colorNode = UB(i, fB(LG), n.b)));
-  let a = FV().y.lessThan(_K);
+    i = tslMix(tslUniform(e.helmet), tslUniform(e.stripe), n.r);
+  ((i = tslMix(i, fB(IG), n.g)), (r.colorNode = tslMix(i, fB(LG), n.b)));
+  let a = tslUv().y.lessThan(_K);
   return (
-    (r.roughnessNode = bV(a, Z(0.85), Z(0.34))),
-    (r.clearcoatNode = bV(a, Z(0), Z(1))),
-    (r.clearcoatRoughnessNode = Z(0.07)),
-    (r.normalNode = cB(DV(t.height).r, Z(vK))),
+    (r.roughnessNode = bV(a, tslFloat(0.85), tslFloat(0.34))),
+    (r.clearcoatNode = bV(a, tslFloat(0), tslFloat(1))),
+    (r.clearcoatRoughnessNode = tslFloat(0.07)),
+    (r.normalNode = cB(tslTexture(t.height).r, tslFloat(vK))),
     (r.maskNode = n.a.greaterThan(0.5)),
     (r.maskShadowNode = r.maskNode),
     r
@@ -337,5 +337,5 @@ var XK = (e, t) => t[Math.floor(e() * t.length)],
     { shirt: 9132587, accent: 15786688, helmet: 15786688, frame: 9132587 },
   ];
 function $K(e) {
-  return GF(e) % QK.length;
+  return hashString(e) % QK.length;
 }

@@ -1,4 +1,4 @@
-// assets/index-gCVK5XnX 32 — time
+// assets/index-gCVK5XnX 32 — pad
 // Lines 57739-57931 of readable/assets/index-gCVK5XnX.pretty.js (statement-aligned).
 function rQ() {
   try {
@@ -29,12 +29,12 @@ var aQ = {
   sQ = new Map(),
   cQ = new Set(),
   lQ = !1,
-  uQ = {
+  wavedash = {
     sdk() {
       return rQ();
     },
     progress(e) {
-      iQ((t) => t.updateLoadProgressZeroToOne(Y(e)));
+      iQ((t) => t.updateLoadProgressZeroToOne(clamp(e)));
     },
     init() {
       iQ((e) => {
@@ -100,7 +100,7 @@ var aQ = {
         (this.last = t),
         !n || r <= dQ || this.time - this.at <= fQ
           ? -1
-          : ((this.at = this.time), Y((r - dQ) / 3))
+          : ((this.at = this.time), clamp((r - dQ) / 3))
       );
     }
     hold(e) {
@@ -121,7 +121,7 @@ var aQ = {
           pedalling: t.pedalling,
           skid: t.skid,
           carve: r ? 0 : t.carve,
-          wheelRate: r || i ? 0 : Math.abs(t.wheelRate) / DF,
+          wheelRate: r || i ? 0 : Math.abs(t.wheelRate) / TAU,
           air: t.mode === `air`,
           rotation: Math.abs(t.yawRate) + Math.abs(t.pitchRate),
           bump: this.bumps.next(e, n, s),
@@ -161,7 +161,7 @@ var aQ = {
   EQ = [`KeyL`],
   DQ = 0.15,
   OQ = 0.3,
-  kQ = {
+  PAD = {
     a: 0,
     b: 1,
     x: 2,
@@ -178,10 +178,10 @@ var aQ = {
     right: 15,
   },
   AQ = [
-    [CH.Superman, `KeyU`, kQ.up],
-    [CH.CanCan, `KeyI`, kQ.left],
-    [CH.Turndown, `KeyO`, kQ.right],
-    [CH.Tabletop, `KeyP`, kQ.down],
+    [TRICK.Superman, `KeyU`, PAD.up],
+    [TRICK.CanCan, `KeyI`, PAD.left],
+    [TRICK.Turndown, `KeyO`, PAD.right],
+    [TRICK.Tabletop, `KeyP`, PAD.down],
   ],
   jQ = 0.5,
   MQ = 0.6,

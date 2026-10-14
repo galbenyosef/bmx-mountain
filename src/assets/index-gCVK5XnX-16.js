@@ -212,7 +212,7 @@ function QV(e = -0.5, t = 0.5, n = -0.5, r = 0.5) {
     i
   );
 }
-function $V(e, t, n, r = n, i = 10) {
+function makeTube(e, t, n, r = n, i = 10) {
   let a = t.clone().sub(e);
   return new fa(r, n, a.length(), i).applyMatrix4(
     JV.compose(
@@ -222,11 +222,11 @@ function $V(e, t, n, r = n, i = 10) {
     ),
   );
 }
-function eH(e, t, n = !0) {
+function addMesh(e, t, n = !0) {
   let r = new wi(e, t);
   return ((r.castShadow = n), (r.receiveShadow = !0), r);
 }
-function tH(e, t = [`position`, `normal`, `uv`]) {
+function mergeGeometry(e, t = [`position`, `normal`, `uv`]) {
   let n = e.every((e) => e.index);
   return UV(
     e.map((e) => {
@@ -245,7 +245,7 @@ function nH(e, t, n, r, i = 0) {
     .makeBasis(new M(-r, i, n), GV, new M(-n, 0, -r))
     .setPosition(e, 0, t);
 }
-var rH = (e, t, n) => new M(n, t, -e);
+var trailToWorld = (e, t, n) => new M(n, t, -e);
 function iH(e, ...t) {
   for (let n of Object.keys(e.attributes))
     t.includes(n) || e.deleteAttribute(n);
@@ -279,7 +279,7 @@ function lH(e, t) {
   );
 }
 var uH = (e) => new Ns().copy(e),
-  dH = (e, t) => new Vi(new Float32Array(e * t), t);
+  makeBuffer = (e, t) => new Vi(new Float32Array(e * t), t);
 function fH(e, t) {
   let n = new Xr();
   for (let [t, r] of Object.entries(e)) n.setAttribute(t, r);
@@ -307,7 +307,7 @@ var pH = {
 function hH([e, t, n]) {
   return new nS({ color: e, roughness: t, metalness: n });
 }
-var gH = (e) => $(e.r, e.g, e.b),
+var gH = (e) => tslVec3(e.r, e.g, e.b),
   _H = [`position`, `normal`, `uv`, `color`, `surface`];
 function vH(e, t, n, r) {
   (oH(e, `color`, t.toArray()), oH(e, `surface`, [n, r]));
@@ -315,7 +315,7 @@ function vH(e, t, n, r) {
 function yH() {
   let e = new nS();
   e.vertexColors = !0;
-  let t = oB(`surface`, `vec2`);
+  let t = tslAttribute(`surface`, `vec2`);
   return ((e.roughnessNode = t.x), (e.metalnessNode = t.y), e);
 }
 function bH(e, t) {

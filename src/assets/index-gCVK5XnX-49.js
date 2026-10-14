@@ -8,13 +8,13 @@ var I3 = new Hr(),
     facing;
     geos;
     constructor(e, t, n, r, i) {
-      ((this.place = dH(n, 4)),
-        (this.facing = dH(n, 4)),
+      ((this.place = makeBuffer(n, 4)),
+        (this.facing = makeBuffer(n, 4)),
         (this.geos = e.map(w3)),
         (this.meshes = this.geos.map((e, n) => {
           (e.setAttribute(`place`, this.place),
             e.setAttribute(`facing`, this.facing));
-          let a = eH(e, t[n], i);
+          let a = addMesh(e, t[n], i);
           return ((a.frustumCulled = !1), a.layers.set(r), a);
         })),
         this.show(0));
@@ -143,7 +143,7 @@ var I3 = new Hr(),
         a.bake(e, i),
         (this.levels = [...this.near.flat(), ...this.side.flat()]));
       for (let e of this.levels) this.group.add(...e.meshes);
-      let o = HF(5);
+      let o = makeRng(5);
       for (let n of [vL.Pine, vL.Aspen])
         this.plant(n, a, r[n].glow, d3(e), t, o);
     }
@@ -210,7 +210,7 @@ var I3 = new Hr(),
         }));
     }
   },
-  V3 = (e) => Y((e - (h3 - g3 / 2)) / g3);
+  V3 = (e) => clamp((e - (h3 - g3 / 2)) / g3);
 function H3(e, t, n, r, i) {
   e.set(t, n.x, n.y - y3, n.z, n.h, n.rot, yL(n), r, 0.85 + n.tint * 0.3, i);
 }
@@ -284,12 +284,12 @@ var U3 = 12,
     },
   ];
 function X3({ blades: e, seed: t, segs: n, wide: r, spread: i }) {
-  let a = HF(t),
+  let a = makeRng(t),
     o = [],
     s = [],
     c = [];
   for (let t = 0; t < e; t++) {
-    let e = a() * DF,
+    let e = a() * TAU,
       t = Math.sqrt(a()) * i,
       l = Math.cos(e) * t,
       u = Math.sin(e) * t,

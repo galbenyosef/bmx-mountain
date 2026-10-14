@@ -1,11 +1,11 @@
-// assets/index-gCVK5XnX 57 — board
+// assets/index-gCVK5XnX 57 — trailtoworld
 // Lines 65505-65891 of readable/assets/index-gCVK5XnX.pretty.js (statement-aligned).
 var o5 = class {
     wood = [];
     bark = [];
     steel = [];
     rubber = [];
-    timber = new w6(HF(4242));
+    timber = new w6(makeRng(4242));
     prop(e) {
       let t = new N().makeRotationY(e.yaw).setPosition(e.x, e.y, e.z),
         n = this.timber.r,
@@ -59,7 +59,7 @@ var o5 = class {
     pallet(e, t, n) {
       let r = new N().multiplyMatrices(
           e,
-          t5.compose(rH(0, t, 0), n5.setFromAxisAngle(GV, n), qV),
+          t5.compose(trailToWorld(0, t, 0), n5.setFromAxisAngle(GV, n), qV),
         ),
         i = 0.95 + this.timber.r() * 0.15,
         a = (e, t, n, a, o, s, c, l, u = i) =>
@@ -127,8 +127,8 @@ var o5 = class {
       for (let a = 0; a < t; a++) {
         let t = -e.w + i * (a + 0.5);
         this.board(
-          rH(r.a0, r.y0 - n / 2, t),
-          rH(r.a1, r.y1 - n / 2, t),
+          trailToWorld(r.a0, r.y0 - n / 2, t),
+          trailToWorld(r.a1, r.y1 - n / 2, t),
           i - 0.012,
           n,
         );
@@ -140,15 +140,15 @@ var o5 = class {
       for (let r of [-1, 1]) {
         let i = r * (e.w - t / 2);
         this.board(
-          rH(n.a0, n.y0 - 0.03 - 0.09, i),
-          rH(n.a1, n.y1 - 0.03 - 0.09, i),
+          trailToWorld(n.a0, n.y0 - 0.03 - 0.09, i),
+          trailToWorld(n.a1, n.y1 - 0.03 - 0.09, i),
           t,
           0.18,
         );
       }
       for (let t = n.a0 + 0.06; t < n.a1 - 0.03; t += 0.13) {
         let i = n.y0 + (t - n.a0) * r - 0.014;
-        this.board(rH(t, i, -e.w), rH(t, i, e.w), 0.095, 0.028);
+        this.board(trailToWorld(t, i, -e.w), trailToWorld(t, i, e.w), 0.095, 0.028);
       }
     }
     posts(e, t, n, r) {
@@ -160,12 +160,12 @@ var o5 = class {
         for (let t of n ? [-e.w + 0.05, e.w - 0.05] : [0]) {
           let e = this.g(o, t) - 0.2;
           s - e < 0.25 ||
-            this.board(rH(o, e, t), rH(o, s, t), 0.09, 0.09, this.shade(0.85));
+            this.board(trailToWorld(o, e, t), trailToWorld(o, s, t), 0.09, 0.09, this.shade(0.85));
         }
         if (n && s - this.g(o, 0) > 0.45)
           this.board(
-            rH(o, this.g(o, -e.w) + 0.08, -e.w + 0.05),
-            rH(o, s - 0.05, e.w - 0.05),
+            trailToWorld(o, this.g(o, -e.w) + 0.08, -e.w + 0.05),
+            trailToWorld(o, s - 0.05, e.w - 0.05),
             0.09,
             0.04,
             this.shade(0.85),
@@ -173,8 +173,8 @@ var o5 = class {
         else if (!n && s - this.g(o, 0) > 0.3)
           for (let e of [-1, 1])
             this.board(
-              rH(o, this.g(o, e * 0.35) - 0.05, e * 0.35),
-              rH(o, s - 0.06, e * 0.03),
+              trailToWorld(o, this.g(o, e * 0.35) - 0.05, e * 0.35),
+              trailToWorld(o, s - 0.06, e * 0.03),
               0.07,
               0.04,
               this.shade(0.85),
@@ -187,8 +187,8 @@ var o5 = class {
           n = Math.abs(t.y1 - t.y0) < 0.05 && t.y0 - this.g(t.a0, 0) > 0.2;
         (this.lengthwise(e, b6(2 * e.w)),
           this.board(
-            rH(t.a0, t.y0 - 0.04 - 0.07, 0),
-            rH(t.a1, t.y1 - 0.04 - 0.07, 0),
+            trailToWorld(t.a0, t.y0 - 0.04 - 0.07, 0),
+            trailToWorld(t.a1, t.y1 - 0.04 - 0.07, 0),
             0.09,
             0.14,
             this.shade(0.85),
@@ -210,11 +210,11 @@ var o5 = class {
       let t = e[e.length - 1],
         n = this.span(t),
         r = t.log,
-        i = rH(n.a0, n.y0 - r, 0),
-        a = rH(n.a1, n.y1 - r, 0),
+        i = trailToWorld(n.a0, n.y0 - r, 0),
+        a = trailToWorld(n.a1, n.y1 - r, 0),
         o = i.distanceTo(a),
         s = new fa(r * 0.94, r, o, 22, 1, !0);
-      (a5(s, (DF * r) / 1.1, o / 1.6),
+      (a5(s, (TAU * r) / 1.1, o / 1.6),
         s.applyMatrix4(
           t5.compose(
             r5.addVectors(i, a).multiplyScalar(0.5),
@@ -246,8 +246,8 @@ var o5 = class {
         for (let t of [-1, 1]) {
           let n = t * (r + 0.05);
           this.board(
-            rH(e, this.g(e, n) - 0.25, n),
-            rH(e, this.g(e, n) + r * 0.9, t * (r + 0.08)),
+            trailToWorld(e, this.g(e, n) - 0.25, n),
+            trailToWorld(e, this.g(e, n) + r * 0.9, t * (r + 0.08)),
             0.06,
             0.06,
             this.shade(0.8),
@@ -267,15 +267,15 @@ var o5 = class {
         let t = e * (n.w + 0.07);
         for (let e of [-0.55, 0.55])
           this.board(
-            rH(a + e, o - 0.15, t),
-            rH(a + e * 0.12, s + 0.04, t),
+            trailToWorld(a + e, o - 0.15, t),
+            trailToWorld(a + e * 0.12, s + 0.04, t),
             0.09,
             0.07,
             this.shade(0.85),
           );
         this.board(
-          rH(a - 0.62, o + 0.12, t),
-          rH(a + 0.62, o + 0.12, t),
+          trailToWorld(a - 0.62, o + 0.12, t),
+          trailToWorld(a + 0.62, o + 0.12, t),
           0.09,
           0.05,
           this.shade(0.85),
@@ -283,7 +283,7 @@ var o5 = class {
       }
       let c = new fa(0.035, 0.035, 2 * n.w + 0.3, 12);
       (c.applyMatrix4(
-        t5.compose(rH(a, s, 0), n5.setFromUnitVectors(GV, new M(1, 0, 0)), qV),
+        t5.compose(trailToWorld(a, s, 0), n5.setFromUnitVectors(GV, new M(1, 0, 0)), qV),
       ),
         c.applyMatrix4(this.f),
         this.out.steel.push(S6(c, h6)));
@@ -326,7 +326,7 @@ var o5 = class {
         ),
       );
       let m = new Hn();
-      return (m.add(eH(tH(l, x6), e)), m.position.set(n.x, r.pivotY, n.z), m);
+      return (m.add(addMesh(mergeGeometry(l, x6), e)), m.position.set(n.x, r.pivotY, n.z), m);
     }
   },
   c5 = class {
@@ -334,8 +334,8 @@ var o5 = class {
     planks = [];
     constructor(e, t) {
       let n = {
-          wood: m6(`wood_rough`, FV(), 0.88),
-          bark: m6(`bark_pine`, FV().mul(LV(1, 0.5)), 0.92),
+          wood: m6(`wood_rough`, tslUv(), 0.88),
+          bark: m6(`bark_pine`, tslUv().mul(tslVec2(1, 0.5)), 0.92),
           steel: hH(pH.steel),
           rubber: hH(pH.rubber),
         },
@@ -362,7 +362,7 @@ var o5 = class {
         [r.steel, n.steel],
         [r.rubber, n.rubber],
       ])
-        e.length && this.group.add(eH(tH(e, x6), t));
+        e.length && this.group.add(addMesh(mergeGeometry(e, x6), t));
       this.update();
     }
     update() {
@@ -375,7 +375,7 @@ var o5 = class {
         );
     }
   },
-  l5 = SI + 0.7,
+  l5 = TRAIL_FADE + 0.7,
   u5 = 3.5,
   d5 = 10,
   f5 = [0.3, 0.8],

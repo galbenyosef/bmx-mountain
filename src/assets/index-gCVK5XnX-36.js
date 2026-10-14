@@ -2,7 +2,7 @@
 // Lines 59034-59188 of readable/assets/index-gCVK5XnX.pretty.js (statement-aligned).
 function j1(e) {
   let t = e.trail,
-    n = HF(131),
+    n = makeRng(131),
     r = [];
   for (let i = v1; i < t.length - 30; i += 4)
     for (let a of [-1, 1]) {
@@ -18,8 +18,8 @@ function j1(e) {
       )
         continue;
       t.pointAt(i - C1[C1.length - 1], T1);
-      let d = M1(e, l, u, MF(T1.tx, T1.tz) + (s ? Math.PI : 0) + c),
-        f = I1(e, l, u, d, MF(-T1.tz * a, T1.tx * a));
+      let d = M1(e, l, u, headingFromXZ(T1.tx, T1.tz) + (s ? Math.PI : 0) + c),
+        f = I1(e, l, u, d, headingFromXZ(-T1.tz * a, T1.tx * a));
       r.push({ x: l, z: u, yaw: d, route: f, open: N1(e, f) });
     }
   return r;
@@ -28,21 +28,21 @@ function M1(e, t, n, r) {
   let i = e.height(t + 1, n) - e.height(t - 1, n),
     a = e.height(t, n + 1) - e.height(t, n - 1);
   if (Math.hypot(i, a) <= 0.05) return r;
-  let o = MF(-a, i);
-  return Math.abs(AF(o - r)) < Math.PI / 2 ? o : o + Math.PI;
+  let o = headingFromXZ(-a, i);
+  return Math.abs(wrapAngle(o - r)) < Math.PI / 2 ? o : o + Math.PI;
 }
 function N1(e, t) {
   let n = 0;
   for (
     ;
-    n < g1 && e.surface(t[(n / _1) * 2], t[(n / _1) * 2 + 1]) === uz.Grass;
+    n < g1 && e.surface(t[(n / _1) * 2], t[(n / _1) * 2 + 1]) === SURFACE.Grass;
   )
     n += _1;
   return n;
 }
 function P1(e, t, n) {
   let r = e.surface(t, n);
-  return (r !== uz.Grass && r !== uz.Forest) ||
+  return (r !== SURFACE.Grass && r !== SURFACE.Forest) ||
     e.slope(t, n) > 0.5 ||
     e.trailDistance(t, n, 60) < 14 ||
     e.liftClearance(t, n) < 6 ||
@@ -59,13 +59,13 @@ function F1(e, t, n, r) {
       s = Math.hypot(n - E1.x, r - E1.z);
     for (let t = 2; t < s - 3; t += 1.5) {
       let a = 1 - t / s,
-        c = OF(E1.x, n, a),
-        l = OF(E1.z, r, a),
-        u = OF(o, i, a),
+        c = lerp(E1.x, n, a),
+        l = lerp(E1.z, r, a),
+        u = lerp(o, i, a),
         d =
           t < Math.min(s * 0.1, 4) - 0.5
             ? 0.2
-            : e.surface(c, l) === uz.Grass
+            : e.surface(c, l) === SURFACE.Grass
               ? b1
               : 0.3;
       if (e.height(c, l) > u - d || e.obstacleAt(c, u, l, 1.8)) return !1;
@@ -86,12 +86,12 @@ function I1(e, t, n, r, i) {
         a = n - Math.cos(s) * r,
         o = e.obstacleAt(i, e.height(i, a) + 1, a, 0.9);
       if (o) {
-        c = MF(-Math.sin(s) + o.nx * 2, -Math.cos(s) + o.nz * 2);
+        c = headingFromXZ(-Math.sin(s) + o.nx * 2, -Math.cos(s) + o.nz * 2);
         break;
       }
     }
     (e.trailDistance(t, n, 30) < 16 && (c = i),
-      (s += Y(AF(c - s), -a, a)),
+      (s += clamp(wrapAngle(c - s), -a, a)),
       (t -= Math.sin(s) * _1),
       (n -= Math.cos(s) * _1));
   }

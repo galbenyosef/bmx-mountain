@@ -4,7 +4,7 @@ function J5(e) {
   if (e.byteLength < K5) return null;
   let t = new DataView(e.buffer, e.byteOffset, K5),
     n = t.getUint8(1);
-  if (n > kH.Walk) return null;
+  if (n > RIDE_MODE.Walk) return null;
   let r = t.getUint8(2),
     i = { t: t.getFloat64(4, !0), mode: n, flags: r, pedal: r & W5 ? 1 : 0 },
     a = i;
@@ -54,7 +54,7 @@ function t7(e) {
   let t = new Uint8Array(2 + e.length * 4),
     n = new DataView(t.buffer);
   return (
-    n.setUint8(0, H5.hears),
+    n.setUint8(0, OPCODE.hears),
     n.setUint8(1, e.length),
     e.forEach((e, t) => n.setUint32(2 + t * 4, e, !0)),
     t

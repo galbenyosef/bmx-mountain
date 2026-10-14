@@ -61,7 +61,7 @@ function Xq(e, t, n) {
   for (let t of n) {
     if (e < t.s - t.spread) return [[r, 1]];
     if (e <= t.s + t.spread) {
-      let n = X(t.s - t.spread, t.s + t.spread, e);
+      let n = smoothstep(t.s - t.spread, t.s + t.spread, e);
       return [
         [t.a, (1 - n) ** 2],
         [t.half, 2 * n * (1 - n)],

@@ -1,13 +1,13 @@
 // assets/index-gCVK5XnX 64 — mul
 // Lines 67507-67840 of readable/assets/index-gCVK5XnX.pretty.js (statement-aligned).
 function S9(e, t, n) {
-  let r = Y(t / v9, 0, e.length / 3 - 1.001),
+  let r = clamp(t / v9, 0, e.length / 3 - 1.001),
     i = Math.floor(r),
     a = r - i;
   return n.set(
-    OF(e[i * 3], e[i * 3 + 3], a),
-    OF(e[i * 3 + 1], e[i * 3 + 4], a),
-    OF(e[i * 3 + 2], e[i * 3 + 5], a),
+    lerp(e[i * 3], e[i * 3 + 3], a),
+    lerp(e[i * 3 + 1], e[i * 3 + 4], a),
+    lerp(e[i * 3 + 2], e[i * 3 + 5], a),
   );
 }
 function C9(e, t) {
@@ -17,38 +17,38 @@ function C9(e, t) {
     return (
       0.12 +
       0.55 *
-        (UF(e * 31 + 5) < 0.45 ? X(0, 0.15, n) * (1 - X(1.1, 1.4, n)) : 0) *
-        Math.sin(n * 2.4 * DF)
+        (hash01(e * 31 + 5) < 0.45 ? smoothstep(0, 0.15, n) * (1 - smoothstep(1.1, 1.4, n)) : 0) *
+        Math.sin(n * 2.4 * TAU)
     );
   }
   let n = Math.floor(t / 4),
     r = t - n * 4;
-  return UF(n * 13 + 7) < 0.3 && r > 2.5
+  return hash01(n * 13 + 7) < 0.3 && r > 2.5
     ? 0.08
-    : 0.1 + 0.55 * Math.sin(r * 4 * DF);
+    : 0.1 + 0.55 * Math.sin(r * 4 * TAU);
 }
 function w9(e, t, n, r, i, a) {
-  let o = FV().x,
+  let o = tslUv().x,
     s = i
-      .mul(Q(0, 1, o.abs()).mul(0.6).add(1))
+      .mul(tslSmoothstep(0, 1, o.abs()).mul(0.6).add(1))
       .mul(o.abs().greaterThan(0).select(1, 0)),
     c = SV(o),
     l = hB(s),
-    u = CV(s),
-    d = $(
+    u = tslSin(s),
+    d = tslVec3(
       e.x.mul(l).sub(c.mul(e.y).mul(u)),
       c.mul(e.x).mul(u).add(e.y.mul(l)),
       e.z,
     ),
     f = hB(r.z),
-    p = CV(r.z),
-    m = $(d.x.mul(f).sub(d.y.mul(p)), d.x.mul(p).add(d.y.mul(f)), d.z),
+    p = tslSin(r.z),
+    m = tslVec3(d.x.mul(f).sub(d.y.mul(p)), d.x.mul(p).add(d.y.mul(f)), d.z),
     h = hB(r.y),
-    g = CV(r.y),
-    _ = $(m.x, m.y.mul(h).sub(m.z.mul(g)), m.y.mul(g).add(m.z.mul(h))),
+    g = tslSin(r.y),
+    _ = tslVec3(m.x, m.y.mul(h).sub(m.z.mul(g)), m.y.mul(g).add(m.z.mul(h))),
     v = hB(r.x),
-    y = CV(r.x),
-    b = $(_.x.mul(v).add(_.z.mul(y)), _.y, _.z.mul(v).sub(_.x.mul(y)));
+    y = tslSin(r.x),
+    b = tslVec3(_.x.mul(v).add(_.z.mul(y)), _.y, _.z.mul(v).sub(_.x.mul(y)));
   return a ? b : b.mul(n).add(t);
 }
 function Uee() {
@@ -105,30 +105,30 @@ var T9 = 400,
   O9 = new M(),
   k9 = new M();
 function Wee(e, t) {
-  let n = oB(`puffA`, `vec4`),
-    r = oB(`puffB`, `vec4`),
+  let n = tslAttribute(`puffA`, `vec4`),
+    r = tslAttribute(`puffB`, `vec4`),
     i = new Wy({ transparent: !0, depthWrite: !1 });
   i.positionNode = n.xyz.add(e.mul(oV.x.mul(n.w))).add(t.mul(oV.y.mul(n.w)));
-  let a = MB(FV().sub(0.5)).mul(2),
-    o = MU(FV().mul(3.5).add(r.z.mul(37)))
+  let a = tslLength(tslUv().sub(0.5)).mul(2),
+    o = valueNoise(tslUv().mul(3.5).add(r.z.mul(37)))
       .mul(0.6)
       .add(0.4),
-    s = UB(
-      Q(1, 0.15, a.add(o.mul(0.35).sub(0.15))),
-      Q(0.6, 0.78, MU(FV().mul(7).add(r.z.mul(53)))).mul(Q(1, 0.35, a)),
+    s = tslMix(
+      tslSmoothstep(1, 0.15, a.add(o.mul(0.35).sub(0.15))),
+      tslSmoothstep(0.6, 0.78, valueNoise(tslUv().mul(7).add(r.z.mul(53)))).mul(tslSmoothstep(1, 0.35, a)),
       r.y,
     ),
     c = n.xyz.sub(lB),
-    l = dV(VB(yB(eV(c), hW), 0), 6),
-    u = $(0.35, 0.42, 0.55),
-    d = UB(
-      $(...mH.dust).mul(gW.mul(Z(0.9).add(l.mul(5))).add(u)),
-      $(0.8, 0.85, 0.88).mul(gW.mul(Z(0.5).add(l.mul(4))).add(u.mul(1.2))),
+    l = dV(tslMax(tslDot(tslNormalize(c), hW), 0), 6),
+    u = tslVec3(0.35, 0.42, 0.55),
+    d = tslMix(
+      tslVec3(...mH.dust).mul(gW.mul(tslFloat(0.9).add(l.mul(5))).add(u)),
+      tslVec3(0.8, 0.85, 0.88).mul(gW.mul(tslFloat(0.5).add(l.mul(4))).add(u.mul(1.2))),
       r.y,
     ),
-    f = Q(0.4, 1.6, MB(c));
+    f = tslSmoothstep(0.4, 1.6, tslLength(c));
   return (
-    (i.colorNode = RV(d, s.mul(r.x).mul(f))),
+    (i.colorNode = tslVec4(d, s.mul(r.x).mul(f))),
     (i.alphaTest = 0.004),
     (i.mrtNode = zU()),
     i
@@ -141,12 +141,12 @@ var Gee = class {
     a;
     b;
     carry = 0;
-    right = MV(new M(1, 0, 0));
-    up = MV(new M(0, 1, 0));
+    right = tslUniform(new M(1, 0, 0));
+    up = tslUniform(new M(0, 1, 0));
     constructor() {
       let e = QV();
-      ((this.a = dH(T9, 4)),
-        (this.b = dH(T9, 4)),
+      ((this.a = makeBuffer(T9, 4)),
+        (this.b = makeBuffer(T9, 4)),
         e.setAttribute(`puffA`, this.a),
         e.setAttribute(`puffB`, this.b),
         (e.instanceCount = 0),
@@ -172,8 +172,8 @@ var Gee = class {
     }
     burst(e, t, n, r, i) {
       for (let a = 0; a < n; a++)
-        (O9.set(WF(2.5), Math.random() * 1.2, WF(2.5)).addScaledVector(t, 0.25),
-          k9.set(e.x + WF(0.6), e.y + 0.05, e.z + WF(0.6)),
+        (O9.set(randSpread(2.5), Math.random() * 1.2, randSpread(2.5)).addScaledVector(t, 0.25),
+          k9.set(e.x + randSpread(0.6), e.y + 0.05, e.z + randSpread(0.6)),
           this.puff(k9, O9, r, i));
     }
     land(e, t, n) {
@@ -183,21 +183,21 @@ var Gee = class {
         o = Math.round(6 + n * 2.5),
         s = 1.5 + n * 0.2;
       for (let t = 0; t < o; t++) {
-        let t = WF(2) * s,
+        let t = randSpread(2) * s,
           o = r * (0.2 + Math.random() * 0.4);
         (O9.set(
           i * o - a * t,
           0.3 + Math.random() * (0.4 + n * 0.08),
           a * o + i * t,
         ),
-          k9.set(e.x + WF(0.6), e.y + 0.05, e.z + WF(0.6)),
+          k9.set(e.x + randSpread(0.6), e.y + 0.05, e.z + randSpread(0.6)),
           this.puff(k9, O9, 0.7 + n * 0.05, 0.45, 2.4));
       }
     }
     stream(e, t, n, r, i, a) {
       for (this.carry += e * r; this.carry >= 1;)
         (--this.carry,
-          O9.set(WF(0.6), 0.4 + Math.random() * 0.4, WF(0.6)).addScaledVector(
+          O9.set(randSpread(0.6), 0.4 + Math.random() * 0.4, randSpread(0.6)).addScaledVector(
             n,
             0.15,
           ),
@@ -215,7 +215,7 @@ var Gee = class {
           1.2 + Math.random() * (1.5 + r * 0.1),
           a * n,
         ).addScaledVector(t, 0.35 + Math.random() * 0.3),
-          k9.set(e.x + WF(0.3), e.y + 0.05, e.z + WF(0.3)),
+          k9.set(e.x + randSpread(0.3), e.y + 0.05, e.z + randSpread(0.3)),
           this.puff(k9, O9, 0.25 + Math.random() * 0.3, 0.9, 0.7, 1));
       }
     }
@@ -229,7 +229,7 @@ var Gee = class {
         if (((t.age += e), t.age >= t.life)) continue;
         ((this.puffs[i] = t),
           t.v.multiplyScalar(Math.exp(-e * (t.wet ? 0.9 : 2.2))),
-          (t.v.y += e * (t.wet ? -J.g : 0.25)),
+          (t.v.y += e * (t.wet ? -PHYSICS.g : 0.25)),
           (t.v.x += e * 0.3),
           t.p.addScaledVector(t.v, e));
         let a = t.age / t.life;
@@ -256,18 +256,18 @@ var Gee = class {
     constructor(e) {
       this.ground = e;
       let t = uH(new Do(1, 0));
-      ((this.a = dH(E9, 4)),
-        (this.b = dH(E9, 4)),
+      ((this.a = makeBuffer(E9, 4)),
+        (this.b = makeBuffer(E9, 4)),
         t.setAttribute(`clodA`, this.a),
         t.setAttribute(`clodB`, this.b),
         (t.instanceCount = 0));
-      let n = oB(`clodA`, `vec4`),
-        r = oB(`clodB`, `vec4`),
+      let n = tslAttribute(`clodA`, `vec4`),
+        r = tslAttribute(`clodB`, `vec4`),
         i = new nS({ roughness: 0.95, flatShading: !0 });
-      ((i.positionNode = gV(sV.mul($(1, 0.7, 0.85)).mul(n.w), r.xyz).add(
+      ((i.positionNode = gV(sV.mul(tslVec3(1, 0.7, 0.85)).mul(n.w), r.xyz).add(
         n.xyz,
       )),
-        (i.colorNode = $(...mH.clod).mul(r.w)),
+        (i.colorNode = tslVec3(...mH.clod).mul(r.w)),
         (this.mesh = new wi(t, i)),
         (this.mesh.frustumCulled = !1),
         (this.mesh.receiveShadow = !0),
@@ -277,13 +277,13 @@ var Gee = class {
       for (let i = 0; i < n; i++)
         (this.clods.length >= E9 && this.clods.shift(),
           this.clods.push({
-            p: e.clone().add(k9.set(WF(0.5), 0.1, WF(0.5))),
+            p: e.clone().add(k9.set(randSpread(0.5), 0.1, randSpread(0.5))),
             v: t
               .clone()
               .multiplyScalar(0.3 + Math.random() * 0.4)
-              .add(O9.set(WF(4), 1.5 + Math.random() * 3, WF(4))),
+              .add(O9.set(randSpread(4), 1.5 + Math.random() * 3, randSpread(4))),
             r: new M(Math.random() * 6, Math.random() * 6, Math.random() * 6),
-            spin: new M(WF(30), WF(30), WF(30)),
+            spin: new M(randSpread(30), randSpread(30), randSpread(30)),
             size: r * (0.5 + Math.random()),
             shade: 0.7 + Math.random() * 0.5,
             age: 0,
@@ -296,7 +296,7 @@ var Gee = class {
       for (let i of this.clods) {
         if (((i.age += e), i.age >= D9)) continue;
         ((this.clods[r] = i),
-          (i.v.y -= J.g * e),
+          (i.v.y -= PHYSICS.g * e),
           i.p.addScaledVector(i.v, e),
           i.r.addScaledVector(i.spin, e));
         let a = this.ground.height(i.p.x, i.p.z) + i.size * 0.6;
@@ -317,13 +317,13 @@ var Gee = class {
   A9 = 4e3,
   qee = 0.3,
   Jee = {
-    [uz.Trail]: 0.16,
-    [uz.Dirt]: 0.3,
-    [uz.Grass]: 0,
-    [uz.Forest]: 0.22,
-    [uz.Rock]: 0,
-    [uz.Wood]: 0,
-    [uz.Water]: 0,
+    [SURFACE.Trail]: 0.16,
+    [SURFACE.Dirt]: 0.3,
+    [SURFACE.Grass]: 0,
+    [SURFACE.Forest]: 0.22,
+    [SURFACE.Rock]: 0,
+    [SURFACE.Wood]: 0,
+    [SURFACE.Water]: 0,
   },
   Yee = 0.028,
   j9 = [0.42, 0.26],

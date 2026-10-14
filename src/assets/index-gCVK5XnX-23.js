@@ -1,8 +1,8 @@
 // assets/index-gCVK5XnX 23 — mul
 // Lines 54870-54937 of readable/assets/index-gCVK5XnX.pretty.js (statement-aligned).
 function eq(e, t = $K(e), n = ``) {
-  let r = HF(GF(e)),
-    i = QK[kF(t, QK.length)],
+  let r = makeRng(hashString(e)),
+    i = QK[wrap(t, QK.length)],
     a = i.shirt === IG;
   return {
     frame: ZK(i.frame),
@@ -39,12 +39,12 @@ var tq = {
   aq = 8;
 function oq(e, t) {
   let n = new nS({ map: e });
-  ((n.roughnessNode = DV(cK()).g), (n.normalNode = cB(DV(cK()).r, Z(aq))));
+  ((n.roughnessNode = tslTexture(cK()).g), (n.normalNode = cB(tslTexture(cK()).r, tslFloat(aq))));
   let r = sV,
-    i = MU(r.xy.mul(9).add(yW.mul(14)))
-      .add(MU(r.zy.mul(13).sub(yW.mul(19))).mul(0.6))
+    i = valueNoise(r.xy.mul(9).add(yW.mul(14)))
+      .add(valueNoise(r.zy.mul(13).sub(yW.mul(19))).mul(0.6))
       .sub(0.8),
-    a = FV().x.greaterThan(0.75).and(FV().y.lessThan(0.5));
+    a = tslUv().x.greaterThan(0.75).and(tslUv().y.lessThan(0.5));
   return ((n.positionNode = r.add(YB.mul(i.mul(t).mul(bV(a, 0, iq))))), n);
 }
 function sq(e, t) {

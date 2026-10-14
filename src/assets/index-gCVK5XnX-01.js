@@ -1,6 +1,6 @@
 // assets/index-gCVK5XnX 01 — math
 // Lines 47337-47502 of readable/assets/index-gCVK5XnX.pretty.js (statement-aligned).
-  J = {
+  PHYSICS = {
     step: 1 / 240,
     mass: 82,
     pitchInertia: 11,
@@ -89,20 +89,20 @@
     shimmyFrom: 18,
     shimmyRange: 10,
   },
-  DF = Math.PI * 2,
-  Y = (e, t = 0, n = 1) => (e < t ? t : e > n ? n : e),
-  OF = (e, t, n) => e + (t - e) * n,
-  kF = (e, t) => ((e % t) + t) % t,
-  X = (e, t, n) => {
-    let r = Y((n - e) / (t - e));
+  TAU = Math.PI * 2,
+  clamp = (e, t = 0, n = 1) => (e < t ? t : e > n ? n : e),
+  lerp = (e, t, n) => e + (t - e) * n,
+  wrap = (e, t) => ((e % t) + t) % t,
+  smoothstep = (e, t, n) => {
+    let r = clamp((n - e) / (t - e));
     return r * r * (3 - 2 * r);
   },
-  AF = (e) => e - DF * Math.floor((e + Math.PI) / DF),
-  jF = (e, t, n) => e + AF(t - e) * n,
-  MF = (e, t) => Math.atan2(-e, -t),
-  NF = (e, t, n) => (e < t ? Math.min(t, e + n) : Math.max(t, e - n)),
-  PF = (e, t) => 1 - Math.exp(-e * t),
-  FF = 1 / 120,
+  wrapAngle = (e) => e - TAU * Math.floor((e + Math.PI) / TAU),
+  lerpAngle = (e, t, n) => e + wrapAngle(t - e) * n,
+  headingFromXZ = (e, t) => Math.atan2(-e, -t),
+  approach = (e, t, n) => (e < t ? Math.min(t, e + n) : Math.max(t, e - n)),
+  approachExp = (e, t) => 1 - Math.exp(-e * t),
+  FIXED_DT = 1 / 120,
   IF = class {
     k;
     x = 0;
@@ -112,7 +112,7 @@
       ((this.k = e), (this.c = 2 * t * Math.sqrt(e)));
     }
     step(e, t) {
-      let n = Math.max(1, Math.ceil(t / FF)),
+      let n = Math.max(1, Math.ceil(t / FIXED_DT)),
         r = t / n;
       for (let t = 0; t < n; t++)
         ((this.v += (this.k * (e - this.x) - this.c * this.v) * r),
@@ -140,7 +140,7 @@
       );
     }
     turn(e, t, n) {
-      return this.to(this.x + AF(e - this.x), t, n);
+      return this.to(this.x + wrapAngle(e - this.x), t, n);
     }
     set(e) {
       ((this.x = e), (this.v = 0));
@@ -163,6 +163,6 @@
   zF = class {
     v = 0;
     to(e, t, n, r = n) {
-      return ((this.v += (e - this.v) * PF(e > this.v ? n : r, t)), this.v);
+      return ((this.v += (e - this.v) * approachExp(e > this.v ? n : r, t)), this.v);
     }
   };

@@ -81,20 +81,20 @@ var FQ = class {
       return (
         (e.fwd = Math.max(+!!t(bQ), this.triggers[1], i < 0 ? -i : 0)),
         (e.back = Math.max(+!!t(xQ), this.triggers[0], i > 0 ? i : 0)),
-        (e.crouch = t(SQ) || this.pad(kQ.a)),
-        (e.barspin = t(wQ) || this.pad(kQ.x) || this.pad(kQ.rb)),
-        (e.tailwhip = t(TQ) || this.pad(kQ.y) || this.pad(kQ.lb)),
-        (e.nohand = t(EQ) || this.pad(kQ.b)),
+        (e.crouch = t(SQ) || this.pad(PAD.a)),
+        (e.barspin = t(wQ) || this.pad(PAD.x) || this.pad(PAD.rb)),
+        (e.tailwhip = t(TQ) || this.pad(PAD.y) || this.pad(PAD.lb)),
+        (e.nohand = t(EQ) || this.pad(PAD.b)),
         (e.style =
-          AQ.find(([, e, n]) => t([e]) || this.pad(n))?.[0] ?? CH.None),
+          AQ.find(([, e, n]) => t([e]) || this.pad(n))?.[0] ?? TRICK.None),
         e
       );
     }
     pressed(e) {
       return this.enabled
-        ? (e === `KeyR` && this.padPressed(kQ.back)) ||
-          (e === `Space` && this.padPressed(kQ.a)) ||
-          (e === `KeyE` && this.padPressed(kQ.y))
+        ? (e === `KeyR` && this.padPressed(PAD.back)) ||
+          (e === `Space` && this.padPressed(PAD.a)) ||
+          (e === `KeyE` && this.padPressed(PAD.y))
           ? !0
           : this.pressedNow.has(e)
         : !1;
@@ -105,8 +105,8 @@ var FQ = class {
       let n = (t) => (!e && this.held(t) ? 1 : 0),
         r = +!e;
       return (
-        (t.x = Y(n(yQ) - n(vQ) + r * this.stick(0) + this.stick(2), -1, 1)),
-        (t.y = Y(n(bQ) - n(xQ) - r * this.stick(1) - this.stick(3), -1, 1)),
+        (t.x = clamp(n(yQ) - n(vQ) + r * this.stick(0) + this.stick(2), -1, 1)),
+        (t.y = clamp(n(bQ) - n(xQ) - r * this.stick(1) - this.stick(3), -1, 1)),
         t
       );
     }
@@ -128,15 +128,15 @@ var FQ = class {
         t = (e) => !!this.padNow[e] && !this.padPrev[e],
         n = this.axes[1];
       return (
-        (e.toggle = t(kQ.start)),
-        (e.step = t(kQ.up) ? -1 : +!!t(kQ.down)),
+        (e.toggle = t(PAD.start)),
+        (e.step = t(PAD.up) ? -1 : +!!t(PAD.down)),
         !e.step &&
           this.navArmed &&
           Math.abs(n) > MQ &&
           ((e.step = Math.sign(n)), (this.navArmed = !1)),
         Math.abs(n) < NQ && (this.navArmed = !0),
-        (e.choose = t(kQ.a)),
-        (e.back = t(kQ.b)),
+        (e.choose = t(PAD.a)),
+        (e.back = t(PAD.b)),
         e
       );
     }
@@ -175,12 +175,12 @@ var FQ = class {
         (this.gamepad = this.padKind ? t : null));
       for (let e of this.spent) this.padNow[e] || this.spent.delete(e);
       (this.enabled || this.padNow.forEach((e, t) => e && this.spent.add(t)),
-        (this.triggers[0] = this.spent.has(kQ.lt)
+        (this.triggers[0] = this.spent.has(PAD.lt)
           ? 0
-          : (t.buttons[kQ.lt]?.value ?? 0)),
-        (this.triggers[1] = this.spent.has(kQ.rt)
+          : (t.buttons[PAD.lt]?.value ?? 0)),
+        (this.triggers[1] = this.spent.has(PAD.rt)
           ? 0
-          : (t.buttons[kQ.rt]?.value ?? 0)));
+          : (t.buttons[PAD.rt]?.value ?? 0)));
     }
   },
   IQ = 30,
@@ -196,7 +196,7 @@ var FQ = class {
       ((this.dust = e), (this.clods = t), (this.sound = n));
     }
     land(e, t) {
-      e.surface > uz.Dirt ||
+      e.surface > SURFACE.Dirt ||
         (this.dust.land(e.pos, e.vel, t),
         t > 3 && this.clods.throw(e.pos, e.vel, Math.round(t), 0.035));
     }
@@ -206,8 +206,8 @@ var FQ = class {
     }
     update(e, t, n) {
       let r = n && t.mode === `ride`;
-      r && t.contact[1] && t.surface <= uz.Dirt && this.dirt(e, t);
-      let i = r && t.surface === uz.Water && (t.contact[0] || t.contact[1]);
+      r && t.contact[1] && t.surface <= SURFACE.Dirt && this.dirt(e, t);
+      let i = r && t.surface === SURFACE.Water && (t.contact[0] || t.contact[1]);
       if (i && !this.wet && t.speed > 2) {
         let e = t.modeT < 0.1 ? t.lastImpact : 0;
         (this.sound.splash(t.speed + e),
@@ -232,7 +232,7 @@ var FQ = class {
         t.skid > 0.5 &&
           Math.random() < e * 6 * t.skid &&
           r.throw(i, t.vel, 1, 0.025));
-      let o = Y((t.carve - 0.8) / 1.2);
+      let o = clamp((t.carve - 0.8) / 1.2);
       if (o > 0) {
         let a = Math.sign(t.yawRate) * IQ;
         (zQ.set(Math.cos(t.yaw) * a, IQ * 0.4, -Math.sin(t.yaw) * a).add(t.vel),
@@ -302,7 +302,7 @@ var FQ = class {
         e.drawPos.copy(e.pos),
         e.vel.set(0, 0, 0),
         Object.assign(t, {
-          mode: kH.Seated,
+          mode: RIDE_MODE.Seated,
           chair: this.chair,
           seat: this.seat,
           x: n.x,
@@ -419,7 +419,7 @@ var FQ = class {
         c = s - this.offset;
       if (this.synced)
         Math.abs(c) <= JQ
-          ? (this.offset += Y(c * YQ, -0.01, XQ))
+          ? (this.offset += clamp(c * YQ, -0.01, XQ))
           : a.length >= QQ && (this.offset = s);
       else {
         if (a.length < ZQ) return;
@@ -440,7 +440,7 @@ var FQ = class {
     `mossy_rock`,
     `snow_02`,
   ],
-  a$ = {
+  FOLIAGE = {
     meadow: 0,
     leaves: 1,
     needles: 2,

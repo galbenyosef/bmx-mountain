@@ -12,11 +12,11 @@ function az(e) {
       return tz + e.len;
   }
 }
-var oz = (ZF * 2) / 2 + 1,
-  sz = (e) => -ZF + e * 2,
-  cz = (e) => Y(Math.round((e + ZF) / 2), 0, oz - 1);
+var GRID_N = (WORLD_HALF * 2) / 2 + 1,
+  sz = (e) => -WORLD_HALF + e * 2,
+  cz = (e) => clamp(Math.round((e + WORLD_HALF) / 2), 0, GRID_N - 1);
 async function lz() {
-  let e = oz,
+  let e = GRID_N,
     t = new Float32Array(e * e);
   return (
     await VF(e, async (n, r) => {

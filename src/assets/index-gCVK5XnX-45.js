@@ -20,7 +20,7 @@ var Z2 = new Gw(),
         (this.maxVelocityLength = 128),
         (this.useSubpixelCorrection = !0),
         (this._jitterIndex = 0),
-        (this._invSize = MV(new j())),
+        (this._invSize = tslUniform(new j())),
         (this._historyRenderTarget = new mn(1, 1, {
           depthBuffer: !1,
           type: v,
@@ -36,13 +36,13 @@ var Z2 = new Gw(),
         (this._resolveMaterial.name = `TRAA.resolve`),
         (this._textureNode = iV(this, this._resolveRenderTarget.texture)),
         (this._originalProjectionMatrix = new N()),
-        (this._cameraNearFar = MV(new j())),
-        (this._cameraWorldMatrix = MV(new N())),
-        (this._cameraWorldMatrixInverse = MV(new N())),
-        (this._cameraProjectionMatrixInverse = MV(new N())),
-        (this._previousCameraWorldMatrix = MV(new N())),
-        (this._previousCameraProjectionMatrixInverse = MV(new N())),
-        (this._previousDepthNode = DV(new sa(1, 1))),
+        (this._cameraNearFar = tslUniform(new j())),
+        (this._cameraWorldMatrix = tslUniform(new N())),
+        (this._cameraWorldMatrixInverse = tslUniform(new N())),
+        (this._cameraProjectionMatrixInverse = tslUniform(new N())),
+        (this._previousCameraWorldMatrix = tslUniform(new N())),
+        (this._previousCameraProjectionMatrixInverse = tslUniform(new N())),
+        (this._previousDepthNode = tslTexture(new sa(1, 1))),
         (this._needsPostProcessingSync = !1),
         (this._velocityNode = null));
     }
@@ -151,7 +151,7 @@ var Z2 = new Gw(),
           (this._historyRenderTarget.depthTexture.type = _),
         (this._velocityNode =
           e.context.velocity === void 0 ? zV : e.context.velocity));
-      let t = qz(([e, t, n, r]) => {
+      let t = tslFn(([e, t, n, r]) => {
           let i = [
               [-1, -1],
               [-1, 1],
@@ -168,16 +168,16 @@ var Z2 = new Gw(),
             let r = this.beautyNode.offset(jB(t, n)).load(e).max(0);
             (a.addAssign(r), o.addAssign(r.pow2()));
           }
-          let s = Z(i.length + 1),
+          let s = tslFloat(i.length + 1),
             c = a.div(s),
             l = o.div(s).sub(c.pow2()).max(0).sqrt().mul(r),
             u = c.sub(l),
             d = c.add(l);
           return U2(c.clamp(u, d), n, u, d);
         }),
-        n = qz(([e, t]) => {
+        n = tslFn(([e, t]) => {
           let n = e.mul(t).fract().abs(),
-            r = VB(n, n.oneMinus());
+            r = tslMax(n, n.oneMinus());
           return r.x.mul(r.y).oneMinus().div(0.75);
         }).setLayout({
           name: `subpixelCorrection`,
@@ -187,16 +187,16 @@ var Z2 = new Gw(),
             { name: `textureSize`, type: `ivec2` },
           ],
         }),
-        r = DV(this._historyRenderTarget.texture),
-        i = qz(() => {
-          let e = FV(),
+        r = tslTexture(this._historyRenderTarget.texture),
+        i = tslFn(() => {
+          let e = tslUv(),
             i = this.beautyNode.size(),
             a = e.mul(i),
             o = G2(this.depthNode, a, this._cameraNearFar),
             s = o.get(`closestDepth`),
             c = o.get(`closestPositionTexel`),
             l = o.get(`farthestDepth`),
-            u = this.velocityNode.load(c).xy.mul(LV(0.5, -0.5)),
+            u = this.velocityNode.load(c).xy.mul(tslVec2(0.5, -0.5)),
             d = e.sub(u),
             f = K2(
               this._previousDepthNode,
@@ -214,10 +214,10 @@ var Z2 = new Gw(),
             _ = this.beautyNode.sample(e),
             v = r.sample(d),
             y = e.sub(d).mul(i).length().div(this.maxVelocityLength).saturate(),
-            b = Z(0.05).toVar();
+            b = tslFloat(0.05).toVar();
           (this.useSubpixelCorrection && b.addAssign(n(u, i).mul(0.25)),
             b.assign(g.select(b.add(y).saturate(), 1)));
-          let x = UB(0.5, 1, y.oneMinus().pow2());
+          let x = tslMix(0.5, 1, y.oneMinus().pow2());
           return W2(_, t(a, _, v, x), b);
         });
       return (
@@ -421,17 +421,17 @@ var Z2 = new Gw(),
         i = r.depthTexture,
         a = mV(`intensity`, `float`, n).setGroup(hV),
         o = mV(`normalBias`, `float`, n).setGroup(hV),
-        s = RV(xV.add(QB.mul(o)), 1).toVar(),
+        s = tslVec4(xV.add(QB.mul(o)), 1).toVar(),
         c = lV.z.negate().toVar(),
-        l = Z(1).toVar(`shadowValue`);
+        l = tslFloat(1).toVar(`shadowValue`);
       for (let a = n.getViewportCount() - 1; a >= 0; a--) {
-        let o = MV(`mat4`)
+        let o = tslUniform(`mat4`)
             .setGroup(hV)
             .onRenderUpdate(() => n.getMatrix(a)),
-          u = MV(`vec4`)
+          u = tslUniform(`vec4`)
             .setGroup(hV)
             .onRenderUpdate(() => n._cascadeData[a]);
-        Jz(c.greaterThanEqual(u.x).and(c.lessThan(u.y)), () => {
+        tslIf(c.greaterThanEqual(u.x).and(c.lessThan(u.y)), () => {
           let n = this.setupShadowCoord(e, o.mul(s)),
             a = this.setupShadowFilter(e, {
               filterFn: t,
@@ -441,10 +441,10 @@ var Z2 = new Gw(),
               shadow: this._filterShadow,
               depthLayer: this.depthLayer,
             });
-          l.assign(UB(a, l, Q(u.z, u.y, c)));
+          l.assign(tslMix(a, l, tslSmoothstep(u.z, u.y, c)));
         });
       }
-      return UB(1, l, a);
+      return tslMix(1, l, a);
     }
     setupShadow(e) {
       let { renderer: t, camera: n } = e,
@@ -470,9 +470,9 @@ var Z2 = new Gw(),
         this._atlasSize.set(u.width, u.height),
         (a.camera.coordinateSystem = n.coordinateSystem),
         (a.camera._reversedDepth = t.reversedDepthBuffer));
-      let f = qz((e) => this._setupCascades(e, c))().toVar(),
+      let f = tslFn((e) => this._setupCascades(e, c))().toVar(),
         p = `${r.type} Shadow [ ${r.name || `ID: ` + r.id} ]`;
-      return f.toInspector(`${p} / Depth`, () => DV(l).r.oneMinus());
+      return f.toInspector(`${p} / Depth`, () => tslTexture(l).r.oneMinus());
     }
     renderShadow(e) {
       let { shadow: t, shadowMap: n, light: r } = this,
@@ -537,5 +537,5 @@ var Z2 = new Gw(),
   k4 = new N().makeRotationX(-(Math.PI / 2 - x4)),
   A4 = new N(),
   j4 = new N(),
-  M4 = (e) => kF(b4 + (e / y4) * 24, 24),
-  N4 = (e) => (kF(e - b4, 24) / 24) * y4;
+  M4 = (e) => wrap(b4 + (e / y4) * 24, 24),
+  N4 = (e) => (wrap(e - b4, 24) / 24) * y4;

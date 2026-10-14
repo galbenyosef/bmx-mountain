@@ -2,10 +2,10 @@
 // Lines 53523-53849 of readable/assets/index-gCVK5XnX.pretty.js (statement-aligned).
 function wU(e, t, n = 10) {
   let r = [];
-  for (let i = 0; i < e.length - 1; i++) r.push($V(e[i], e[i + 1], t, t, n));
+  for (let i = 0; i < e.length - 1; i++) r.push(makeTube(e[i], e[i + 1], t, t, n));
   for (let i = 1; i < e.length - 1; i++)
     r.push(new jo(t, n, 6).translate(e[i].x, e[i].y, e[i].z));
-  return tH(r);
+  return mergeGeometry(r);
 }
 function TU(e, t, n) {
   let r = new Wa(),
@@ -29,26 +29,26 @@ function TU(e, t, n) {
 }
 function EU(e, t) {
   let n = new Hn(),
-    r = new Mo(J.wheelRadius - 0.03, 0.03, 10, 40).rotateY(Math.PI / 2);
-  n.add(eH(r, e.rubber));
-  let i = new Mo(J.wheelRadius - 0.052, 0.012, 6, 40).rotateY(Math.PI / 2);
-  n.add(eH(i, e.wall, !1));
-  let a = new Mo(J.wheelRadius - 0.062, 0.011, 6, 36).rotateY(Math.PI / 2);
-  n.add(eH(a, e.rim, !1));
-  let o = HF(t),
+    r = new Mo(PHYSICS.wheelRadius - 0.03, 0.03, 10, 40).rotateY(Math.PI / 2);
+  n.add(addMesh(r, e.rubber));
+  let i = new Mo(PHYSICS.wheelRadius - 0.052, 0.012, 6, 40).rotateY(Math.PI / 2);
+  n.add(addMesh(i, e.wall, !1));
+  let a = new Mo(PHYSICS.wheelRadius - 0.062, 0.011, 6, 36).rotateY(Math.PI / 2);
+  n.add(addMesh(a, e.rim, !1));
+  let o = makeRng(t),
     s = [],
-    c = J.wheelRadius - 0.07;
+    c = PHYSICS.wheelRadius - 0.07;
   for (let e = 0; e < 36; e++) {
-    let t = (e / 36) * DF,
+    let t = (e / 36) * TAU,
       n = e % 2 == 0 ? 1 : -1,
       r = t + n * 0.5,
       i = new M(n * 0.035, Math.sin(r) * 0.022, Math.cos(r) * 0.022),
       a = new M(0, Math.sin(t) * c, Math.cos(t) * c);
-    s.push($V(i, a, 0.0011 + o() * 1e-4, 0.0011, 3));
+    s.push(makeTube(i, a, 0.0011 + o() * 1e-4, 0.0011, 3));
   }
   return (
-    n.add(eH(tH(s), e.chrome, !1)),
-    n.add(eH(new fa(0.018, 0.018, 0.1, 10).rotateZ(Math.PI / 2), e.black, !1)),
+    n.add(addMesh(mergeGeometry(s), e.chrome, !1)),
+    n.add(addMesh(new fa(0.018, 0.018, 0.1, 10).rotateZ(Math.PI / 2), e.black, !1)),
     n
   );
 }
@@ -75,19 +75,19 @@ function DU(e) {
 function OU(e, t) {
   let n = bU,
     r = n.headTop.clone().lerp(n.headBottom, 0.25),
-    i = tH([
-      $V(n.headBottom, n.headTop, 0.022),
-      $V(r, n.seatCluster, 0.016),
-      $V(n.headBottom.clone().lerp(n.headTop, 0.2), n.bb, 0.019),
-      $V(n.bb, n.seatCluster, 0.016),
-      $V(n.bb.clone().setX(0.05), n.rearHub.clone().setX(0.055), 0.011),
-      $V(n.bb.clone().setX(-0.05), n.rearHub.clone().setX(-0.055), 0.011),
-      $V(
+    i = mergeGeometry([
+      makeTube(n.headBottom, n.headTop, 0.022),
+      makeTube(r, n.seatCluster, 0.016),
+      makeTube(n.headBottom.clone().lerp(n.headTop, 0.2), n.bb, 0.019),
+      makeTube(n.bb, n.seatCluster, 0.016),
+      makeTube(n.bb.clone().setX(0.05), n.rearHub.clone().setX(0.055), 0.011),
+      makeTube(n.bb.clone().setX(-0.05), n.rearHub.clone().setX(-0.055), 0.011),
+      makeTube(
         n.seatCluster.clone().setX(0.035),
         n.rearHub.clone().setX(0.055),
         0.009,
       ),
-      $V(
+      makeTube(
         n.seatCluster.clone().setX(-0.035),
         n.rearHub.clone().setX(-0.055),
         0.009,
@@ -96,10 +96,10 @@ function OU(e, t) {
         .rotateZ(Math.PI / 2)
         .translate(n.bb.x, n.bb.y, n.bb.z),
     ]);
-  (e.add(eH(i, t.paint)),
-    e.add(eH($V(n.seatCluster, n.seat, 0.012), t.chrome)),
+  (e.add(addMesh(i, t.paint)),
+    e.add(addMesh(makeTube(n.seatCluster, n.seat, 0.012), t.chrome)),
     e.add(
-      eH(
+      addMesh(
         new ua(0.035, 0.16, 4, 10)
           .rotateX(Math.PI / 2)
           .scale(1, 0.55, 1)
@@ -111,7 +111,7 @@ function OU(e, t) {
   (a.position.copy(n.rearHub),
     e.add(a),
     e.add(
-      eH(
+      addMesh(
         new fa(0.06, 0.06, 0.006, 25)
           .rotateZ(Math.PI / 2)
           .translate(0.055, n.bb.y, n.bb.z),
@@ -120,16 +120,16 @@ function OU(e, t) {
       ),
     ),
     e.add(
-      eH(
-        tH([
-          $V(
+      addMesh(
+        mergeGeometry([
+          makeTube(
             new M(0.055, n.bb.y + 0.058, n.bb.z),
             new M(0.055, 0.025, n.rearHub.z),
             0.004,
             0.004,
             4,
           ),
-          $V(
+          makeTube(
             new M(0.055, n.bb.y - 0.058, n.bb.z),
             new M(0.055, -0.025, n.rearHub.z),
             0.004,
@@ -144,21 +144,21 @@ function OU(e, t) {
   let o = new Hn();
   o.position.copy(n.bb);
   let s = (e) =>
-    $V(
+    makeTube(
       new M(e * 0.07, 0, 0),
       new M(e * 0.07, -n.crankLength, 0),
       0.012,
       0.012,
       8,
     );
-  o.add(eH(tH([s(1), s(-1).rotateX(Math.PI)]), t.black));
+  o.add(addMesh(mergeGeometry([s(1), s(-1).rotateX(Math.PI)]), t.black));
   let c = new fa(0.05, 0.05, 0.1, 6).rotateZ(Math.PI / 2).scale(1, 0.25, 1),
     l = new Vn();
-  (l.position.set(0.12, -n.crankLength, 0), l.add(eH(c, t.black)));
+  (l.position.set(0.12, -n.crankLength, 0), l.add(addMesh(c, t.black)));
   let u = new Vn();
   return (
     u.position.set(-0.12, n.crankLength, 0),
-    u.add(eH(c, t.black)),
+    u.add(addMesh(c, t.black)),
     o.add(l, u),
     e.add(o),
     { rearWheel: a, cranks: o, pedalL: u, pedalR: l }
@@ -168,20 +168,20 @@ function kU(e, t) {
   let n = bU,
     r = (e) => e.clone().sub(n.headBottom),
     i = r(n.frontHub),
-    a = tH([
-      $V(r(n.headBottom).setX(0.045), i.clone().setX(0.05), 0.012, 0.01),
-      $V(r(n.headBottom).setX(-0.045), i.clone().setX(-0.05), 0.012, 0.01),
+    a = mergeGeometry([
+      makeTube(r(n.headBottom).setX(0.045), i.clone().setX(0.05), 0.012, 0.01),
+      makeTube(r(n.headBottom).setX(-0.045), i.clone().setX(-0.05), 0.012, 0.01),
       new fa(0.03, 0.03, 0.03, 12).rotateZ(Math.PI / 2),
-      $V(r(n.headTop), r(n.stem), 0.016),
+      makeTube(r(n.headTop), r(n.stem), 0.016),
     ]);
-  e.add(eH(a, t.chrome));
+  e.add(addMesh(a, t.chrome));
   let o = EU(t, 1);
   (o.position.copy(i), e.add(o));
   let s = new Hn();
   e.add(s);
   let c = r(n.stem);
   s.add(
-    eH(
+    addMesh(
       new fa(0.03, 0.03, 0.06, 10)
         .rotateZ(Math.PI / 2)
         .scale(1, 1, 1.2)
@@ -199,10 +199,10 @@ function kU(e, t) {
       new M(e * 0.39, l.y, l.z + 0.012),
     ];
   s.add(
-    eH(
-      tH([
+    addMesh(
+      mergeGeometry([
         wU(d(-1).reverse().concat(d(1)), 0.011, 10),
-        $V(
+        makeTube(
           new M(-0.19, c.y + 0.13, c.z + 0.04),
           new M(0.19, c.y + 0.13, c.z + 0.04),
           0.0095,
@@ -216,8 +216,8 @@ function kU(e, t) {
       .rotateZ(Math.PI / 2)
       .translate(e.x, e.y, e.z);
   s.add(
-    eH(
-      tH([
+    addMesh(
+      mergeGeometry([
         f(l.clone().add(new M(-0.045, 0, 0.004))),
         f(u.clone().add(new M(0.045, 0, 0.004))),
       ]),
@@ -228,14 +228,14 @@ function kU(e, t) {
     m = new M(0, c.y + 0.115, c.z - 0.03);
   return (
     s.add(
-      eH(
+      addMesh(
         p.clone().rotateY(Math.PI).rotateX(-0.22).translate(m.x, m.y, m.z),
         t.plate,
         !1,
       ),
     ),
     s.add(
-      eH(
+      addMesh(
         p
           .clone()
           .rotateX(-0.22)
@@ -261,38 +261,38 @@ function AU(e, t, n, r, i, a) {
     (e.pedalL.rotation.x = a),
     (e.pedalR.rotation.x = a));
 }
-var jU = qz(([e]) => SB(CV(yB(e, LV(127.1, 311.7))).mul(43758.5453))),
-  MU = qz(([e]) => {
+var jU = tslFn(([e]) => SB(tslSin(tslDot(e, tslVec2(127.1, 311.7))).mul(43758.5453))),
+  valueNoise = tslFn(([e]) => {
     let t = xB(e),
       n = SB(e),
-      r = n.mul(n).mul(Z(3).sub(n.mul(2))),
+      r = n.mul(n).mul(tslFloat(3).sub(n.mul(2))),
       i = jU(t),
-      a = jU(t.add(LV(1, 0))),
-      o = jU(t.add(LV(0, 1))),
-      s = jU(t.add(LV(1, 1)));
-    return UB(UB(i, a, r.x), UB(o, s, r.x), r.y);
+      a = jU(t.add(tslVec2(1, 0))),
+      o = jU(t.add(tslVec2(0, 1))),
+      s = jU(t.add(tslVec2(1, 1)));
+    return tslMix(tslMix(i, a, r.x), tslMix(o, s, r.x), r.y);
   }),
-  NU = (e, t, n) => LV(e.x.mul(t).sub(e.y.mul(n)), e.x.mul(n).add(e.y.mul(t)));
-function PU(e, t) {
-  let n = Z(0),
+  NU = (e, t, n) => tslVec2(e.x.mul(t).sub(e.y.mul(n)), e.x.mul(n).add(e.y.mul(t)));
+function fbmNoise(e, t) {
+  let n = tslFloat(0),
     r = 0.5,
     i = 0,
     a = e;
   for (let e = 0; e < t; e++)
-    ((n = n.add(MU(a).mul(r))),
+    ((n = n.add(valueNoise(a).mul(r))),
       (i += r),
       (r *= 0.5),
       (a = NU(a, 1.6, 1.2).add(3.1)));
   return n.div(i);
 }
 function FU(e, t, n, r, i = r) {
-  ((e.alphaTestNode = Z(n)),
+  ((e.alphaTestNode = tslFloat(n)),
     (e.maskNode = i),
     (e.maskShadowNode = r.and(t.greaterThan(n))));
 }
 var IU = () => uV.sub(lB),
-  LU = (e) => eV(uB.mul(RV(e, 0)).xyz),
-  RU = () => LU($(0, 1, 0)),
+  LU = (e) => tslNormalize(uB.mul(tslVec4(e, 0)).xyz),
+  RU = () => LU(tslVec3(0, 1, 0)),
   zU = () => KB({ normal: nV(RU()) });
 function BU(e) {
   ((e.polygonOffset = !0),
@@ -305,7 +305,7 @@ function VU(e, t = 0) {
     (e.polygonOffsetUnits = t));
 }
 function HU(e) {
-  let t = dV(eB(e), $(4));
+  let t = dV(tslAbs(e), tslVec3(4));
   return t.div(t.x.add(t.y).add(t.z));
 }
 var UU = (e, t, n, r) => t.mul(e.x).add(n.mul(e.y)).add(r.mul(e.z)),
@@ -313,7 +313,7 @@ var UU = (e, t, n, r) => t.mul(e.x).add(n.mul(e.y)).add(r.mul(e.z)),
   GU = new $i();
 function KU(e, t) {
   let n = new N(),
-    r = MV(n)
+    r = tslUniform(n)
       .onObjectUpdate(({ camera: e }) => {
         let t = lH(e, GU).planes,
           r = n.elements;
@@ -324,6 +324,6 @@ function KU(e, t) {
             (r[12 + e] = t[e].constant));
         return n;
       })
-      .mul(RV(e, 1));
-  return HB(HB(r.x, r.y), HB(r.z, r.w)).greaterThan(Z(t).negate());
+      .mul(tslVec4(e, 1));
+  return HB(HB(r.x, r.y), HB(r.z, r.w)).greaterThan(tslFloat(t).negate());
 }

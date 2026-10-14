@@ -6,10 +6,10 @@ var T2 = (e, t, n) => new S2(qB(e), qB(t), n),
   O2 = new j(1, 0),
   k2 = new j(0, 1),
   A2,
-  j2 = qz(({ input: e, threshold: t, smoothWidth: n }) => {
+  j2 = tslFn(({ input: e, threshold: t, smoothWidth: n }) => {
     let r = LB(e.rgb),
-      i = Q(t, t.add(n), r);
-    return UB(RV(0), e, i);
+      i = tslSmoothstep(t, t.add(n), r);
+    return tslMix(tslVec4(0), e, i);
   }),
   M2 = class extends Rc {
     static get type() {
@@ -18,10 +18,10 @@ var T2 = (e, t, n) => new S2(qB(e), qB(t), n),
     constructor(e, t = 1, n = 0, r = 0) {
       (super(`vec4`),
         (this.inputNode = e),
-        (this.strength = t.isNode ? t : MV(t)),
-        (this.radius = n.isNode ? n : MV(n)),
-        (this.threshold = r.isNode ? r : MV(r)),
-        (this.smoothWidth = MV(0.01)),
+        (this.strength = t.isNode ? t : tslUniform(t)),
+        (this.radius = n.isNode ? n : tslUniform(n)),
+        (this.threshold = r.isNode ? r : tslUniform(r)),
+        (this.smoothWidth = tslUniform(0.01)),
         (this.bloomTintColors = [
           new M(1, 1, 1),
           new M(1, 1, 1),
@@ -50,12 +50,12 @@ var T2 = (e, t, n) => new S2(qB(e), qB(t), n),
       ((this._compositeMaterial = null),
         (this._highPassFilterMaterial = null),
         (this._separableBlurMaterials = []),
-        (this._textureNodeBright = DV(this._renderTargetBright.texture)),
-        (this._textureNodeBlur0 = DV(this._renderTargetsVertical[0].texture)),
-        (this._textureNodeBlur1 = DV(this._renderTargetsVertical[1].texture)),
-        (this._textureNodeBlur2 = DV(this._renderTargetsVertical[2].texture)),
-        (this._textureNodeBlur3 = DV(this._renderTargetsVertical[3].texture)),
-        (this._textureNodeBlur4 = DV(this._renderTargetsVertical[4].texture)),
+        (this._textureNodeBright = tslTexture(this._renderTargetBright.texture)),
+        (this._textureNodeBlur0 = tslTexture(this._renderTargetsVertical[0].texture)),
+        (this._textureNodeBlur1 = tslTexture(this._renderTargetsVertical[1].texture)),
+        (this._textureNodeBlur2 = tslTexture(this._renderTargetsVertical[2].texture)),
+        (this._textureNodeBlur3 = tslTexture(this._renderTargetsVertical[3].texture)),
+        (this._textureNodeBlur4 = tslTexture(this._renderTargetsVertical[4].texture)),
         (this._textureOutput = iV(
           this,
           this._renderTargetsHorizontal[0].texture,
@@ -131,21 +131,21 @@ var T2 = (e, t, n) => new S2(qB(e), qB(t), n),
         );
       let r = rB([1, 0.8, 0.6, 0.4, 0.2]),
         i = NV(this.bloomTintColors),
-        a = qz(() => {
+        a = tslFn(() => {
           let e = N2(r.element(0), this.radius)
-              .mul(RV(i.element(0), 1))
+              .mul(tslVec4(i.element(0), 1))
               .mul(this._textureNodeBlur0),
             t = N2(r.element(1), this.radius)
-              .mul(RV(i.element(1), 1))
+              .mul(tslVec4(i.element(1), 1))
               .mul(this._textureNodeBlur1),
             n = N2(r.element(2), this.radius)
-              .mul(RV(i.element(2), 1))
+              .mul(tslVec4(i.element(2), 1))
               .mul(this._textureNodeBlur2),
             a = N2(r.element(3), this.radius)
-              .mul(RV(i.element(3), 1))
+              .mul(tslVec4(i.element(3), 1))
               .mul(this._textureNodeBlur3),
             o = N2(r.element(4), this.radius)
-              .mul(RV(i.element(4), 1))
+              .mul(tslVec4(i.element(4), 1))
               .mul(this._textureNodeBlur4);
           return e.add(t).add(n).add(a).add(o).mul(this.strength);
         });
@@ -185,18 +185,18 @@ var T2 = (e, t, n) => new S2(qB(e), qB(t), n),
           s = r + i;
         (a.push((e * r + (e + 1) * i) / s), o.push(s));
       }
-      let s = DV(null),
+      let s = tslTexture(null),
         c = rB(a),
         l = rB(o),
-        u = MV(new j()),
-        d = MV(new j(0.5, 0.5)),
-        f = FV(),
+        u = tslUniform(new j()),
+        d = tslUniform(new j(0.5, 0.5)),
+        f = tslUv(),
         p = (e) => s.sample(e),
-        m = qz(() => {
+        m = tslFn(() => {
           let e = p(f).rgb.mul(i).toVar();
           return (
             Yz(
-              { start: kB(0), end: kB(a.length), type: `int`, condition: `<` },
+              { start: tslInt(0), end: tslInt(a.length), type: `int`, condition: `<` },
               ({ i: t }) => {
                 let n = l.element(t),
                   r = d.mul(u).mul(c.element(t)),
@@ -205,7 +205,7 @@ var T2 = (e, t, n) => new S2(qB(e), qB(t), n),
                 e.addAssign(nB(i, a).mul(n));
               },
             ),
-            RV(e, 1)
+            tslVec4(e, 1)
           );
         }),
         h = new _y();
@@ -221,7 +221,7 @@ var T2 = (e, t, n) => new S2(qB(e), qB(t), n),
       );
     }
   },
-  N2 = qz(({ factor: e, radius: t }) => UB(e, Z(1.2).sub(e), t), {
+  N2 = tslFn(({ factor: e, radius: t }) => tslMix(e, tslFloat(1.2).sub(e), t), {
     factor: `float`,
     radius: `float`,
     return: `float`,
@@ -574,23 +574,23 @@ var T2 = (e, t, n) => new S2(qB(e), qB(t), n),
         (this.depthNode = t),
         (this.normalNode = n),
         (this._noiseTexture = R2()),
-        (this.noiseNode = DV(this._noiseTexture)),
-        (this.lumaPhi = MV(5)),
-        (this.depthPhi = MV(5)),
-        (this.normalPhi = MV(5)),
-        (this.radius = MV(5)),
-        (this.index = MV(0)),
+        (this.noiseNode = tslTexture(this._noiseTexture)),
+        (this.lumaPhi = tslUniform(5)),
+        (this.depthPhi = tslUniform(5)),
+        (this.normalPhi = tslUniform(5)),
+        (this.radius = tslUniform(5)),
+        (this.index = tslUniform(0)),
         (this.updateBeforeType = Xz.FRAME),
-        (this._resolution = MV(new j())),
+        (this._resolution = tslUniform(new j())),
         (this._sampleVectors = NV(L2(16, 2, 1))),
-        (this._cameraProjectionMatrixInverse = MV(r.projectionMatrixInverse)));
+        (this._cameraProjectionMatrixInverse = tslUniform(r.projectionMatrixInverse)));
     }
     updateBefore() {
       let e = this.textureNode.value;
       this._resolution.value.set(e.image.width, e.image.height);
     }
     setup() {
-      let e = FV(),
+      let e = tslUv(),
         t = (e) => this.textureNode.sample(e),
         n = (e) => this.depthNode.sample(e).x,
         r = (e) =>
@@ -598,63 +598,63 @@ var T2 = (e, t, n) => new S2(qB(e), qB(t), n),
             ? wB(e, this.depthNode.value, this._cameraProjectionMatrixInverse)
             : this.normalNode.sample(e).rgb.normalize(),
         i = (e) => this.noiseNode.sample(e),
-        a = qz(([e, i, a, o]) => {
+        a = tslFn(([e, i, a, o]) => {
           let s = t(o).toVar(),
             c = n(o).toVar(),
             l = r(o).toVar(),
             u = s.rgb,
             d = EB(o, c, this._cameraProjectionMatrixInverse).toVar(),
-            f = dV(VB(yB(i, l).toVar(), 0), this.normalPhi).toVar(),
-            p = eB(LB(u).sub(LB(e))).toVar(),
-            m = VB(Z(1).sub(p.div(this.lumaPhi)), 0).toVar(),
-            h = eB(yB(a.sub(d), i)).toVar(),
-            g = VB(Z(1).sub(h.div(this.depthPhi)), 0),
+            f = dV(tslMax(tslDot(i, l).toVar(), 0), this.normalPhi).toVar(),
+            p = tslAbs(LB(u).sub(LB(e))).toVar(),
+            m = tslMax(tslFloat(1).sub(p.div(this.lumaPhi)), 0).toVar(),
+            h = tslAbs(tslDot(a.sub(d), i)).toVar(),
+            g = tslMax(tslFloat(1).sub(h.div(this.depthPhi)), 0),
             _ = m.mul(g).mul(f);
-          return RV(u.mul(_), _);
+          return tslVec4(u.mul(_), _);
         }),
-        o = qz(([e]) => {
+        o = tslFn(([e]) => {
           let o = n(e).toVar(),
             s = r(e).toVar(),
             c = t(e).toVar(),
             l = fV(`vec4`);
           return (
-            Jz(o.greaterThanEqual(1).or(yB(s, s).equal(0)), () => {
+            tslIf(o.greaterThanEqual(1).or(tslDot(s, s).equal(0)), () => {
               l.assign(c);
             }).Else(() => {
-              let t = $(c.rgb),
+              let t = tslVec3(c.rgb),
                 n = EB(e, o, this._cameraProjectionMatrixInverse).toConst(),
                 r = kV(this.noiseNode, 0),
-                u = LV(e.x, e.y.oneMinus());
+                u = tslVec2(e.x, e.y.oneMinus());
               u = u.mul(this._resolution.div(r));
               let d = i(u).toVar(),
-                f = LV(
-                  CV(d.element(this.index.mod(4).mul(2).mul($z))),
+                f = tslVec2(
+                  tslSin(d.element(this.index.mod(4).mul(2).mul($z))),
                   hB(d.element(this.index.mod(4).mul(2).mul($z))),
                 ),
                 p = RB(f.x, f.y.negate(), f.x, f.y),
-                m = Z(1).toVar(),
-                h = $(c.rgb).toVar();
+                m = tslFloat(1).toVar(),
+                h = tslVec3(c.rgb).toVar();
               (Yz(
-                { start: kB(0), end: kB(16), type: `int`, condition: `<` },
+                { start: tslInt(0), end: tslInt(16), type: `int`, condition: `<` },
                 ({ i: r }) => {
                   let i = this._sampleVectors.element(r),
                     o = p
-                      .mul(i.xy.mul(Z(1).add(i.z.mul(this.radius.sub(1)))))
+                      .mul(i.xy.mul(tslFloat(1).add(i.z.mul(this.radius.sub(1)))))
                       .div(this._resolution),
                     c = e.add(o),
                     l = a(t, s, n, c);
                   (h.addAssign(l.xyz), m.addAssign(l.w));
                 },
               ),
-                Jz(m.greaterThan(Z(0)), () => {
+                tslIf(m.greaterThan(tslFloat(0)), () => {
                   h.divAssign(m);
                 }),
-                l.assign(RV(h, c.a)));
+                l.assign(tslVec4(h, c.a)));
             }),
             l
           );
         });
-      return qz(() => o(e))();
+      return tslFn(() => o(e))();
     }
     dispose() {
       (super.dispose(), this._noiseTexture.dispose());

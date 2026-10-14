@@ -30,7 +30,7 @@ var NX = new qt(),
   oZ = 15,
   sZ = 0.15,
   cZ = 0.75,
-  lZ = [cq.chest, cq.head, cq.shL, cq.shR, cq.elL, cq.elR, cq.haL, cq.haR],
+  lZ = [BONES.chest, BONES.head, BONES.shL, BONES.shR, BONES.elL, BONES.elR, BONES.haL, BONES.haR],
   uZ = 0.9,
   dZ = class {
     world;
@@ -54,7 +54,7 @@ var NX = new qt(),
       y: 0,
       z: 0,
       speed: 0,
-      mode: kH.Ride,
+      mode: RIDE_MODE.Ride,
       crouch: 0,
       compF: 0,
       compR: 0,
@@ -66,7 +66,7 @@ var NX = new qt(),
     lineY = 0;
     lineVy = 0;
     sprint = 0;
-    flutter = MV(0);
+    flutter = tslUniform(0);
     upT = -1;
     walk = Array.from({ length: 15 }, () => new M());
     kneelAt = new M();
@@ -117,10 +117,10 @@ var NX = new qt(),
         (this.remember(e), this.lastQ.copy(r), (this.seen = !0));
         return;
       }
-      let i = PF(18, t),
+      let i = approachExp(18, t),
         a = RX.copy(this.lastQ).invert().premultiply(r);
       a.w < 0 && a.set(-a.x, -a.y, -a.z, -a.w);
-      let o = 2 * Math.acos(Y(a.w, -1, 1)),
+      let o = 2 * Math.acos(clamp(a.w, -1, 1)),
         s = Math.sqrt(Math.max(1e-12, 1 - a.w * a.w)),
         c = zX.set(a.x, a.y, a.z).multiplyScalar(o / s / t);
       if (
@@ -129,83 +129,83 @@ var NX = new qt(),
         (this.pitchRate +=
           (c.dot(IX.set(1, 0, 0).applyQuaternion(r)) - this.pitchRate) * i),
         (this.vy += ((e.y - n.y) / t - this.vy) * i),
-        (this.accel += ((e.speed - n.speed) / t - this.accel) * PF(6, t)),
+        (this.accel += ((e.speed - n.speed) / t - this.accel) * approachExp(6, t)),
         GX.set((e.x - n.x) / t, (e.y - n.y) / t, (e.z - n.z) / t),
         GX.lengthSq() < 2500 &&
-          (this.acc.lerp(WX.subVectors(GX, this.vel).divideScalar(t), PF(8, t)),
+          (this.acc.lerp(WX.subVectors(GX, this.vel).divideScalar(t), approachExp(8, t)),
           this.vel.lerp(GX, i)),
-        e.mode === kH.Ride && Math.abs(e.y - this.lineY) < 2)
+        e.mode === RIDE_MODE.Ride && Math.abs(e.y - this.lineY) < 2)
       ) {
-        let n = PF(1 / tZ, t),
+        let n = approachExp(1 / tZ, t),
           r = this.lineY + this.lineVy * t,
           i = e.y - r;
         ((this.lineY = r + n * i),
           (this.lineVy += ((n * n) / (2 - n)) * (i / t)));
       } else
-        ((this.lineY = e.y), (this.lineVy = e.mode === kH.Ride ? 0 : this.vy));
-      if (n.mode === kH.Air && e.mode === kH.Ride) {
-        let e = Y(-this.vy * 0.55, 0, 4);
+        ((this.lineY = e.y), (this.lineVy = e.mode === RIDE_MODE.Ride ? 0 : this.vy));
+      if (n.mode === RIDE_MODE.Air && e.mode === RIDE_MODE.Ride) {
+        let e = clamp(-this.vy * 0.55, 0, 4);
         ((this.crouch.v += e),
           (this.reach.v -= e * 0.35),
           (this.lean.v += e * 0.25),
           (this.headPitch.v -= e * 0.4));
-      } else if (n.mode === kH.Ride && e.mode === kH.Air) {
+      } else if (n.mode === RIDE_MODE.Ride && e.mode === RIDE_MODE.Air) {
         let t = n.crouch > 0.3 && e.crouch < n.crouch;
         ((this.crouch.v -= t ? 5 : 1.5),
           (this.reach.v += t ? 0.6 : 0.3),
           t && (this.lean.v -= 0.6));
-      } else if (e.mode === kH.Ride) {
-        ((this.reach.v -= Y((e.compF - n.compF) * 6, -0.6, 0.6)),
-          (this.crouch.v += Y((e.compR - n.compR) * 8, -0.8, 0.8)));
+      } else if (e.mode === RIDE_MODE.Ride) {
+        ((this.reach.v -= clamp((e.compF - n.compF) * 6, -0.6, 0.6)),
+          (this.crouch.v += clamp((e.compR - n.compR) * 8, -0.8, 0.8)));
         let t = this.acc.x * Math.cos(e.yaw) - this.acc.z * Math.sin(e.yaw);
-        ((this.roll.v -= Y((t - this.lastSide) * 0.012, -0.3, 0.3)),
+        ((this.roll.v -= clamp((t - this.lastSide) * 0.012, -0.3, 0.3)),
           (this.lastSide = t));
       }
       this.remember(e);
     }
     body(e, t) {
-      let n = e.mode === kH.Air,
-        r = e.mode === kH.Crash,
-        i = Y((e.compF + e.compR) / 2 / 0.22, 0, 1) * 0.8 + e.crouch * 0.85,
+      let n = e.mode === RIDE_MODE.Air,
+        r = e.mode === RIDE_MODE.Crash,
+        i = clamp((e.compF + e.compR) / 2 / 0.22, 0, 1) * 0.8 + e.crouch * 0.85,
         a = 0,
         o = 0;
       if (n) {
         let t = this.vy < -2.5;
         ((i = t ? 0.12 + e.crouch * 0.3 : 0.5 + e.crouch * 0.35),
           (a = t ? 0.06 : -0.08),
-          (o = Y(-this.pitchRate * 0.06, -0.4, 0.35)),
-          (a += Y(this.pitchRate * 0.025, -0.1, 0.12)));
+          (o = clamp(-this.pitchRate * 0.06, -0.4, 0.35)),
+          (a += clamp(this.pitchRate * 0.025, -0.1, 0.12)));
       } else
         ((a =
-          Y(-this.accel * 0.025, -0.06, 0.12) -
-          Y((e.compF - e.compR) * 0.8, -0.06, 0.12) -
+          clamp(-this.accel * 0.025, -0.06, 0.12) -
+          clamp((e.compF - e.compR) * 0.8, -0.06, 0.12) -
           e.crouch * 0.1),
           (o = e.crouch * 0.18),
           (this.sprint +=
-            ((e.pedal ? 1 - X(aZ, oZ, e.speed) : 0) - this.sprint) * PF(4, t)),
+            ((e.pedal ? 1 - smoothstep(aZ, oZ, e.speed) : 0) - this.sprint) * approachExp(4, t)),
           e.pedal &&
             ((o += 0.14 + this.sprint * 0.16),
             (a -= 0.05),
             (i += 0.07 * Math.sin(2 * e.crank) + this.sprint * (iZ - i * 0.5))),
-          (i += Y((e.y - this.lineY) * nZ, rZ[1], rZ[0])),
+          (i += clamp((e.y - this.lineY) * nZ, rZ[1], rZ[0])),
           (o +=
-            Y(this.accel * 0.02, -0.25, 0.15) + e.pump * 0.12 - e.lift * 0.4),
+            clamp(this.accel * 0.02, -0.25, 0.15) + e.pump * 0.12 - e.lift * 0.4),
           (i += e.pump * 0.3 - e.lift * 0.15),
           (a += e.lift * 0.1));
-      let s = e.style === CH.Turndown ? e.styled * e.styleSide : 0,
+      let s = e.style === TRICK.Turndown ? e.styled * e.styleSide : 0,
         c =
-          Y(
+          clamp(
             this.yawRate * (n ? 0.07 : 0.04),
             n ? -0.6 : -0.25,
             n ? 0.6 : 0.25,
           ) -
           s * 0.35,
-        l = Math.atan((e.speed * -this.yawRate) / J.g),
+        l = Math.atan((e.speed * -this.yawRate) / PHYSICS.g),
         u = n
           ? 0
-          : Y(
+          : clamp(
               -e.roll * 0.45 +
-                Y((l - e.roll) * 0.6, -0.2, 0.2) -
+                clamp((l - e.roll) * 0.6, -0.2, 0.2) -
                 e.wobble * 0.25 * Math.sin(this.flailT * 13),
               -0.3,
               0.3,
@@ -213,7 +213,7 @@ var NX = new qt(),
       r ? (this.flailT += t * (2 + Math.min(10, e.speed))) : (this.flailT += t);
       let d = this.gaze(e, n);
       return {
-        crouch: Y(this.crouch.step(Y(i, iZ, 1), t), -0.32, 1.1),
+        crouch: clamp(this.crouch.step(clamp(i, iZ, 1), t), -0.32, 1.1),
         reach: this.reach.step(a, t),
         lean: this.lean.step(o, t),
         roll: this.roll.step(u, t),
@@ -225,8 +225,8 @@ var NX = new qt(),
         wide: +(e.bars === 0),
         feetOff:
           e.whip === 0 ? 0 : Math.sin(Math.min(Math.PI, Math.abs(e.whip) / 2)),
-        dab: X(0.35, 0.7, e.wobble) * (e.roll > 0 ? 1 : -1),
-        turn: Y(l * 2, -1, 1),
+        dab: smoothstep(0.35, 0.7, e.wobble) * (e.roll > 0 ? 1 : -1),
+        turn: clamp(l * 2, -1, 1),
         ankle: e.pedal ? Math.sin(e.crank) * 0.25 : 0,
         style: e.style,
         side: e.styleSide,
@@ -241,7 +241,7 @@ var NX = new qt(),
         i = WX.set(0, 1, 0).applyQuaternion(this.lastQ).y > 0.3;
       if (r < 1 || !i || Math.abs(this.pitchRate) > 3)
         return [this.yawRate * 0.12, t ? -0.3 : -0.14, 0];
-      let a = MF(n.x, n.z) + this.yawRate * (t ? 0 : 0.3),
+      let a = headingFromXZ(n.x, n.z) + this.yawRate * (t ? 0 : 0.3),
         o = t ? (this.vy < 0 ? Math.atan2(n.y, r) - 0.3 : -0.1) : -0.18;
       return (
         WX.set(
@@ -251,9 +251,9 @@ var NX = new qt(),
         ),
         WX.applyQuaternion(RX.copy(this.lastQ).invert()),
         [
-          Y(MF(WX.x, WX.z), -1.1, 1.1),
-          Y(Math.asin(Y(WX.y, -1, 1)), -0.85, 0.45),
-          Y(e.roll * 0.7, -0.5, 0.5),
+          clamp(headingFromXZ(WX.x, WX.z), -1.1, 1.1),
+          clamp(Math.asin(clamp(WX.y, -1, 1)), -0.85, 0.45),
+          clamp(e.roll * 0.7, -0.5, 0.5),
         ]
       );
     }
@@ -293,16 +293,16 @@ var NX = new qt(),
       return this.upT >= 1.3;
     }
     pose(e, t) {
-      let n = e.mode === kH.Crash;
-      if ((this.observe(e, t), n || (this.limp = !1), e.mode === kH.Seated))
+      let n = e.mode === RIDE_MODE.Crash;
+      if ((this.observe(e, t), n || (this.limp = !1), e.mode === RIDE_MODE.Seated))
         return this.seat(e);
       (n && this.ragdoll && !this.limp && this.goLimp(e, this.ragdoll),
         (this.sinceRiding = n ? this.sinceRiding + t : 0),
         t > 0 && (this.lastDt = t),
-        (this.flutter.value = X(6, 26, e.speed)));
+        (this.flutter.value = smoothstep(6, 26, e.speed)));
       let r = this.body(e, t),
         i = this.placeBike(e, t);
-      if (e.mode === kH.Walk) return this.walkOff(e);
+      if (e.mode === RIDE_MODE.Walk) return this.walkOff(e);
       if (this.limp && this.ragdoll) return this.lie(e, this.ragdoll, t);
       this.ride(e, r, i, n);
     }
@@ -321,7 +321,7 @@ var NX = new qt(),
           t.clone().sub(this.before[n]).multiplyScalar(e).clampLength(0, 35),
         );
       } else {
-        if ((this.pose({ ...e, mode: kH.Ride }, 0), e.bx || e.by || e.bz)) {
+        if ((this.pose({ ...e, mode: RIDE_MODE.Ride }, 0), e.bx || e.by || e.bz)) {
           let t = FX.set(e.bx, e.by, e.bz).sub(this.joints[0]);
           for (let e of this.joints) e.add(t);
         }
@@ -336,7 +336,7 @@ var NX = new qt(),
     }
     placeBike(e, t) {
       let n = e.pedal
-          ? Math.sin(e.crank) * (0.04 + sZ * this.sprint) * Y(1 - e.speed / 18)
+          ? Math.sin(e.crank) * (0.04 + sZ * this.sprint) * clamp(1 - e.speed / 18)
           : 0,
         r = (e.compF + e.compR) / 2,
         i = this.bike.root,
@@ -346,9 +346,9 @@ var NX = new qt(),
           .set(e.x, e.y, e.z)
           .addScaledVector(IX.set(0, 1, 0).applyQuaternion(a), r),
         mU(
-          e.pitch + Math.atan2(e.compF - e.compR, J.wheelbase),
+          e.pitch + Math.atan2(e.compF - e.compR, PHYSICS.wheelbase),
           e.yaw,
-          e.roll + 0.08 * Y(AF(e.roll), -0.9, 0.9) + n,
+          e.roll + 0.08 * clamp(wrapAngle(e.roll), -0.9, 0.9) + n,
           i.quaternion,
         ),
         e.pedal > 0)
@@ -362,18 +362,18 @@ var NX = new qt(),
       }
       JX.copy(i.position);
       let o =
-        (e.style === CH.Tabletop ? XX : e.style === CH.Turndown ? ZX : 0) *
+        (e.style === TRICK.Tabletop ? XX : e.style === TRICK.Turndown ? ZX : 0) *
         e.styleSide *
         e.styled;
-      (e.mode === kH.Air &&
+      (e.mode === RIDE_MODE.Air &&
         Math.hypot(this.vel.x, this.vel.z) > 3 &&
-        (o += cZ * Math.sin(AF(e.yaw - MF(this.vel.x, this.vel.z)))),
+        (o += cZ * Math.sin(wrapAngle(e.yaw - headingFromXZ(this.vel.x, this.vel.z)))),
         o !== 0 &&
           (i.position.add(YX.copy($X).applyQuaternion(i.quaternion)),
           i.quaternion.multiply(LX.setFromAxisAngle(eZ, o)),
           i.position.sub(YX.copy($X).applyQuaternion(i.quaternion))));
       let s =
-        e.bars + (e.style === CH.Turndown ? QX * e.styleSide * e.styled : 0);
+        e.bars + (e.style === TRICK.Turndown ? QX * e.styleSide * e.styled : 0);
       return (AU(this.bike, e.steer, s, e.whip, e.spin, this.crankShown), a);
     }
     walkOff(e) {
@@ -402,7 +402,7 @@ var NX = new qt(),
         ((this.kneelYaw = Math.atan2(e.x, e.z)), (this.upT = 0));
       }
       this.upT >= 0 && (this.upT += n);
-      let r = this.upT < 0 ? 0 : X(0, uZ, this.upT);
+      let r = this.upT < 0 ? 0 : smoothstep(0, uZ, this.upT);
       (bX(this.rider, (e, n) =>
         r > 0
           ? t.at(e, n).lerp(EX(e, this.kneelAt, this.kneelYaw, qX), r)

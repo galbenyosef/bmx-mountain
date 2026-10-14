@@ -35,7 +35,7 @@ function zJ({ phiOf: e, edgeAt: t, point: n, normal: r }) {
       PJ(
         jJ,
         6,
-        (e, t, n) => IJ((t, n, r) => yG(...o((e / jJ) * DF, t), n, r))(t, n),
+        (e, t, n) => IJ((t, n, r) => yG(...o((e / jJ) * TAU, t), n, r))(t, n),
         { facing: `column`, wrapI: !0 },
       ),
     ),
@@ -51,8 +51,8 @@ function BJ() {
       jJ,
       16,
       (i, a, o) => {
-        let s = (i / jJ) * DF,
-          c = (a / 16) * DF,
+        let s = (i / jJ) * TAU,
+          c = (a / 16) * TAU,
           l = Math.cos(c),
           u = Math.sin(c),
           d = n + ((e.outer - e.inner) / 2) * Math.sign(l) * Math.abs(l) ** 0.6,
@@ -67,12 +67,12 @@ function BJ() {
       6,
       (n, r, i) => {
         let o = (r / 6) * a;
-        return t(o, (n / jJ) * DF, e.lens + e.bulge * (1 - (o / a) ** 2), i);
+        return t(o, (n / jJ) * TAU, e.lens + e.bulge * (1 - (o / a) ** 2), i);
       },
       { facing: (e, t, n, r) => r.subVectors(n, uG), wrapI: !0 },
     ),
     s = CG.width * EJ.from,
-    c = (e) => Math.PI + s + (e / 64) * (DF - 2 * s);
+    c = (e) => Math.PI + s + (e / 64) * (TAU - 2 * s);
   return {
     frame: i,
     lens: o,
@@ -162,20 +162,20 @@ function VJ() {
         .normalize(),
       c = new M().crossVectors(i, r).normalize();
     d.push(
-      new jo(0.0058, 14, 5, 0, DF, 0, Math.PI / 2)
+      new jo(0.0058, 14, 5, 0, TAU, 0, Math.PI / 2)
         .scale(1, 0.4, 1)
         .applyMatrix4(new N().makeBasis(i, r, c).setPosition(n)),
     );
   }
-  return { top: l, under: u, screws: tH(d) };
+  return { top: l, under: u, screws: mergeGeometry(d) };
 }
 function HJ() {
   let e = LJ(),
     { frame: t, lens: n, strap: r } = BJ(),
     { top: i, under: a, screws: o } = VJ();
   return {
-    paint: tH([RJ(e), r, i, a]),
-    rubber: tH(zJ(e)),
+    paint: mergeGeometry([RJ(e), r, i, a]),
+    rubber: mergeGeometry(zJ(e)),
     frame: t,
     lens: n,
     screws: o,
@@ -189,10 +189,10 @@ function GJ() {
       .translate(iJ.x, iJ.y, iJ.z + 0.015),
     t = new nS({ roughness: 0.4, metalness: 0.3 });
   return (
-    (t.colorNode = $(0.04, 0.04, 0.045)),
-    (t.emissiveNode = $(1, 0.93, 0.8)
+    (t.colorNode = tslVec3(0.04, 0.04, 0.045)),
+    (t.emissiveNode = tslVec3(1, 0.93, 0.8)
       .mul(rJ.mul(14))
-      .mul(Q(0.6, 0.95, YB.z.negate()))),
+      .mul(tslSmoothstep(0.6, 0.95, YB.z.negate()))),
     { geometry: e, material: t }
   );
 }
@@ -201,12 +201,12 @@ function KJ(e) {
     n = new Hn();
   return (
     n.add(
-      eH(t.paint, e.paint),
-      eH(t.rubber, e.rubber, !1),
-      eH(t.frame, e.goggles, !1),
-      eH(t.lens, e.lens, !1),
-      eH(t.screws, e.chrome, !1),
-      eH((WJ ??= GJ()).geometry, WJ.material, !1),
+      addMesh(t.paint, e.paint),
+      addMesh(t.rubber, e.rubber, !1),
+      addMesh(t.frame, e.goggles, !1),
+      addMesh(t.lens, e.lens, !1),
+      addMesh(t.screws, e.chrome, !1),
+      addMesh((WJ ??= GJ()).geometry, WJ.material, !1),
     ),
     n
   );
@@ -214,8 +214,8 @@ function KJ(e) {
 var qJ = 0.54,
   JJ = 0.19,
   YJ = 0.48000000000000004,
-  XJ = { upper: 0.29, fore: 0.25, thigh: 0.45, shin: 0.44 },
-  ZJ = XJ.upper + XJ.fore,
+  LIMB_LENGTHS = { upper: 0.29, fore: 0.25, thigh: 0.45, shin: 0.44 },
+  ZJ = LIMB_LENGTHS.upper + LIMB_LENGTHS.fore,
   QJ = { out: 0.1, drop: 0.03 },
   $J = 0.07,
   eY = 0.0165 + 0.0105,
@@ -253,10 +253,10 @@ function SY(e, t, n) {
   for (let a = 0; a < i; a++) {
     let o = t + (n - t) * (a / i),
       s = t + (n - t) * ((a + 1) / i);
-    (r.push($V(e[a], e[a + 1], o, s, 10)),
+    (r.push(makeTube(e[a], e[a + 1], o, s, 10)),
       r.push(new jo(s, 10, 6).translate(e[a + 1].x, e[a + 1].y, e[a + 1].z)));
   }
-  return tH(r);
+  return mergeGeometry(r);
 }
 function CY(e) {
   let t = [],
@@ -294,7 +294,7 @@ function CY(e) {
         .rotateX(Math.PI / 2 - 0.5)
         .translate(0, 0.045, 0.075),
     ));
-  let o = aH(tH(t));
+  let o = aH(mergeGeometry(t));
   if (e) {
     o.scale(-1, 1, 1);
     let e = o.index;
@@ -309,13 +309,13 @@ function wY(e) {
   let t = new Hn();
   return (
     t.add(
-      eH(
-        tH([
-          new jo(1, 18, 12, 0, DF, 0, Math.PI * 0.62)
+      addMesh(
+        mergeGeometry([
+          new jo(1, 18, 12, 0, TAU, 0, Math.PI * 0.62)
             .rotateX(Math.PI / 2)
             .scale(0.072, 0.11, 0.06)
             .translate(0, 0.045, 0.02),
-          new jo(1, 16, 12, 0, DF, 0, Math.PI * 0.55)
+          new jo(1, 16, 12, 0, TAU, 0, Math.PI * 0.55)
             .rotateX(Math.PI / 2)
             .scale(0.058, 0.14, 0.045)
             .translate(0, 0.2, 0.025),

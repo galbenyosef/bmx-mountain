@@ -2,42 +2,42 @@
 // Lines 58707-59033 of readable/assets/index-gCVK5XnX.pretty.js (statement-aligned).
 function Y$() {
   let e = new nS({ transparent: !0 }),
-    t = oB(`flow`, `vec4`),
-    n = oB(`dir`, `vec2`),
+    t = tslAttribute(`flow`, `vec4`),
+    n = tslAttribute(`dir`, `vec2`),
     r = t.z,
     i = t.w,
     a = SB(yW.div(W$)),
     o = SB(a.add(0.5)),
     s = (e, n, i = 0, a = 0) => {
-      let o = LV(
+      let o = tslVec2(
         t.y.add(i).mul(1.3),
         t.x.add(a).sub(e.mul(W$).mul(r)).mul(0.7),
       ).add(n);
-      return MU(o)
+      return valueNoise(o)
         .mul(0.55)
-        .add(MU(o.mul(LV(2.7, 2.2)).add(5.2)).mul(0.3))
-        .add(MU(o.mul(LV(6.1, 5.3)).add(9.7)).mul(0.15));
+        .add(valueNoise(o.mul(tslVec2(2.7, 2.2)).add(5.2)).mul(0.3))
+        .add(valueNoise(o.mul(tslVec2(6.1, 5.3)).add(9.7)).mul(0.15));
     },
     c = (e = 0, t = 0) =>
-      UB(s(a, 0, e, t), s(o, 17, e, t), a.sub(0.5).abs().mul(2)),
+      tslMix(s(a, 0, e, t), s(o, 17, e, t), a.sub(0.5).abs().mul(2)),
     l = c(),
     u = (e, n) =>
-      MU(LV(t.y.mul(4.5), t.x.sub(e.mul(W$).mul(r)).mul(0.8)).add(n)),
-    d = J$(l, UB(u(a, 3), u(o, 29), a.sub(0.5).abs().mul(2)), r, i),
-    f = UB($(0.07, 0.075, 0.05), $(0.012, 0.028, 0.026), Q(0, 0.7, i)),
+      valueNoise(tslVec2(t.y.mul(4.5), t.x.sub(e.mul(W$).mul(r)).mul(0.8)).add(n)),
+    d = J$(l, tslMix(u(a, 3), u(o, 29), a.sub(0.5).abs().mul(2)), r, i),
+    f = tslMix(tslVec3(0.07, 0.075, 0.05), tslVec3(0.012, 0.028, 0.026), tslSmoothstep(0, 0.7, i)),
     p = bB(i.mul(-4)).oneMinus().mul(0.55).add(0.45);
-  ((e.colorNode = RV(
-    UB(f, $(0.78, 0.82, 0.82), d),
-    VB(p, d.mul(0.9)).mul(Q(0, 0.03, i)),
+  ((e.colorNode = tslVec4(
+    tslMix(f, tslVec3(0.78, 0.82, 0.82), d),
+    tslMax(p, d.mul(0.9)).mul(tslSmoothstep(0, 0.03, i)),
   )),
-    (e.roughnessNode = UB(0.05, 0.55, d)));
+    (e.roughnessNode = tslMix(0.05, 0.55, d)));
   let m = 0.05,
-    h = UB(0.04, 0.12, Q(0.5, 4, r)).div(m),
+    h = tslMix(0.04, 0.12, tslSmoothstep(0.5, 4, r)).div(m),
     g = c(m, 0).sub(l).mul(h),
     _ = c(0, m).sub(l).mul(h);
   return (
     (e.normalNode = LU(
-      eV($(g.mul(n.y).sub(_.mul(n.x)), 1, _.mul(n.y).negate().sub(g.mul(n.x)))),
+      tslNormalize(tslVec3(g.mul(n.y).sub(_.mul(n.x)), 1, _.mul(n.y).negate().sub(g.mul(n.x)))),
     )),
     e
   );
@@ -52,20 +52,20 @@ var X$ = (e, t) => [...e.map((e) => -e).reverse(), 0, ...t],
       for (let i = 0; i < t.length; i += L$) {
         let a = Math.min(t.length, i + L$);
         this.group.add(
-          eH(this.channel(e, i, a), n, !1),
-          eH(this.water(e, i, a), r, !1),
+          addMesh(this.channel(e, i, a), n, !1),
+          addMesh(this.water(e, i, a), r, !1),
         );
       }
     }
     channel(e, t, n) {
       let r = e.creek,
         i = (z$.length + B$.length + V$.length) * 2 + 1,
-        a = Math.round((n - t) / dI) + 1,
+        a = Math.round((n - t) / SAMPLE_STEP) + 1,
         o = new Float32Array(a * i * 3),
         s = new Float32Array(a * i),
         c = new Uint8Array(a * i);
       for (let l = 0; l < a; l++) {
-        let a = Math.min(n, t + l * dI);
+        let a = Math.min(n, t + l * SAMPLE_STEP);
         r.pointAt(a, K$);
         let u = (e) => {
             let t = r.halfWidth(a, e),
@@ -121,8 +121,8 @@ var X$ = (e, t) => [...e.map((e) => -e).reverse(), 0, ...t],
             g = K$.x - K$.tz * n,
             _ = K$.z + K$.tx * n,
             v = e.baseHeight(g, _),
-            y = OF(u, v + tL, d),
-            b = OF(u - v, tL * Y((p - Math.abs(n)) / (p * 0.4)) - 0.01, d),
+            y = lerp(u, v + tL, d),
+            b = lerp(u - v, tL * clamp((p - Math.abs(n)) / (p * 0.4)) - 0.01, d),
             x =
               d > 0
                 ? Math.max(
@@ -131,7 +131,7 @@ var X$ = (e, t) => [...e.map((e) => -e).reverse(), 0, ...t],
                   ) / 0.5
                 : 0;
           (o.set([g, y, _], h * 3),
-            s.set([a, n, OF(f, 0.4 + 6 * Math.sqrt(x), d), b], h * 4),
+            s.set([a, n, lerp(f, 0.4 + 6 * Math.sqrt(x), d), b], h * 4),
             c.set([K$.tx, K$.tz], h * 2));
         }
       }
@@ -142,7 +142,7 @@ var X$ = (e, t) => [...e.map((e) => -e).reverse(), 0, ...t],
     }
   },
   Q$ = 160,
-  $$ = 0.65,
+  DEER_CHANCE = 0.65,
   e1 = 25,
   t1 = 110,
   n1 = 0.35,
@@ -218,7 +218,7 @@ var X$ = (e, t) => [...e.map((e) => -e).reverse(), 0, ...t],
         this.place(a, r.site, 0);
         let c = (e) => {
           let t = Math.hypot(e.x - a.x, e.z - a.z);
-          t >= o || ((o = t), (s = MF(e.x - a.x, e.z - a.z)));
+          t >= o || ((o = t), (s = headingFromXZ(e.x - a.x, e.z - a.z)));
         };
         t && c(t);
         for (let e of n) c(e);
@@ -233,18 +233,18 @@ var X$ = (e, t) => [...e.map((e) => -e).reverse(), 0, ...t],
     visitAt(e) {
       return this.visit?.slot === e
         ? this.visit
-        : e < 1 || !this.sites.length || UF(e * 7 + 1) > $$
+        : e < 1 || !this.sites.length || hash01(e * 7 + 1) > DEER_CHANCE
           ? null
           : {
               slot: e,
-              site: this.sites[Math.floor(UF(e * 7 + 2) * this.sites.length)],
-              from: e * Q$ + UF(e * 7 + 3) * e1,
-              fawn: UF(e * 7 + 4) < n1,
-              seed: UF(e * 7 + 5),
+              site: this.sites[Math.floor(hash01(e * 7 + 2) * this.sites.length)],
+              from: e * Q$ + hash01(e * 7 + 3) * e1,
+              fawn: hash01(e * 7 + 4) < n1,
+              seed: hash01(e * 7 + 5),
             };
     }
     pose(e, t, n, r, i, a, o) {
-      let s = X(0, u1, r),
+      let s = smoothstep(0, u1, r),
         c = 0,
         l = 0,
         u = 1;
@@ -253,10 +253,10 @@ var X$ = (e, t) => [...e.map((e) => -e).reverse(), 0, ...t],
         ((l = 1 - Math.exp(-t / c1)),
           (c = this.boltFrom + s1 * (t - c1 * l)),
           (e.gallop = 1),
-          (u = 1 - X(5, d1, t)));
+          (u = 1 - smoothstep(5, d1, t)));
       } else if (r > t1) {
         let e = r - t1;
-        ((c = l1 * e), (l = X(0, 1, e)), (u = 1 - X(8.5, f1, e)));
+        ((c = l1 * e), (l = smoothstep(0, 1, e)), (u = 1 - smoothstep(8.5, f1, e)));
       }
       let d = a * (l > 0 ? 2.2 : 1.2);
       (this.place(e, t.site, Math.max(0, c - d), a * 1.2),
@@ -271,15 +271,15 @@ var X$ = (e, t) => [...e.map((e) => -e).reverse(), 0, ...t],
       let o = 8 + t * 5,
         s = Math.floor(n / o + t),
         c = n / o + t - s,
-        l = 0.18 + 0.25 * UF(s * 13 + 1),
+        l = 0.18 + 0.25 * hash01(s * 13 + 1),
         u = 1 - i;
-      ((e.graze = X(0.02, 0.1, c) * (1 - X(1 - l - 0.06, 1 - l, c)) * u),
-        (e.look = (UF(s * 13 + 2) - 0.5) * 1.2 * (1 - e.graze)),
+      ((e.graze = smoothstep(0.02, 0.1, c) * (1 - smoothstep(1 - l - 0.06, 1 - l, c)) * u),
+        (e.look = (hash01(s * 13 + 2) - 0.5) * 1.2 * (1 - e.graze)),
         (e.alert =
-          this.alertAt >= 0 ? X(0, 0.3, r - this.alertAt) * (1 - i) : 0),
+          this.alertAt >= 0 ? smoothstep(0, 0.3, r - this.alertAt) * (1 - i) : 0),
         e.alert > 0 &&
           ((e.graze *= 1 - e.alert),
-          (e.look += (Y(AF(a - e.yaw), -1.2, 1.2) - e.look) * e.alert)),
+          (e.look += (clamp(wrapAngle(a - e.yaw), -1.2, 1.2) - e.look) * e.alert)),
         (e.earL = k1(n * 1.7 + t * 19, 3)),
         (e.earR = k1(n * 1.5 + t * 31, 5)),
         (e.tail =
@@ -288,14 +288,14 @@ var X$ = (e, t) => [...e.map((e) => -e).reverse(), 0, ...t],
             : 0.25 * Math.max(0, k1(n * 2.1 + t * 7, 11))));
     }
     place(e, t, n, r = 0) {
-      (A1(t, n, D1), (e.yaw = n > 0 ? MF(D1.dx, D1.dz) : t.yaw));
+      (A1(t, n, D1), (e.yaw = n > 0 ? headingFromXZ(D1.dx, D1.dz) : t.yaw));
       let i = -Math.sin(e.yaw),
         a = -Math.cos(e.yaw);
       ((e.x = D1.x - a * r), (e.z = D1.z + i * r));
       let o = (e, t) => this.terrain.height(e, t);
-      ((e.open = X(-3, S1, t.open - n)),
+      ((e.open = smoothstep(-3, S1, t.open - n)),
         (e.y = o(e.x, e.z)),
-        (e.pitch = Y(
+        (e.pitch = clamp(
           0.7 *
             Math.atan2(
               o(e.x + i * 0.5, e.z + a * 0.5) - o(e.x - i * 0.5, e.z - a * 0.5),
@@ -308,11 +308,11 @@ var X$ = (e, t) => [...e.map((e) => -e).reverse(), 0, ...t],
   };
 function k1(e, t) {
   let n = Math.floor(e);
-  return UF(n * 17 + t) > 0.14
+  return hash01(n * 17 + t) > 0.14
     ? 0
-    : Math.sin((e - n) * DF) *
-        (UF(n * 17 + t + 1) < 0.5 ? -1 : 1) *
-        X(0, 0.15, e - n);
+    : Math.sin((e - n) * TAU) *
+        (hash01(n * 17 + t + 1) < 0.5 ? -1 : 1) *
+        smoothstep(0, 0.15, e - n);
 }
 function A1(e, t, n) {
   let r = e.route,

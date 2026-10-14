@@ -11,8 +11,8 @@ var p6 = class {
       n = [];
     for (let t of e.towers) n.push(...this.tower(t.x, t.y, t.z, t.y + t.h));
     for (let e of [!1, !0]) n.push(...this.station(e));
-    let r = eH(tH(n, _H), t),
-      i = eH(tH([this.cable(tR), this.cable(-tR)], _H), t, !1);
+    let r = addMesh(mergeGeometry(n, _H), t),
+      i = addMesh(mergeGeometry([this.cable(tR), this.cable(-tR)], _H), t, !1);
     ((this.chairs = new Yi(this.chair(), t, e.chairs)),
       (this.chairs.castShadow = this.chairs.receiveShadow = !0),
       (this.chairs.frustumCulled = !1));
@@ -120,16 +120,16 @@ var p6 = class {
     let f = e ? t.length - t.unloadD : t.loadD;
     (s.push(u6(o, a * tR, i, f, 4.2, 0.08, 8, `deck`)),
       s.push(u6(o, a * tR, i + 0.045, f, 3.6, 0.02, 0.12, `line`)));
-    let p = a * rR.v;
+    let p = a * STATION.v;
     (s.push(
       u6(
         o,
         p,
-        i + rR.high / 2 - 0.2,
-        rR.a,
-        rR.across,
-        rR.high + 0.4,
-        rR.along,
+        i + STATION.high / 2 - 0.2,
+        STATION.a,
+        STATION.across,
+        STATION.high + 0.4,
+        STATION.along,
         `wood`,
       ),
     ),
@@ -137,23 +137,23 @@ var p6 = class {
         u6(
           o,
           p,
-          i + rR.high + 0.12,
-          rR.a,
-          rR.across + 0.5,
+          i + STATION.high + 0.12,
+          STATION.a,
+          STATION.across + 0.5,
           0.25,
-          rR.along + 0.5,
+          STATION.along + 0.5,
           `roof`,
         ),
       ),
       s.push(
         u6(
           o,
-          a * (rR.v - Math.sign(rR.v) * (rR.across / 2 + 0.01)),
+          a * (STATION.v - Math.sign(STATION.v) * (STATION.across / 2 + 0.01)),
           i + 1.6,
-          rR.a,
+          STATION.a,
           0.04,
           0.9,
-          rR.along * 0.7,
+          STATION.along * 0.7,
           `glass`,
         ),
       ));
@@ -163,8 +163,8 @@ var p6 = class {
           o,
           p,
           i + 1.6,
-          rR.a + e * (rR.along / 2 + 0.01),
-          rR.across * 0.6,
+          STATION.a + e * (STATION.along / 2 + 0.01),
+          STATION.across * 0.6,
           0.9,
           0.04,
           `glass`,
@@ -257,14 +257,14 @@ var p6 = class {
       ),
         a.push(u6(e, o, n + 0.93, 0.56, 0.05, 0.12, 0.05, `darkSteel`)));
     }
-    return tH(a, _H);
+    return mergeGeometry(a, _H);
   }
 };
 function m6(e, t, n) {
   let r = g$(e, t),
     i = new nS({ roughness: n });
   return (
-    (i.colorNode = r.colour.mul(oB(`color`, `vec3`))),
+    (i.colorNode = r.colour.mul(tslAttribute(`color`, `vec3`))),
     (i.normalNode = r.normal),
     i
   );
@@ -332,8 +332,8 @@ var w6 = class {
       );
     }
   },
-  T6 = 7,
-  E6 = (fR - dR) / T6,
+  LODGE_HALF = 7,
+  E6 = (fR - dR) / LODGE_HALF,
   D6 = 0.9,
   O6 = 0.31,
   k6 = 0.85,

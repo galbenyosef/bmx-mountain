@@ -10,8 +10,8 @@ var T8 = class {
     this.terrain = e;
     for (let e = 0; e < _8; e++)
       for (let t = 0; t < _8; t++) {
-        let n = -ZF + (t + 0.5) * g8 * 2,
-          r = -ZF + (e + 0.5) * g8 * 2;
+        let n = -WORLD_HALF + (t + 0.5) * g8 * 2,
+          r = -WORLD_HALF + (e + 0.5) * g8 * 2;
         this.tiles.push({
           i: t,
           j: e,
@@ -29,7 +29,7 @@ var T8 = class {
     let r = x8[n],
       i = {
         group: new Hn(),
-        mesh: eH(new Xr(), this.material, !1),
+        mesh: addMesh(new Xr(), this.material, !1),
         i: e,
         j: t,
         size: r,
@@ -113,12 +113,12 @@ var T8 = class {
       c = new Float32Array(s * 3),
       l = new Float32Array(s * 3),
       u = (e, t, n, r) => {
-        let a = n * oz + t;
+        let a = n * GRID_N + t;
         ((c[e * 3] = sz(t)), (c[e * 3 + 1] = i[a] - r), (c[e * 3 + 2] = sz(n)));
-        let o = i[n * oz + Math.max(0, t - 1)],
-          s = i[n * oz + Math.min(oz - 1, t + 1)],
-          u = i[Math.max(0, n - 1) * oz + t],
-          d = i[Math.min(oz - 1, n + 1) * oz + t],
+        let o = i[n * GRID_N + Math.max(0, t - 1)],
+          s = i[n * GRID_N + Math.min(GRID_N - 1, t + 1)],
+          u = i[Math.max(0, n - 1) * GRID_N + t],
+          d = i[Math.min(GRID_N - 1, n + 1) * GRID_N + t],
           f = o - s,
           p = u - d,
           m = Math.hypot(f, 4, p);
@@ -180,19 +180,19 @@ var O8 = 128,
   I8 = new M();
 function L8() {
   let e = new nS({ roughness: 0.8, flatShading: !0 }),
-    t = oB(`pebble`, `vec4`),
-    n = oB(`look`, `vec4`);
+    t = tslAttribute(`pebble`, `vec4`),
+    n = tslAttribute(`look`, `vec4`);
   return (
-    (e.positionNode = gV(sV.mul($(1, 0.6, 0.85)).mul(t.w), n.xyz).add(t.xyz)),
-    (e.colorNode = $(0.46, 0.43, 0.38).mul(n.w)),
+    (e.positionNode = gV(sV.mul(tslVec3(1, 0.6, 0.85)).mul(t.w), n.xyz).add(t.xyz)),
+    (e.colorNode = tslVec3(0.46, 0.43, 0.38).mul(n.w)),
     e
   );
 }
 function R8() {
   let e = new nS({ roughness: 0.85 }),
-    t = g$(`bark_pine`, FV().mul(LV(1, 0.35)));
+    t = g$(`bark_pine`, tslUv().mul(tslVec2(1, 0.35)));
   return (
-    (e.colorNode = t.colour.mul($(0.95, 0.85, 0.75)).add(0.04)),
+    (e.colorNode = t.colour.mul(tslVec3(0.95, 0.85, 0.75)).add(0.04)),
     (e.normalNode = t.normal),
     e
   );
@@ -203,13 +203,13 @@ var z8 = class {
     let t = L8(),
       n = R8(),
       r = e.trail,
-      i = HF(29),
+      i = makeRng(29),
       a = new Do(1, 0);
     for (let o = 0; o < r.length; o += O8) {
       let s = Math.min(r.length, o + O8);
-      this.group.add(eH(this.pebbles(e, a, o, s, i), t, !1));
+      this.group.add(addMesh(this.pebbles(e, a, o, s, i), t, !1));
       let c = this.roots(e, o, s, i);
-      c && this.group.add(eH(c, n, !1));
+      c && this.group.add(addMesh(c, n, !1));
     }
   }
   pebbles(e, t, n, r, i) {
@@ -222,9 +222,9 @@ var z8 = class {
     for (let t = 0; t < o; t++) {
       let t = n + i() * (r - n),
         o = i() < 0.5 ? -1 : 1,
-        d = i() < 0.7 ? xI - 0.6 + i() * 1.2 : xI + i() * (SI - xI - 0.5),
-        f = OF(A8[0], A8[1], i() ** 2),
-        p = [i() * DF, i() * DF, i() * DF],
+        d = i() < 0.7 ? TRAIL_HALF_WIDTH - 0.6 + i() * 1.2 : TRAIL_HALF_WIDTH + i() * (TRAIL_FADE - TRAIL_HALF_WIDTH - 0.5),
+        f = lerp(A8[0], A8[1], i() ** 2),
+        p = [i() * TAU, i() * TAU, i() * TAU],
         m = 0.75 + i() * 0.5;
       if (a.featureAt(t) > 0.05) continue;
       a.pointAt(t, F8, o * d);
@@ -250,14 +250,14 @@ var z8 = class {
       a = [];
     for (let o = t + r() * j8; o < n; o += j8 + r() * 8) {
       let t = r() < 0.5 ? -1 : 1,
-        n = xI + 0.6 + r() * 1.8,
+        n = TRAIL_HALF_WIDTH + 0.6 + r() * 1.8,
         s = r() * 2.2,
         c = (r() - 0.5) * 4,
-        l = r() * DF,
+        l = r() * TAU,
         u = 0.7 + r() * 0.6;
       if (
         (i.pointAt(o, F8, t * n),
-        e.cover[(cz(F8.z) * oz + cz(F8.x)) * 4 + 1] < 140 ||
+        e.cover[(cz(F8.z) * GRID_N + cz(F8.x)) * 4 + 1] < 140 ||
           i.featureOf(o) ||
           i.featureOf(o + c) ||
           Math.abs(i.bankAt(o)) > 0.12)
@@ -266,16 +266,16 @@ var z8 = class {
       let d = [];
       for (let r = 0; r <= N8; r++) {
         let a = r / N8,
-          f = t * OF(n, s, a) + Math.sin(a * 6 + l) * 0.22,
+          f = t * lerp(n, s, a) + Math.sin(a * 6 + l) * 0.22,
           p = o + c * a + Math.sin(a * 4.3 + l * 2) * 0.35;
         i.pointAt(p, F8, f);
         let { x: m, z: h } = F8,
-          g = OF(M8[0], M8[1], a) * u * (1 - Math.sin(Math.PI * a)) * 0.9;
+          g = lerp(M8[0], M8[1], a) * u * (1 - Math.sin(Math.PI * a)) * 0.9;
         d.push(new M(m, e.baseHeight(m, h) - g, h));
       }
-      a.push(B8(d, (e) => OF(M8[0], M8[1], e) * u));
+      a.push(B8(d, (e) => lerp(M8[0], M8[1], e) * u));
     }
-    return a.length ? tH(a) : null;
+    return a.length ? mergeGeometry(a) : null;
   }
 };
 function B8(e, t) {
@@ -295,7 +295,7 @@ function B8(e, t) {
       s.crossVectors(o, a));
     let u = t(l / (n - 1));
     for (let t = 0; t <= P8; t++) {
-      let n = (t / P8) * DF,
+      let n = (t / P8) * TAU,
         a = Math.cos(n),
         d = Math.sin(n),
         f = l * 7 + t;
@@ -323,11 +323,11 @@ function B8(e, t) {
   );
 }
 var V8 = [
-    -SI,
+    -TRAIL_FADE,
     -5.2,
     -4.3,
     -3.55,
-    -xI,
+    -TRAIL_HALF_WIDTH,
     -2.3,
     -1.6,
     -0.8,
@@ -335,11 +335,11 @@ var V8 = [
     0.8,
     1.6,
     2.3,
-    xI,
+    TRAIL_HALF_WIDTH,
     3.55,
     4.3,
     5.2,
-    SI,
+    TRAIL_FADE,
   ],
   H8 = 0.25,
   U8 = 256,

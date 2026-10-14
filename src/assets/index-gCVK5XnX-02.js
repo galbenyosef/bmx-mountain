@@ -15,14 +15,14 @@ function BF(e, t, n) {
 }
 async function VF(e, t) {
   let n =
-    typeof Worker > `u` ? 1 : Y((navigator.hardwareConcurrency || 4) - 1, 2, 8);
+    typeof Worker > `u` ? 1 : clamp((navigator.hardwareConcurrency || 4) - 1, 2, 8);
   await Promise.all(
     Array.from({ length: n }, (r, i) =>
       t(Math.floor((i * e) / n), Math.floor(((i + 1) * e) / n)),
     ),
   );
 }
-function HF(e) {
+function makeRng(e) {
   let t = e >>> 0;
   return () => {
     t = (t + 1831565813) >>> 0;
@@ -34,7 +34,7 @@ function HF(e) {
     );
   };
 }
-function UF(e) {
+function hash01(e) {
   let t = Math.imul(e | 0, 2654435761) ^ 1540483477;
   return (
     (t ^= t >>> 15),
@@ -43,15 +43,15 @@ function UF(e) {
     (t >>> 0) / 4294967296
   );
 }
-var WF = (e) => (Math.random() - 0.5) * e;
-function GF(e) {
+var randSpread = (e) => (Math.random() - 0.5) * e;
+function hashString(e) {
   let t = 2166136261;
   for (let n = 0; n < e.length; n++)
     t = Math.imul(t ^ e.charCodeAt(n), 16777619);
   return t >>> 0;
 }
 function KF(e) {
-  let t = GF(e);
+  let t = hashString(e);
   return (
     (t ^= t >>> 16),
     (t = Math.imul(t, 2246822507)),
@@ -65,7 +65,7 @@ var qF = 0.5 * (Math.sqrt(3) - 1),
   XF = class {
     perm = new Uint8Array(512);
     constructor(e) {
-      let t = HF(e),
+      let t = makeRng(e),
         n = new Uint8Array(256);
       for (let e = 0; e < 256; e++) n[e] = e;
       for (let e = 255; e > 0; e--) {
@@ -139,7 +139,7 @@ var qF = 0.5 * (Math.sqrt(3) - 1),
       return r / o;
     }
   },
-  ZF = 1024,
+  WORLD_HALF = 1024,
   QF = { x: -40, z: -860, h: 680 },
   $F = 12,
   eI = 395,
@@ -147,7 +147,7 @@ var qF = 0.5 * (Math.sqrt(3) - 1),
   nI = new XF(19),
   rI = new XF(41);
 function iI(e, t, n) {
-  let r = Y(0.5 + (0.5 * (t - e)) / n);
+  let r = clamp(0.5 + (0.5 * (t - e)) / n);
   return t * r + e * (1 - r) + n * r * (1 - r) * 0.5;
 }
 function aI(e, t) {
@@ -158,17 +158,17 @@ function aI(e, t) {
     o =
       tI.fbm(Math.cos(i) * 1.7 + 11, Math.sin(i) * 1.7 - 4, 3) *
       60 *
-      X(60, 400, a),
+      smoothstep(60, 400, a),
     s = Math.max(0, a + o);
   return (
-    360 * Y(1 - s / 2100) ** 1.15 -
-    100 * Y((s - 430) / 1070) ** 1.2 +
-    (QF.h - 360) * Y(1 - s / 900) ** 1.8
+    360 * clamp(1 - s / 2100) ** 1.15 -
+    100 * clamp((s - 430) / 1070) ** 1.2 +
+    (QF.h - 360) * clamp(1 - s / 900) ** 1.8
   );
 }
 function oI(e, t, n) {
   if (n <= 0) return 0;
-  let r = 0.5 + 0.5 * X(3e3, -5e3, t),
+  let r = 0.5 + 0.5 * smoothstep(3e3, -5e3, t),
     i = e + rI.fbm(e / 9e3 + 5, t / 9e3, 3) * 2500,
     a = t + rI.fbm(e / 9e3, t / 9e3 + 9, 3) * 2500,
     o = 0.5 + 0.5 * rI.fbm(i / 11e3, a / 11e3, 3),
@@ -187,19 +187,19 @@ function cI(e, t, n, r) {
 }
 function lI(e) {
   let t = eI - e;
-  return t > 0 ? e - 0.25 * t * X(0, 40, t) : e;
+  return t > 0 ? e - 0.25 * t * smoothstep(0, 40, t) : e;
 }
 function uI(e, t) {
   let n = aI(e, t),
-    r = X(500, 1500, Math.abs(e - 80));
+    r = smoothstep(500, 1500, Math.abs(e - 80));
   n = iI(n, sI(e, t, r), 1 + 120 * r);
   let i = Math.hypot(e, t * 0.85),
-    a = X(1800, 5200, i) * (1 - X(16e3, 24e3, i));
+    a = smoothstep(1800, 5200, i) * (1 - smoothstep(16e3, 24e3, i));
   n = iI(n, oI(e, t, a), 1 + 300 * a);
   let o = $F + Math.max(0, -t) * 0.02 + Math.max(0, t - 1100) * 0.01;
   n = iI(n, o, 30);
-  let s = X(0, 400, n),
-    c = 6 + 8 * s + 40 * X(300, 560, n);
+  let s = smoothstep(0, 400, n),
+    c = 6 + 8 * s + 40 * smoothstep(300, 560, n);
   return (
     (n = lI(n)),
     (n += tI.fbm(e / 260, t / 260, 4) * c),
@@ -207,7 +207,7 @@ function uI(e, t) {
     n
   );
 }
-var dI = 0.5;
+var SAMPLE_STEP = 0.5;
 function fI(e, t, n, r = 1, i = !0) {
   let a = e.length,
     o = [];
@@ -255,7 +255,7 @@ function hI(e, t) {
       u = Math.hypot(c - o, l - s);
     for (; i <= r + u;) {
       let e = u > 0 ? (i - r) / u : 0;
-      (n.push([OF(o, c, e), OF(s, l, e)]), (i += t));
+      (n.push([lerp(o, c, e), lerp(s, l, e)]), (i += t));
     }
     r += u;
   }
@@ -278,8 +278,8 @@ function gI(e, t) {
       n.push(mI(i[e - 1], i[e], i[e + 1], i[e + 2], r / t));
   }
   n.push(e[r]);
-  let a = hI(n, dI),
-    o = Math.round(t / dI);
+  let a = hI(n, SAMPLE_STEP),
+    o = Math.round(t / SAMPLE_STEP);
   if (o > 0) {
     let e = (e) =>
         fI(
@@ -291,7 +291,7 @@ function gI(e, t) {
       n = e(1);
     a = hI(
       Array.from(t, (e, t) => [e, n[t]]),
-      dI,
+      SAMPLE_STEP,
     );
   }
   let s = a.map(([e, t]) => ({ x: e, z: t, tx: 0, tz: 0, k: 0 })),
@@ -308,7 +308,7 @@ function gI(e, t) {
       n = s[e + 6],
       r = t.tx * n.tz - t.tz * n.tx,
       i = t.tx * n.tx + t.tz * n.tz;
-    l[e] = Math.atan2(r, i) / (12 * dI);
+    l[e] = Math.atan2(r, i) / (12 * SAMPLE_STEP);
   }
   let u = fI(l, 8, 16, 1, !1);
   for (let e = 0; e < c; e++) s[e].k = u[e];

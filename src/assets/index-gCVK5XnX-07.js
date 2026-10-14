@@ -22,7 +22,7 @@ var RL = 5.6,
   ],
   tR = RL / 2,
   nR = Math.PI * tR,
-  rR = { a: -2, v: -8.2, along: 3.2, across: 2.4, high: 2.7 },
+  STATION = { a: -2, v: -8.2, along: 3.2, across: 2.4, high: 2.7 },
   iR = { back: -4.2, front: 14.5, above: 0.35, tall: 1.5 },
   aR = 0.25,
   oR = 0.02,
@@ -89,7 +89,7 @@ var RL = 5.6,
         i = n < this.length / 2,
         a = i ? n : this.length - n,
         o = Math.max(-QL.back - a, a - QL.front, -QL.left - r, r - QL.right, 0);
-      return { w: 1 - X(0, QL.blend, o), top: !i };
+      return { w: 1 - smoothstep(0, QL.blend, o), top: !i };
     }
     clearance(e, t) {
       let { u: n, v: r } = this.local(e, t),
@@ -104,7 +104,7 @@ var RL = 5.6,
         x: e.x,
         y: this.bottomY - zL - BL,
         z: e.z,
-        yaw: MF(this.dx, this.dz),
+        yaw: headingFromXZ(this.dx, this.dz),
       };
     }
     stationAt(e, t, n, r) {
@@ -133,8 +133,8 @@ var RL = 5.6,
           (this.stationAt(r, a.a, a.v, n),
             t.push(e(n.x, n.z, n.y, 0.42, i + iR.above + iR.tall)));
         for (let i of [-0.8, 0.8])
-          (this.stationAt(r, rR.a + i, rR.v, n),
-            t.push(e(n.x, n.z, n.y, 1.35, n.y + rR.high)));
+          (this.stationAt(r, STATION.a + i, STATION.v, n),
+            t.push(e(n.x, n.z, n.y, 1.35, n.y + STATION.high)));
       }
       return t;
     }
@@ -228,16 +228,16 @@ var RL = 5.6,
     }
     chairD(e, t) {
       let n = this.period,
-        r = kF(t + (e * n) / this.chairs, n);
+        r = wrap(t + (e * n) / this.chairs, n);
       return yI(this.dAt, r / oR);
     }
     nextChair(e, t) {
       let [n, r, i] = this.due(e, t);
-      return { chair: kF(-r, this.chairs), at: n + r * i };
+      return { chair: wrap(-r, this.chairs), at: n + r * i };
     }
     arrival(e, t, n) {
       let [r, i, a] = this.due(t, n);
-      return r + (i + kF(-e - i, this.chairs)) * a;
+      return r + (i + wrap(-e - i, this.chairs)) * a;
     }
     due(e, t) {
       let n = this.period / this.chairs,
@@ -283,14 +283,14 @@ var RL = 5.6,
           l = s - a,
           u = l > 0 ? (n - a) / l : 0,
           d = n > 14 && n < e - 14;
-        this.profile[i] = OF(o, c, u) - (d ? JL * l * 4 * u * (1 - u) : 0);
+        this.profile[i] = lerp(o, c, u) - (d ? JL * l * 4 * u * (1 - u) : 0);
       }
     }
     speedAt(e) {
       let t = this.length;
       if ((e >= t && e < t + nR) || e >= 2 * t + nR) return HL;
       let n = e < t ? e : 2 * t + nR - e;
-      return OF(HL, VL, X(14, 26, n) * X(14, 26, t - n));
+      return lerp(HL, VL, smoothstep(14, 26, n) * smoothstep(14, 26, t - n));
     }
     time() {
       let e = Math.ceil(this.loop / aR) + 1;
@@ -348,7 +348,7 @@ var RL = 5.6,
         (t.x = sR.x),
         (t.y = s),
         (t.z = sR.z),
-        (t.yaw = MF(a, o)),
+        (t.yaw = headingFromXZ(a, o)),
         t
       );
     }

@@ -9,7 +9,7 @@ function e6({ patch: e, spacing: t, seed: n }) {
   for (let e = 0; e < 100; e++) s.set([1 / 0, -1 / 0, 1 / 0, -1 / 0], e * 4);
   let c = new Uint8Array(100),
     l = new Uint16Array(100),
-    u = HF(n * 31 + 7);
+    u = makeRng(n * 31 + 7);
   for (let e = 0; e < r; e++)
     for (let n = 0; n < r; n++) {
       let i = [(n + u()) * t, (e + u()) * t, u(), u()],
@@ -29,29 +29,29 @@ function e6({ patch: e, spacing: t, seed: n }) {
   return { per: a, table: _$(o, a, 100, i, E, _), boxes: s, anywhere: c };
 }
 function t6(e, t) {
-  let n = t.add(ZF).div(2),
-    r = xB(n).clamp(LV(0), LV(oz - 2)),
+  let n = t.add(WORLD_HALF).div(2),
+    r = xB(n).clamp(tslVec2(0), tslVec2(GRID_N - 2)),
     i = SB(n),
-    a = (t, n) => OV(e, jB(r.add(LV(t, n)))).r;
-  return UB(UB(a(0, 0), a(1, 0), i.x), UB(a(0, 1), a(1, 1), i.x), i.y);
+    a = (t, n) => OV(e, jB(r.add(tslVec2(t, n)))).r;
+  return tslMix(tslMix(a(0, 0), a(1, 0), i.x), tslMix(a(0, 1), a(1, 1), i.x), i.y);
 }
 function n6(e, t, n, r) {
-  let i = CV(yB(e, LV(0.09, 0.05)).sub(yW.mul(1.7)))
+  let i = tslSin(tslDot(e, tslVec2(0.09, 0.05)).sub(yW.mul(1.7)))
       .mul(0.5)
       .add(0.5),
-    a = MU(e.mul(0.04).sub(LV(yW.mul(0.35), yW.mul(0.12))))
+    a = valueNoise(e.mul(0.04).sub(tslVec2(yW.mul(0.35), yW.mul(0.12))))
       .mul(0.75)
       .add(0.25)
       .mul(i.mul(0.5).add(0.5));
   return {
-    x: n.mul(r).mul(a.mul(0.35).add(CV(yW.mul(3.1).add(t.mul(40))).mul(0.06))),
+    x: n.mul(r).mul(a.mul(0.35).add(tslSin(yW.mul(3.1).add(t.mul(40))).mul(0.06))),
     z: n.mul(r).mul(a).mul(0.18),
   };
 }
-var r6 = (e) => Math.floor(Y(Math.floor((e + ZF) / 2), 0, oz - 2) / q3),
+var r6 = (e) => Math.floor(clamp(Math.floor((e + WORLD_HALF) / 2), 0, GRID_N - 2) / q3),
   i6 = class {
     meshes = [];
-    cam = MV(new M());
+    cam = tslUniform(new M());
     tiled = [];
     low;
     high;
@@ -62,23 +62,23 @@ var r6 = (e) => Math.floor(Y(Math.floor((e + ZF) / 2), 0, oz - 2) / q3),
       `vec4`,
     );
     pressed = 0;
-    pressBox = MV(new pn(1 / 0, 1 / 0, -1 / 0, -1 / 0));
+    pressBox = tslUniform(new pn(1 / 0, 1 / 0, -1 / 0, -1 / 0));
     constructor(e, t) {
       let n = C$(e),
         r = v$(e.grass, s, ee),
-        i = (this.blocks = Math.ceil((oz - 1) / q3));
+        i = (this.blocks = Math.ceil((GRID_N - 1) / q3));
       ((this.low = new Float32Array(i * i).fill(1 / 0)),
         (this.high = new Float32Array(i * i).fill(-1 / 0)),
         (this.green = new Uint8Array(i * i)));
       for (let t = 0; t < i; t++)
         for (let n = 0; n < i; n++) {
           let r = t * i + n;
-          for (let i = t * q3; i <= Math.min(t * q3 + q3, oz - 1); i++)
-            for (let t = n * q3; t <= Math.min(n * q3 + q3, oz - 1); t++) {
-              let n = e.h[i * oz + t];
+          for (let i = t * q3; i <= Math.min(t * q3 + q3, GRID_N - 1); i++)
+            for (let t = n * q3; t <= Math.min(n * q3 + q3, GRID_N - 1); t++) {
+              let n = e.h[i * GRID_N + t];
               ((this.low[r] = Math.min(this.low[r], n)),
                 (this.high[r] = Math.max(this.high[r], n)),
-                (this.green[r] = Math.max(this.green[r], e.grass[i * oz + t])));
+                (this.green[r] = Math.max(this.green[r], e.grass[i * GRID_N + t])));
             }
         }
       let a = 0;
@@ -164,16 +164,16 @@ var r6 = (e) => Math.floor(Y(Math.floor((e + ZF) / 2), 0, oz - 2) / q3),
           );
     }
     pushed(e) {
-      let t = LV(0);
+      let t = tslVec2(0);
       for (let n = 0; n < U3; n++) {
         let r = this.presses.element(n),
           i = e.sub(r.xy),
-          a = MB(i),
-          o = VB(yW.sub(r.z), 0),
+          a = tslLength(i),
+          o = tslMax(yW.sub(r.z), 0),
           s = bB(o.mul(-3.5)).mul(hB(o.mul(7)));
-        t = t.add(i.div(VB(a, 0.001)).mul(Q(W3, 0.2, a).mul(s).mul(r.w)));
+        t = t.add(i.div(tslMax(a, 0.001)).mul(tslSmoothstep(W3, 0.2, a).mul(s).mul(r.w)));
       }
-      return t.div(VB(1, MB(t)));
+      return t.div(tslMax(1, tslLength(t)));
     }
     field(e, t, n, r) {
       let i = X3(e),
@@ -185,7 +185,7 @@ var r6 = (e) => Math.floor(Y(Math.floor((e + ZF) / 2), 0, oz - 2) / q3),
         );
       i.instanceCount = 0;
       let d = (e.spread + 0.2 + 0.021 * e.wide) * 1.7,
-        f = eH(
+        f = addMesh(
           i,
           this.material(
             { field: e, inner: t, per: a, drawn: u, reach: d },
@@ -213,29 +213,29 @@ var r6 = (e) => Math.floor(Y(Math.floor((e + ZF) / 2), 0, oz - 2) / q3),
       let { far: c } = e,
         l = new nS({ roughness: 0.8, side: 2 }),
         u = r.element(OB.div(jV(n))),
-        d = OV(a, jB(kB(OB.mod(jV(n))), kB(u.z))),
+        d = OV(a, jB(tslInt(OB.mod(jV(n))), tslInt(u.z))),
         f = d.xy.add(u.xy),
-        p = MB(f.sub(this.cam.xz)),
+        p = tslLength(f.sub(this.cam.xz)),
         m = t6(o, f),
-        h = DV(s, w$(f)).level(Z(0)).r,
-        g = MU(f.mul(0.09))
+        h = tslTexture(s, w$(f)).level(tslFloat(0)).r,
+        g = valueNoise(f.mul(0.09))
           .mul(0.7)
-          .add(MU(f.mul(0.31)).mul(0.3)),
-        _ = UB(0.22, 0.85, Q(0.2, 0.8, g)).mul(d.z.mul(0.6).add(0.7)),
+          .add(valueNoise(f.mul(0.31)).mul(0.3)),
+        _ = tslMix(0.22, 0.85, tslSmoothstep(0.2, 0.8, g)).mul(d.z.mul(0.6).add(0.7)),
         v = TV(d.w, h.mul(g.mul(0.5).add(0.75))),
-        y = Q(c * 0.75, c, p).oneMinus(),
-        b = t > 0 ? Q(t * 0.8, t, p) : Z(1),
+        y = tslSmoothstep(c * 0.75, c, p).oneMinus(),
+        b = t > 0 ? tslSmoothstep(t * 0.8, t, p) : tslFloat(1),
         x = _.mul(v).mul(y).mul(b),
         S = oV,
         C = S.y.mul(S.y),
-        w = d.z.mul(DF),
-        T = NU(S.xz, hB(w), CV(w)),
+        w = d.z.mul(TAU),
+        T = NU(S.xz, hB(w), tslSin(w)),
         E = n6(f, d.z, C, x),
         D = x
           .mul(0.6)
           .add(1)
-          .mul(VB(1, p.div(9))),
-        O = t > 0 ? LV(0) : LV(0).toVar(),
+          .mul(tslMax(1, p.div(9))),
+        O = t > 0 ? tslVec2(0) : tslVec2(0).toVar(),
         ee = this.pressBox,
         te = f.x
           .greaterThan(ee.x)
@@ -243,28 +243,28 @@ var r6 = (e) => Math.floor(Y(Math.floor((e + ZF) / 2), 0, oz - 2) / q3),
           .and(f.x.lessThan(ee.z))
           .and(f.y.lessThan(ee.w)),
         ne = C.mul(x).mul(0.6),
-        re = $(
+        re = tslVec3(
           f.x.add(T.x.mul(D)).add(E.x).add(O.x.mul(ne)),
-          S.y.mul(x).mul(MB(O).mul(-0.45).add(1)).add(m).sub(0.02),
+          S.y.mul(x).mul(tslLength(O).mul(-0.45).add(1)).add(m).sub(0.02),
           f.y.add(T.y.mul(D)).add(E.z).add(O.y.mul(ne)),
         ),
         ie = t > 0 ? p.greaterThan(t * 0.8).and(p.lessThan(c)) : p.lessThan(c),
-        ae = KU($(f.x, m.add(0.55), f.y), VB(1, p.div(9)).mul(i).add(1.8)),
-        oe = Q(
+        ae = KU(tslVec3(f.x, m.add(0.55), f.y), tslMax(1, p.div(9)).mul(i).add(1.8)),
+        oe = tslSmoothstep(
           0.4,
           0.66,
-          MU(f.mul(0.011).add(3))
+          valueNoise(f.mul(0.011).add(3))
             .mul(0.6)
-            .add(MU(f.mul(0.03)).mul(0.4)),
+            .add(valueNoise(f.mul(0.03)).mul(0.4)),
         ),
-        se = Z(0).toVar();
-      l.positionNode = qz(() => {
-        let e = $(f.x, -1e5, f.y).toVar();
+        se = tslFloat(0).toVar();
+      l.positionNode = tslFn(() => {
+        let e = tslVec3(f.x, -1e5, f.y).toVar();
         return (
-          Jz(ie, () => {
-            Jz(ae, () => {
-              Jz(x.greaterThan(0.02), () => {
-                (t === 0 && Jz(te, () => O.assign(this.pushed(f))),
+          tslIf(ie, () => {
+            tslIf(ae, () => {
+              tslIf(x.greaterThan(0.02), () => {
+                (t === 0 && tslIf(te, () => O.assign(this.pushed(f))),
                   e.assign(re),
                   se.assign(oe));
               });
@@ -273,11 +273,11 @@ var r6 = (e) => Math.floor(Y(Math.floor((e + ZF) / 2), 0, oz - 2) / q3),
           e
         );
       })();
-      let ce = UB($(0.16, 0.24, 0.045), $(0.42, 0.33, 0.09), IV(se)).mul(
+      let ce = tslMix(tslVec3(0.16, 0.24, 0.045), tslVec3(0.42, 0.33, 0.09), IV(se)).mul(
           IV(d.w).mul(0.4).add(0.8),
         ),
-        le = FV().y,
-        ue = ce.mul(UB(0.36, 1.25, le)).add($(0.05, 0.04, 0).mul(le.mul(le)));
+        le = tslUv().y,
+        ue = ce.mul(tslMix(0.36, 1.25, le)).add(tslVec3(0.05, 0.04, 0).mul(le.mul(le)));
       return (
         (l.colorNode = ue),
         (l.normalNode = RU()),
@@ -309,7 +309,7 @@ function u6(e, t, n, r, i, a, o, s) {
 }
 function d6(e, t, n, r, i, a = r, o = 10) {
   return o6(
-    $V(t.clone().applyMatrix4(e), n.clone().applyMatrix4(e), r, a, o),
+    makeTube(t.clone().applyMatrix4(e), n.clone().applyMatrix4(e), r, a, o),
     i,
   );
 }
