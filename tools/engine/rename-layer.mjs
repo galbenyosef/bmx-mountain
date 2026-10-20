@@ -1,19 +1,23 @@
-// Shared rename-layer logic for the bmx-mountain mirror: tokenize,
-// apply, and verify a semantic rename map over the readable layer. (Copied +
-// adapted from the fleet's newest engine lineage — a-place-beyond / grid-academy
-// / embervale-adventure / call-of-roque / kals-valley / ziggy-card / stillwater
+// Shared rename-layer logic for the bmx-mountain mirror: tokenize, apply, and
+// verify a semantic rename map over the readable layer. (Copied + adapted from
+// the fleet's newest engine lineage — a-place-beyond / grid-academy /
+// embervale-adventure / call-of-roque / kals-valley / ziggy-card / stillwater
 // / madrid-rush / kowloon / vanta7 / skyforge / pelota
-// tools/engine/rename-layer.mjs, carrying the canonical guard family and ALL
-// recorded defect fixes: the brace-depth template scanner (vanta7, proposal
-// (r)), the marked FunctionDeclaration/ClassDeclaration ids (kowloon, proposal
-// (p)), the bracket-aware `:` object-key guard incl. applyBindingMap
-// (stillwater / madrid-rush), the reconstruction-time binding map (turfwar,
-// proposal (t)(1) — split-spec sources[].renameBindings), the `of`/`in`
-// KEYWORD-position guard in applyBindingMap (dune-arrakis, proposal (x)), the
-// TOKEN-BASED import-specifier extractor (embervale, proposal (ab) — a
-// text-level regex misreads UI copy as imports) and `recordCounts` (mindfall,
-// proposal (af) — flat counts must count OCCURRENCES on the base token stream,
-// not name keys); nothing is read from another mirror at runtime.)
+// tools/engine/rename-layer.mjs, and RE-SYNCED on 2026-10-20 with the current
+// fleet set (mirrors-standard/templates/rename-campaign/engine/rename-layer.mjs
+// — the newest lineage), carrying the canonical guard family and ALL recorded
+// defect fixes: the brace-depth template scanner (vanta7, proposal (r)), the
+// marked FunctionDeclaration/ClassDeclaration ids (kowloon, proposal (p)), the
+// bracket-aware `:` object-key guard incl. applyBindingMap (stillwater /
+// madrid-rush), the reconstruction-time binding map (turfwar, proposal (t)(1)
+// — split-spec sources[].renameBindings), the `of`/`in` KEYWORD-position guard
+// in applyBindingMap (dune-arrakis, proposal (x)), the TOKEN-BASED
+// import-specifier extractor (embervale, proposal (ab) — a text-level regex
+// misreads UI copy as imports), `recordCounts` (mindfall, proposal (af) — flat
+// counts must count OCCURRENCES on the base token stream, not name keys) and
+// the SPREAD-CALL property-access guard (wonderforge — `...HM(c)` is a CALL,
+// not a property read; matching it demoted a clean word-boundary rename to the
+// index-addressed map); nothing is read from another mirror at runtime.)
 //
 // A "rename layer" is what turns a prettified chunk range into a readable src/
 // slice. The campaign (tools/apply-names.mjs) renames a chunk's top-level
@@ -32,21 +36,27 @@
 // than inventing a plausible map — which is the difference between a verified
 // readable layer and one that merely looks right.
 //
-// Layout note (this mirror): the capture is ONE file — index.html — whose big
-// inline `<script type="module">` (2,697,801 B) carries the whole dependency
-// graph. That block is a single-file bundle behind a tiny `__defs`/`__req`
-// module registry: its first two statements (the registry object and the
-// loader) are wholeFile build machinery and the next twelve are the vendor
-// `__defs['<id>'] = function () { … };` module definitions (three.js r187dev
-// plus the ten examples/jsm addons), a VENDOR REGION claimed wholeFile, never
-// sliced. Everything after is the game's own ~526 KB of app code, sitting at
-// MODULE TOP LEVEL (no IIFE wrapper), so the chunk's program scope IS the
-// literal module scope and a slice is src/index-inline-1-NN.js. Sections in
-// split-spec.json carry the readable twin as their sourceFile (repo-relative)
-// and the src-relative section file. The loader machinery, the three.js vendor
-// region and the two inline stylesheets are wholeFile sections (never sliced);
-// the app chunk has no skipped section. The small service-worker registration
-// script (index-inline-2) and the captured sw.js are separate one-slice chunks.
+// Layout note (this mirror): the capture preserves the served URL structure —
+// the repo root IS the CDN host root (the game is served from a per-build
+// Wavedash CDN host), so the entry chunk is captured at
+// assets/index-gCVK5XnX.js (a custom Vite production build of the game, with
+// three.js r186 merged in) and its readable twin is
+// readable/assets/index-gCVK5XnX.pretty.js, while a slice is
+// src/assets/index-gCVK5XnX-NN.js. The entry chunk is a FLAT ESM module (1,016
+// top-level statements, no module-factory/registry table), so the chunk's
+// program scope IS the literal module scope and statement boundaries are the
+// true slice boundary. Two wholeFile bands sit above the app code: the Vite
+// modulepreload polyfill (one IIFE) and the bundled three.js r186 region; the
+// minifier merged the vendor band's last declarator with the app's physics
+// config into ONE `var`, so the app's first slice starts mid-declaration (a
+// recorded `boundary` fragment — still byte-exact and standalone-parsing). The
+// four module workers (cover / deerSkin / horizon / natural.worker-*.js) are
+// whole-program IIFEs, one slice each, re-rooted at the IIFE callee (proposals
+// (ag)/(ah)). The platform's embed.js / sw-embed.js / embed.css are wholeFile
+// sections (never sliced); the binary tex/*.webp and sfx/*.wav payloads are
+// hashed notRendered records. Sections in split-spec.json carry the readable
+// twin as their sourceFile (repo-relative) and the src-relative section file.
+//
 // Namespace guard (the one rule the writer and the appliers share): an
 // identifier before a ":" is treated as an object-literal key ONLY in property
 // position — inside braces with the previous token "{" or ",". Elsewhere
@@ -608,7 +618,11 @@ export function recoverSlice(range, committedBody) {
   // occurrence in the range, is never a property or object key, and is not the
   // ambiguous `c ? x : y` middle token.
   const isKey = (name) =>
-    new RegExp(`\\.\\s*${escapeRe(name)}\\b`).test(range) || new RegExp(`[{,]\\s*${escapeRe(name)}\\s*:`).test(range);
+    // A property access, but NOT the third dot of a spread operator: `...HM(c)`
+    // is a CALL, not a property read, and matching it demoted a clean
+    // word-boundary rename to the index-addressed map (wonderforge).
+    new RegExp(`(?<!\\.)\\.(?!\\.)\\s*${escapeRe(name)}\\b`).test(range) ||
+    new RegExp(`[{,]\\s*${escapeRe(name)}\\s*:`).test(range);
   const ambiguous = new Set();
   for (let i = 0; i < a.length; i++) {
     if (a[i].t !== "id") continue;

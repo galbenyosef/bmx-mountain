@@ -150,6 +150,7 @@ node tools/verify.mjs               # re-hash the capture against the manifest
 node tools/audit.js                 # derived-layer + rename-map integrity gate
 node tools/verify-rename.mjs --all  # per-slice rename reproduction + references/bindings
 node tools/check-chunk.mjs --all    # cross-slice calls resolve after renames
+node tools/refcheck.mjs             # scope/binding-drift library (the drift checks run inside the two above)
 node tools/record-manifest.mjs --check  # the committed manifest reproduces exactly
 ```
 
@@ -222,16 +223,26 @@ section is entirely about `readable/`, `src/`, `split-spec.json`,
   `rename-map.json` by mechanical token alignment (both sides must agree in
   every non-identifier position); `tools/derive.mjs` re-applies that map on
   every re-cut, so the layer is reproducible. The engine is the newest fleet
-  lineage (`templates/rename-campaign`, roadster-flying-car) carrying the
-  canonical guard family — marked Function/ClassDeclaration ids (p), the
-  brace-depth template scanner (r), ranged-declaration refusal + per-source line
-  cache (s), the index-only binding map (t1), `of`/`in` keyword safety (x),
-  token-wise import specifiers (ab), per-chunk target uniqueness (ad), flat
-  occurrence counting (af), fixed-point pretties (t3), the labeled-loop body
-  walk (aj — the voxelrush live fix) and whole-program-IIFE re-rooting (ag)/(ah).
+  lineage (`templates/rename-campaign`, roadster-flying-car; re-synced
+  2026-10-20) carrying the canonical guard family — marked
+  Function/ClassDeclaration ids (p), the brace-depth template scanner (r),
+  ranged-declaration refusal + per-source line cache (s), the index-only
+  binding map (t1), `of`/`in` keyword safety (x), token-wise import specifiers
+  (ab), per-chunk target uniqueness (ad), flat occurrence counting (af),
+  fixed-point pretties (t3), the labeled-loop body walk (aj — the voxelrush
+  live fix), the spread-call property-access guard (wonderforge — `...HM(c)`
+  is a call, not a property read) and whole-program-IIFE re-rooting (ag)/(ah).
   Renames applied: **67 (of 67 rules) over the entry chunk, 2,673 identifier
   occurrences**; the recovered map holds **619 word-boundary records, 0 indexed
-  records**, all index-validated by the audit. Highlights: `PHYSICS` (the
+  records**, all index-validated by the audit.
+  **Rules refused by the writer: 0 of 67** — the refusal preflight was clean
+  (every rule bound exactly one program-scope name; none sat in a shorthand
+  property, property access, object key or keyword position; none was bound in
+  more than one place; and every eligible occurrence of every named binding was
+  renamed, since a partial application is refused). So `tools/names.json` carries
+  an empty `refused` section and there is no per-rule refusal to record; the
+  bindings that were *not* renamed are scope decisions, not refusals (see the
+  deliberate non-renames below). Highlights: `PHYSICS` (the
   physics config object), the math/utility helpers read out of the
   minifier-merged `var` (`TAU`, `clamp`, `smoothstep`, `lerp`, `wrap`,
   `wrapAngle`, `lerpAngle`, `headingFromXZ`, `approach`, `approachExp`,
@@ -282,6 +293,51 @@ section is entirely about `readable/`, `src/`, `split-spec.json`,
   bundle's own minified names (their bindings are IIFE-locals, out of scope for
   this pass). The platform-only extras (cloud saves, other riders) still need a
   platform session, and the ~614 B upload-side remainder stays unreachable.
+
+### 2026-10-20 rename-campaign re-verification
+
+The rename layer was re-run end to end against the committed capture, and the
+toolchain was brought level with the current fleet set. The capture was not
+touched (`node tools/verify.mjs` still re-hashes all 79 files, 0 problems).
+
+- **The reviewed worklist was already applied — 67 of 67 rules, 0 refusals.**
+  `node tools/apply-names.mjs --all` reports *75 file(s) visited, 0 changed,
+  2,673 identifier splice(s) (app: 67 name(s) over 1 chunk(s))* — every rule
+  fires, every file already carries its rename, and the writer refuses
+  nothing. `node tools/recover-scoped-map.mjs` re-derives `rename-map.json`
+  mechanically (75 slices aligned over 249,743 token positions → 619
+  word-boundary records, 0 indexed records) and `node tools/derive.mjs`
+  re-derives the whole layer byte-identically: `src/`, `readable/`,
+  `split-spec.json` and `rename-map.json` come back unchanged, so the spec
+  still records all 67 bindings under `sources[].renameBindings`. The
+  worklist's outcome is now stated in `tools/names.json` itself (`__outcome`,
+  plus an explicit empty `refused` section — there is no per-rule refusal to
+  record).
+- **The engine was the one stale tool.** `tools/engine/rename-layer.mjs` was
+  still the 2026-10-15 copy and carried the roadster-flying-car layout note
+  (an inline `<script>` module, a `__defs`/`__req` registry, three.js r187dev —
+  none of which is true of this capture). It was re-synced with the current
+  fleet engine (`templates/rename-campaign/engine/rename-layer.mjs`), which
+  adds the spread-call property-access guard (wonderforge: `...HM(c)` is a
+  call, not a property read, and matching it demoted a clean word-boundary
+  rename to the index-addressed map), and the layout note was rewritten for
+  this mirror's real shape (served-path capture, flat ESM entry chunk, the
+  three.js r186 vendor band, four whole-program-IIFE workers). The fix is
+  provably a no-op here: none of the 67 names occurs after a dot anywhere in
+  the chunk, so the recovered map is byte-identical before and after.
+- **Gates (verbatim tails, 2026-10-20)**:
+
+  ```
+  node tools/verify.mjs         → 79 files checked, 0 problems
+  node tools/verify-rename.mjs --all → 75/75 slice(s) reproduce byte-exact, 67 renamed slice(s) (0 indexed occurrence(s)), 5/5 chunk(s) references+bindings YES
+  node tools/check-chunk.mjs --all   → 5 chunk(s), 75 slice body(ies) substituted — all cross-slice calls resolve
+  node tools/derive.mjs --check → 75/75 parse standalone, 75/75 round-trip byte-exact — self-check clean
+  node tools/audit.js           → AUDIT PASS — 82 spec sections (75/75 src↔pretty round-trips byte-exact through the recorded rename map, 67 renamed slice(s), …, rename map: 619 record(s) over 67 slice(s), all indices address the recorded identifiers and no foreign position, …)
+  node tools/record-manifest.mjs --check → record-manifest --check: 79 files match the committed record
+  ```
+
+  `node tools/refcheck.mjs` is a library (its scope/binding-drift checks run
+  inside `verify-rename` and `check-chunk`); it exits 0.
 
 ## Mirror conventions
 

@@ -69,6 +69,8 @@
     "vz": "49836: `{s:0,u:0}` creek-locator scratch — creekProbe",
     "sU": "52161: `[0,1,0]` scratch normal — scratchNormal"
   },
+  "__outcome": "Campaign result (re-verified 2026-10-20): 67 of 67 rules fired — 2,673 identifier splices over the one app chunk (readable/assets/index-gCVK5XnX.pretty.js), 619 word-boundary records and 0 indexed (scoped) records in rename-map.json, re-proved byte-exact by tools/verify-rename.mjs, tools/check-chunk.mjs and tools/audit.js. THE WRITER REFUSED 0 RULES, so there is nothing to record per rule; the refusal preflight was clean because every rule bound exactly one program-scope name, none sat in a shorthand-property, property-access, object-key or keyword position, none was bound in more than one place, and every eligible occurrence of every named binding was renamed (a partial application is refused, and `node tools/apply-names.mjs --all` exits 0 with no refusal output). The bindings that were NOT renamed are scope decisions rather than refusals — the bundled three.js vendor band (wholeFile), function-body locals, object keys and shorthand properties; see the README section 'What the campaign deliberately does not rename'.",
+  "refused": {},
   "app": {
     "readable/assets/index-gCVK5XnX.pretty.js": {
       "J": "PHYSICS",
