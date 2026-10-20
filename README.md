@@ -151,6 +151,7 @@ node tools/audit.js                 # derived-layer + rename-map integrity gate
 node tools/verify-rename.mjs --all  # per-slice rename reproduction + references/bindings
 node tools/check-chunk.mjs --all    # cross-slice calls resolve after renames
 node tools/refcheck.mjs             # scope/binding-drift library (the drift checks run inside the two above)
+node tools/check-exports.mjs        # the derived layer still exports every public name
 node tools/record-manifest.mjs --check  # the committed manifest reproduces exactly
 ```
 
