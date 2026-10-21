@@ -332,7 +332,7 @@ touched (`node tools/verify.mjs` still re-hashes all 79 files, 0 problems).
   node tools/verify.mjs         → 79 files checked, 0 problems
   node tools/verify-rename.mjs --all → 75/75 slice(s) reproduce byte-exact, 67 renamed slice(s) (0 indexed occurrence(s)), 5/5 chunk(s) references+bindings YES
   node tools/check-chunk.mjs --all   → 5 chunk(s), 75 slice body(ies) substituted — all cross-slice calls resolve
-  node tools/derive.mjs --check → 75/75 parse standalone, 75/75 round-trip byte-exact — self-check clean
+  node tools/derive.mjs --check → re-derives in a throwaway scratch copy outside the mirror and compares the result with the committed tree — DERIVE CHECK PASS (nothing written)
   node tools/audit.js           → AUDIT PASS — 82 spec sections (75/75 src↔pretty round-trips byte-exact through the recorded rename map, 67 renamed slice(s), …, rename map: 619 record(s) over 67 slice(s), all indices address the recorded identifiers and no foreign position, …)
   node tools/record-manifest.mjs --check → record-manifest --check: 79 files match the committed record
   ```
