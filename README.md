@@ -143,6 +143,14 @@ then open `http://127.0.0.1:8747/`. The game boots straight from local files
 (no platform session — the platform-only extras such as cloud saves and other
 riders stay external).
 
+## Boot test (2026-10-27)
+
+- Entry: `http://127.0.0.1:4732/index.html` served by `tools/serve.mjs` with the network blocked (`MAP * 127.0.0.1`).
+- Outcome: **rendered** — the 3D mountain trail rendered live with the rider on the ground and the "Space get back on" prompt; the game opened on its pause menu and resumed into gameplay.
+- Evidence: body 1,094 chars; canvas 1224x550; 0 console errors (1 THREE.TSL warning); 0 failed same-origin requests, 0 blocked cross-origin (no external host was contacted); screenshot `docs/boot-2026-10-27.png`.
+- Gaps seen: none.
+- The README's "the game boots straight from local files" claim is confirmed: the capture rendered offline with no platform session, and the pause menu's Resume control resumed play locally.
+
 ## Verify
 
 ```
